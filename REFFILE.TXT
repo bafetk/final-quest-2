@@ -1,0 +1,703 @@
+Here is a list of functions, examples, and instructions to get
+you started with REF programming.
+
+All commands MUST be capitalized in the REF file. Use a text editor.
+
+Contents:
+
+Section 1
+
+    A. Introduction
+
+Section 2
+
+    A. Commands
+
+        1. #WAIT
+        2. #GOTO
+        3. #NEWPOS
+        4. #CLS
+        5. #PRINT
+        6. #GOLD+,-
+        7. #WEAPON,+,-
+        8. #ARMOR,+,-
+        9. #CHOICE
+       10. #WRITE
+       11. #RETURN
+       12. #DONE
+       13. @IPS
+       14. #ANIMATE, #DONEANIMATE
+       15. #MOVEOBJ, #DONEMOVE
+       16. #SET
+       17. #IF
+       18. #MONSTER
+       19. #RUNREF
+       20. #RANDOMIF
+       21. @IF
+       22. #SHOW
+       23. #NOLINE
+       24. #SHELL
+       25. #CLEAR
+       26. @GOTO
+       27. #SLEEP
+
+    B. @#INTRO, @#INVSCR, @#HELP, @#MAP
+
+    C. Instructions
+        
+        1. Limits, MUST READ!!!
+    
+    D. Using Color and Variables in your PRINT and WRITE statements..
+
+--------------------------------------------------------------------------------
+
+Section 1
+
+A. Introduction
+
+    I created this REF file so that I wouldn't have to keep on going into
+the program and editing it every time I wanted the program to do something
+else.  I was also very low on space available for the program.  I still am
+right now.  I only have enough memory for about one more screen load. This
+really helps me a lot because I no longer have to worry about memory, and
+I am not limited to what I can do in a program.  I am sure you will find
+it very useful.
+
+Section 2
+
+A. Commands
+
+    I created a bunch of commands to help you with your programming.  With-
+out these functions, REF programming would not be possible.  In this file
+are detailed discriptions of each command.
+
+
+
+1. #WAIT
+
+Syntax:  
+
+#WAIT #
+
+if # is 1 then a cursor will show
+if # is 0 then a cursor will not show
+
+    Typed like it appears, this function needs no interduction.  To use this
+fucntion, just type it in.  It will wait for a keypress in the program.
+
+
+
+2. #GOTO
+
+Syntax:
+
+#GOTO ##
+
+    This function allows you to goto a different screen in the program. Valid
+screen numbers are from 1-100.  When you use this function, it will reload
+the screen to that screen, and then you will be running under those functions
+from that screen.
+
+
+
+3. #NEWPOS
+
+Syntax:
+
+#NEWPOS ## ##
+
+    To change your position in the game, warps ... going to a different screen
+etc., you will find the NEWPOS function very handy, the first number being
+x and the second number being y.  It is as easy in that, details will be
+described in the Limits Section.
+
+
+
+4. #CLS
+
+Syntax:
+
+#CLS
+
+    No description necesary.  I think this command is pretty self explanitory.
+
+
+
+5. #PRINT
+
+Syntax:
+
+#PRINT
+ #
+SOMETEXT
+
+    This function allows you to print stuff out on the screen.  To use this
+function, you must first decide how many lines you are going to print, as
+you can only print once on a screen.  For instance, if I was going to print:
+
+Hello, How are you
+I am fine
+
+Can I have a drink?
+
+would appear in the REF file as 
+
+#PRINT
+ 4
+Hello, How are you
+I am fine
+
+Can I have a drink?
+
+
+
+6. #GOLD+,-
+
+Syntax:
+
+#GOLD+ #
+
+    Use this function to give your player gold, or the basic "money" of the
+game.  The # would be replaced with how much gold you wanted to give them.
+
+#GOLD- #
+
+    Use this function when somebody buys something, or when you want to simply
+take away some gold.  It has an automatic checker to see if the user has
+enough gold.  If the user doesn't, then it will simply print to the screen
+"Not enough gold, press a key..."
+
+
+7. #WEAPON, #WEAPON+, #WEAPON-
+
+Syntax:
+
+#WEAPON #
+
+    Use this to change a users weapon from 1-4, one being the weakest, 4
+being the strongest.
+
+#WEAPON+ #
+
+    Use this to add # to the weapon for instance, weapon 1 + 3 = weapon 4
+
+#WEAPON- #
+
+    Use this to subtract # from the weapon for instance,
+    weapon 3 - 1 = weapon 2
+
+
+8. #ARMOR, #ARMOR+, #ARMOR-
+
+Syntax:
+
+#ARMOR #
+
+    Use this to change a users armor from 1-4, one being the weakest, 4
+being the strongest.
+
+#ARMOR+ #
+
+    Use this to add the armor number, for instance armor 3 + 1 = armor 4
+
+#ARMOR- #
+
+    Use this to subtract the armor number, for instance armor 3 - 1 = armor 2
+
+
+
+9. #CHOICE
+
+Syntax:
+
+#CHOICE
+ #
+######...
+...
+#IF number
+PROGRAMMING
+@DONE
+#IF number
+PROGRAMMING
+@DONE
+@DONECHOICE
+
+        #CHOICE replaces the old #NOP function.  Instead of being limited,
+you can use your programming powers...  with choice, you first enter the
+amount of options that you want.. for instance 2, and then enter the options
+in, for instance: Buy RPG and leave, like this
+
+#CHOICE
+ 2
+Buy RPG
+Leave
+
+        then, you use if to do what your option says...  It searches the file
+for the next "IF 1", or "IF 2" and so on...
+
+#IF 1
+#CLS
+#PRINT
+ 3
+Here, try out your new RPG
+
+Now wheres that 20000
+#WAIT
+#GOLD- 20000
+@DONE
+#IF 2
+@DONE
+@DONECHOICE
+
+
+10. #WRITE
+
+Syntax:
+
+#WRITE
+SOMETEXT
+
+    Use this function to print stuff in the status display box at the bottom
+of the screen during gameplay.  It will say it if you nock up against some-
+thing, and also when you go onto something.  Whether you "knock-up" against
+them or go "onto" them depends in the space is hard or not specified in the
+level editor.  Enter the text you want in the "SOMETEXT" position.  You must
+not use a comma ",".
+
+
+
+11. #RETURN
+
+Syntax:
+
+#RETURN
+
+    Use after IF (number) sections to return to first menu.
+
+
+
+12. #DONE
+
+Syntax:
+
+#DONE
+
+    Used to end an @IPS function
+
+
+
+13. @IPS
+
+Syntax:
+
+@IPS ## ##
+PROGRAMMING
+#DONE
+
+    This is the most important function of them all.  the ## ## is X, then Y.
+In between the @IPS and #DONE, you do all your programming with the functions
+up above.  @IPS means "IF POSITION IS ## ## THEN DO THIS".
+
+
+
+14. #ANIMATE
+  
+Syntax:
+
+#ANIMATE
+ #
+PROGRAMMING
+#DONEANIMATE
+
+
+#DONEANIMATE is used to end #ANIMATE sequences.
+
+    Programming function to add animating in the program.  This function was
+added late in the development stage and has not been tested.  It may most
+likely not work correctly, but if it does...
+
+    The first # under "#animate" is used to tell the program whether to sleep
+1 second while before a function is run. If it is "1" then the program will
+wait 1 second and then continue.  If it is 0 or anything else, it will not.
+
+    The "PROGRAMMING" stands for any regular function that is in the program,
+etc. #PRINT,#CLS,#WRITE.  #NOP will not work, do not use this function in an
+animated process.  I'm not sure what will happen.
+
+
+15.  #MOVEOBJ
+
+Syntax:
+
+#MOVEOBJ
+ #
+ ## ##
+ ## ##
+#DONEMOVE
+
+#DONEMOVE is used to end the #MOVEOBJ sequence
+
+    Used to move the object at X,Y to another place on the screen.
+    # - Number of Seconds to halt computer (for animation). This value
+        can be anywhere from 0.01 to infinite. (added as of Rev 0.92C)
+    ## ## - X and Y coordinates, where the object is on the cur screen
+    ## ## - X and Y coordinates, where to move the object..
+
+
+
+16.  #SET
+
+Syntax:
+
+#SET ## +,-,=,+1,-1,=1 ##;
+
+    Use to set a variable in the game.  For instance...
+
+#SET SOMETHING + 36;
+
++ = add number on right side to variable on left side
+- = subtract number on right side from variable on left side
+= = Set variable on left to number on right
+=1 = Set variable on left to VARIABLE on right
+-1 = Subtract from variable on left the value of the variable on right
++1 = Add to variable on left the value of the variable on right
+
+17.  #IF
+
+Syntax:
+
+#IF ## =,>,<,>=,<=,<1,<2,>1,>2,=1 ## THEN
+
+#ENDIF
+
+Like....
+
+#IF SOMETHING = 36 THEN
+#WRITE
+`!HELLO
+#ENDIF
+
+= = IF variable value on left is equal to the NUMERAL value on right THEN
+> = IF variable value on left is greater then the NUMERAL value on right THEN
+< = IF variable value on left is less then the NUMERAL value on right THEN
+<= = IF variable value on left is less then or equal to the NUMERAL value on right THEN
+>= = IF variable value on left is greater then or equal to the NUMERAL value on right THEN
+=1 = IF variable value on left is equal to the variable value on the right THEN
+<1 = IF variable value on left is less then or equal to the variable value on the right THEN
+>1 = IF variable value on left is greater then or equal to the variable value on the right THEN
+<2 = IF variable value on left is less then the variable value on the right THEN
+>2 = IF variable value on left is greater then the variable value on the right THEN
+
+
+18.  #MONSTER
+
+Syntax:
+
+#MONSTER
+######
+######
+######
+######
+######
+
+        To specify a monster of your choice to fight during a game...
+
+#MONSTER
+I'm gonna rip off your balls..   ;what the monster says
+Pig Cop                          ;what the monster's name is
+35                               ;the monster's hitpoints
+62                               ;the gold you get for killing it.
+67                               ;experiece when monster defeated
+
+        Use MAXENERGY for the hitpoint place to make this monsters hitpoints
+   as much as yours..
+
+
+
+19.  #RUNREF
+
+Syntax:
+
+#RUNREF #######|#####
+
+        Use to run a REF file outside the FQREFS file..
+
+EG:
+
+#RUNREF FOREST.REF|WOMAN
+
+
+
+20. #RANDOMIF
+
+Syntax:
+
+#RANDOMIF #
+###
+#ENDRANDOM
+
+        Use this command to have a random sequence in the game, for instance.
+
+#RANDOMIF 6
+#WRITE
+`CHello
+#ENDRANDOM
+
+        The above program will have a 1/6 chance of writeing "Hello" on the
+        screen..
+
+
+21.  @IF
+
+Syntax:
+
+Same as #IF except occours outside of @IPS statements...
+
+
+
+22. #SHOW
+
+Syntax:
+
+
+#SHOW Somefilename|somelabelname
+
+
+Use show to show different pictures in game... somelabelname is for example..
+
+JEFF
+
+and it would look for
+
+@#JEFF
+
+in the Somefilename file..
+
+
+23. #NOLINE
+
+This will delete the status barr at the bottom of the screen...  Run it in a
+@DO statement..
+
+
+24. #SHELL
+
+Syntax:
+
+#SHELL SOMEPROGRAMNAME
+
+        Use this command to run programs outside the ref language..
+
+
+25. #CLEAR
+
+Syntax:
+
+#CLEAR SOMELINE
+
+        Use this to clear a line on the screen...
+
+
+26. @GOTO
+
+Syntax:
+
+@GOTO SOMELABEL
+
+        Use this to goto a labeled spot in the ref file...
+EG.
+
+@GOTO AKORI
+
+It will look for @#AKORI in the reffile...
+
+
+27. #SLEEP
+
+Syntax:
+
+#SLEEP #
+
+        Where # is the amount of seconds to wait at a certain position...
+
+Eg.  #SLEEP .5    ...  will halt the computer for .5 seconds.   This has the
+                       same effect when using #MOVEOBJ as of Ver .92C
+
+
+------------------------------------------------------------------------------
+B. @#INTRO, @#INVSCR, @#HELP, @#MAP
+
+@#INTRO...
+
+Intro is what is on the Main menu screen...
+
+You do it like this..
+
+@#INTRO #  ;# is some number from 1 to 25, howmany lines of graphics there are.
+15;1       ;Color of an option currently selected  foregroud;background
+15;0       ;Color of an option not currently selected  foregroud;background
+11;33      ;(Y;X) Position of "Begin Game" on screen
+12;33      ;(Y;X) Position of "Save Game" on screen
+13;33      ;(Y;X) Position of "Load Game" on screen
+14;33      ;(Y;X) Position of "Help" on screen
+15;33      ;(Y;X) Position of "Resume Game" on screen
+16;33      ;(Y;X) Position of "Quit" on screen  
+########   ;The screen graphics...
+@END       ;End function
+
+@#INVSCR
+
+Invscr is what is on the Inventory screen when you hit I in a game...
+
+Like this..
+
+
+@#INVSCR #   ;# is how many number of lines you have to program...
+###########  ;programming, graphics...
+@END         ;End function
+
+
+@#HELP
+This is what is shown in the help menu option...
+@END
+
+@#MAP
+This displays on the map screen...
+@END
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+C. Instructions
+
+1. Limits, MUST READ!!!
+
+    You must be very persistant and very careful when you are programming in 
+REF, because if you aren't, the program is likely to really "SCREW..."
+
+Here is a sample REF procedure for if you were to move to x3,y20...
+
+@IPS 3 20
+#CLS
+#PRINT 2
+`1Hello, How are you?
+ 
+#CHOICE
+ 2
+Respond "Fine"
+Leave...
+#IF 2
+@DONE
+#IF 1
+#CLS
+#PRINT 4
+`2Me too.
+
+`3Tea??
+
+#CHOICE
+ 2
+YES
+NO
+#IF 2
+#PRINT
+ 4
+
+
+
+`@Ok.. that's fine... Press a key...
+#WAIT
+@DONE
+#IF 1
+#PRINT
+ 4
+
+
+
+`!Yes Please...
+#WAIT
+#CLS
+#PRINT
+ 1
+`$You leave content...
+#WAIT
+@DONE
+@DONECHOICE
+#DONE
+
+
+------------------------------------------------------------------------------
+D. The fundimentals of Colors and variables!!!
+
+    To use a color is simple, when using a write or print state ment, just
+put in a "`" without the quotes, followed by a symbol with the color you 
+want..
+
+1 = Dark Blue
+2 = Dark Green
+3 = Dark Cyan
+4 = Dark Red
+5 = Violet
+6 = Brown
+7 = White Grey
+8 = Dark Grey
+9 = Light Blue
+0 = Light Green
+! = Light Cyan
+@ = Light Magnenta
+# = Light Purple
+$ = Yellow
+% = White
+
+To change the background color in a statement, put `b# where # is
+1 TO 7..
+
+Variables...
+
+Using a "`" and then one of these letters will do something...
+
+K = Clears the Screen
+F = Put HEX CHR on the screen
+E = Show's Experience
+N = will change color to a blinking color.. after N, put 1,2,#,$, so on...
+X = Change cursor x pos... must have two characters.. EG `X02
+Y = Change cursor y pos... must have two characters.. EG `Y03
+C = Center the Words on screen
+H = Show's hitpoints...
+G = Show's Gold...
+A = Show's Attack...
+D = Show's Defense...
+I = Show's Weapon Name
+Z = Show's Armor Name
+
+
+The "`v" function...
+
+You use this to show the what a user set variable in your program is...
+For instance...
+
+if WOMAN = 5, then you would put in `vWOMAN`  .. and you would get 5 in
+your print statement...
+
+                    ***** Special Note on `X and `Y *****
+
+You can use variables for your `X and `Y coordinates... For instance..
+
+@#SLEEPER
+#CLS
+#SET X = 1;
+#SET Y = 2;
+@#SLEEPER1
+#SLEEP 1
+#PRINT 1
+`X:X;`Y:Y;`$.
+#SET X + 1;
+#IF X = 10 THEN
+@GOTO DONE
+#ENDIF
+@GOTO SLEEPER1
+@#DONE
+@END
+
+
+End of Documentation
+

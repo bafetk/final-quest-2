@@ -1,0 +1,103 @@
+@#ARMOR
+#CLS
+#PRINT 6
+`%Welcome to Riply's `!A`#r`!m`#o`!u`#r`% Shop!!
+`%I sell the best armor... `$GUARANTEED!!!
+
+`2You have `$$`g`2.
+
+`4Your Choice:
+
+#CHOICE 4
+Buy Heavy Coat
+Buy Chain Mail
+Buy Death Armour
+Get outa here...
+#IF 1
+#CLS
+#PRINT 3
+`#A heavy coat for 100 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 100
+#ARMOR 2
+@DONE
+#IF 2
+#CLS
+#PRINT 3
+`#A Chainmail for 500 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 500
+#ARMOR 3
+@DONE
+#IF 3
+#CLS
+#PRINT 3
+`#Death Armour for 1000 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 1000
+#ARMOR 4
+@DONE
+#IF 4
+@DONE
+@DONECHOICE
+@END
+
+
+@#WEAPON
+#CLS
+#PRINT 10
+`@Welcome to the best `b1`!W`#e`!a`#p`!o`#n`b0 `@store in the entire world!
+`%Why don't you try some of my weapons... I have:
+
+`#A chaingun for 5000 Gold
+`#An RPG for 20000 Gold
+`#A shotgun for 1000 Gold
+
+`2You have `$`g`2 gold...
+
+`4Your Choice:
+#CHOICE 4
+Buy chaingun
+Buy RPG
+Buy shotgun
+Get outa here...
+#IF 1
+#CLS
+#PRINT 3
+`#A chaingun for 5000 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 5000
+#WEAPON 3
+@DONE
+#IF 2
+#CLS
+#PRINT 3
+`#An RPG for 20000 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 20000
+#WEAPON 4
+@DONE
+#IF 3
+#CLS
+#PRINT 3
+`#A shotgun for 1000 Gold... Here.. try it...
+
+`#Press a key
+#WAIT
+#GOLD- 1000
+#WEAPON 2
+@DONE
+#IF 4
+@DONE
+@DONECHOICE
+@END

@@ -1,493 +1,434 @@
-DECLARE SUB clump (CLUMP1$, posx, posy, size, collor)
-DECLARE SUB letters (which$, px, py, sz, col)
-DECLARE SUB inv ()
-DECLARE SUB query ()
-DIM SHARED save1name$, save2name$, save3name$, save4name$, save5name$
+DECLARE SUB setsettings ()
+DECLARE SUB cole (pressed, toprint$, cole1$)
+DECLARE SUB endscreen ()
+DECLARE SUB printer (da, towrite$, doingit)
+DECLARE SUB writer (towrite$)
+DIM map(1920)
+DIM map2(1920)
+DIM opt(2000)
+COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp
+COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, EXPER, k, x, y, monsters$
 RANDOMIZE TIMER
 cl$ = COMMAND$
-IF cl$ = "-DEBUGMODE" THEN
-INPUT "Enter Password: ", password$
-IF password$ = "CoMpUtEr!" THEN cc = 1
-IF NOT password$ = "CoMpUtEr!" THEN GOTO eeeeerrrrr
+IF UCASE$(cl$) = "-DEBUGMODE" THEN
+cc = 2
 END IF
-file$ = "fqmaps.dat"
-dddd$ = "fqmaps.dat"
 tt = 0
 dd = 0
-monsters$ = "ON"
-i = 1
-s = 0
-h = 250
-defs = 10
-z = 1
-w = 10
-rp = 12
-record = 1354
-y = 18
-x = 11
+EXPER = 0
+helpmecode = 1
+superhuman$ = "NO"
+monsters$ = "NO"
+doposx = 1
+
+OPEN "NOSCR.DAT" FOR BINARY AS #244
+IF LOF(244) < 2 THEN
+CLOSE #244
+KILL "NOSCR.DAT"
+GOTO noscrdat
+END IF
+CLOSE #244
+
+OPEN "VARIABLE.DAT" FOR BINARY AS #245
+IF LOF(245) < 2 THEN
+CLOSE #245
+KILL "VARIABLE.DAT"
+GOTO novariabledat
+END IF
+CLOSE #245
+
+OPEN "SETTINGS.DAT" FOR OUTPUT AS #5
+OPEN "VARIABLE.DAT" FOR INPUT AS #60
+INPUT #60, COMP1$
+INPUT #60, COMP2$
+INPUT #60, gamename$
+
+IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
+IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
+IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
+IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
+
+
+INPUT #60, version1$
+INPUT #60, version2$
+INPUT #60, revision$
+INPUT #60, superhuman$
+INPUT #60, superminus
+INPUT #60, h
+INPUT #60, hitmax
+INPUT #60, s
+INPUT #60, x
+INPUT #60, y
+dkdk = y - 1
+record = dkdk * 79 + x
+INPUT #60, w
+INPUT #60, defs
+INPUT #60, i
+INPUT #60, z
+INPUT #60, rp
+INPUT #60, thescreen
+INPUT #60, weapon1name$
+INPUT #60, weapon2name$
+INPUT #60, weapon3name$
+INPUT #60, weapon4name$
+INPUT #60, armour1name$
+INPUT #60, armour2name$
+INPUT #60, armour3name$
+INPUT #60, armour4name$
+INPUT #60, weapon1power
+INPUT #60, weapon2power
+INPUT #60, weapon3power
+INPUT #60, weapon4power
+INPUT #60, armour1power
+INPUT #60, armour2power
+INPUT #60, armour3power
+INPUT #60, armour4power
+gh:
+IF EOF(60) THEN GOTO gh1
+INPUT #60, data$
+PRINT #5, data$
+GOTO gh:
+gh1:
+CLOSE #60
+CLOSE #5
 Null$ = CHR$(0)
 CLS
 COLOR 14, 1
 LOCATE 1, 1
-PRINT "                          Final Quest 2 V0.9B Startup                           "
+PRINT "                                                                                "
+LOCATE 1, 24
+beginline$ = gamename$ + " " + version1$ + " " + revision$ + " Startup..."
+stg = LEN(beginline$)
+stxy = stg \ 2
+stxy = FIX(stxy)
+startx = 40 - stxy
+LOCATE , startx
+PRINT beginline$
 COLOR 7, 0
-IF cc = 1 THEN PRINT "Debug Mode on..."
+IF cc = 2 THEN PRINT "Debug Mode on..."
+IF cc = 2 THEN SLEEP 1
+
+
 PRINT "Looking for Level Map File..."; SPC(0);
-SHELL "if exist null. del null."
-SHELL "if exist n1 del n1."
-SHELL "if exist n2. del n2."
-OPEN "n1" FOR OUTPUT AS #1
-OPEN "n2" FOR OUTPUT AS #2
-bb = 2
-oo = 1
-PRINT #1, oo
-PRINT #2, bb
-CLOSE #1
-CLOSE #2
-SHELL "IF EXIST fqmaps.dat Rename n1. null."
-SHELL "IF NOT EXIST FQmaps.dat RENAME n2. null."
-OPEN "null" FOR INPUT AS #1
-INPUT #1, ifexist$
-CLOSE #1
-IF ifexist$ = "2" THEN GOTO errorer
-SHELL "if exist null. del null."
-SHELL "if exist n1 del n1."
-SHELL "if exist n2. del n2."
-SHELL "if exist more. del more."
+OPEN "FQMAPS.DAT" FOR BINARY AS #7
+IF LOF(7) < 2 THEN
+CLOSE #7
+KILL "FQMAPS.DAT"
+PRINT "Not Found."
+GOTO errorer
+END IF
+CLOSE #7
 PRINT "Found."
-PRINT "Querying Moble System..."
-query
-IF NOT cc = 1 THEN LOCATE 4, 1
-IF cc = 1 THEN LOCATE 5, 1
-PRINT "Moble System Queryed."
-PRINT "Looking for saved games, please hold..."; SPC(0);
-IF cc = 1 THEN PRINT
-IF cc = 1 THEN PRINT "Debug Mode: Deleting Old Data Files..."
-SHELL "if exist null. del null."
-SHELL "if exist null1. del null1."
-SHELL "if exist null2. del null2."
-SHELL "if exist null3. del null3."
-SHELL "if exist null4. del null4."
-SHELL "if exist n1 del n1."
-SHELL "if exist n2. del n2."
-SHELL "if exist n3. del n3."
-SHELL "if exist n4. del n4."
-SHELL "if exist n5. del n5."
-IF cc = 1 THEN PRINT "Debug Mode: Makeing New Data Files..."
-OPEN "n1" FOR OUTPUT AS #1
-OPEN "n2" FOR OUTPUT AS #2
-OPEN "n3" FOR OUTPUT AS #3
-OPEN "n4" FOR OUTPUT AS #4
-OPEN "n5" FOR OUTPUT AS #5
-oo = 1
-PRINT #1, oo
-PRINT #2, oo
-PRINT #3, oo
-PRINT #4, oo
-PRINT #5, oo
-IF cc = 1 THEN PRINT "Debug Mode: New Data Files Closing..."
-CLOSE #1
-CLOSE #2
-CLOSE #3
-CLOSE #4
-CLOSE #5
-OPEN "n0" FOR OUTPUT AS #1
-pp = 0
-PRINT #1, pp
-CLOSE #1
-IF cc = 1 THEN PRINT "Debug Mode: Renaming Files for Conformation..."
-SHELL "IF EXIST FQSAVE0.DAT rename n1. null."
-SHELL "IF NOT EXIST FQSAVE0.DAT copy n0. null.>more"
-SHELL "IF EXIST FQSAVE1.DAT rename n2. null1."
-SHELL "IF NOT EXIST FQSAVE1.DAT copy n0. null1>MORE"
-SHELL "IF EXIST FQSAVE2.DAT rename n3. null2."
-SHELL "IF NOT EXIST FQSAVE2.DAT copy n0. null2>MORE"
-SHELL "IF EXIST FQSAVE3.DAT rename n4. null3."
-SHELL "IF NOT EXIST FQSAVE3.DAT copy n0. null3>MORE"
-SHELL "IF EXIST FQSAVE4.DAT rename n5. null4."
-SHELL "IF NOT EXIST FQSAVE4.DAT copy n0. null4>MORE"
-IF cc = 1 THEN PRINT "Debug Mode: Reciving Data from Files..."
-OPEN "null" FOR INPUT AS #1
-INPUT #1, zz$
-OPEN "null1" FOR INPUT AS #2
-INPUT #2, yy$
-OPEN "null2" FOR INPUT AS #3
-INPUT #3, xx$
-OPEN "null3" FOR INPUT AS #4
-INPUT #4, ww$
-OPEN "null4" FOR INPUT AS #5
-INPUT #5, vv$
-IF cc = 1 THEN PRINT "Debug Mode: Closeing Files..."
-CLOSE #1
-CLOSE #2
-CLOSE #3
-CLOSE #4
-CLOSE #5
-IF cc = 1 THEN PRINT "Debug Mode: Deleting Files..."
-SHELL "if exist null. del null."
-SHELL "if exist null1. del null1."
-SHELL "if exist null2. del null2."
-SHELL "if exist null3. del null3."
-SHELL "if exist null4. del null4."
-SHELL "if exist n1. del n1."
-SHELL "if exist n2. del n2."
-SHELL "if exist n3. del n3."
-SHELL "if exist n4. del n4."
-SHELL "if exist n5. del n5."
-SHELL "if exist more. del more."
-SHELL "if exist n0. del n0."
-IF cc = 1 THEN PRINT "Debug Mode: Looking for Saved game Names..."
+IF cc = 2 THEN SLEEP 1
 
-save1name$ = "Empty..."
-save2name$ = "Empty..."
-save3name$ = "Empty..."
-save4name$ = "Empty..."
-save5name$ = "Empty..."
+PRINT "Building Map Dimension, Please wait..."; SPC(0);
+OPEN "fqmaps.dat" FOR BINARY AS #98
+im = 1
+csg:
+IF im >= LOF(98) THEN GOTO nx
+a$ = SPACE$(5)
+GET #98, im, a$
+type$ = LEFT$(a$, 1)
+number = VAL(RIGHT$(a$, 4))
+IF type$ = "1" THEN map(number) = 1
+IF type$ = "2" THEN map(number) = 2
+IF type$ = "3" THEN map(number) = 3
+map2(number) = im
+im = im + 5219
+GOTO csg
 
-IF zz$ = "1" THEN
-OPEN "FQSAVE0.DAT" FOR INPUT AS #2
-INPUT #2, save1name$
-CLOSE #2
-END IF
-IF yy$ = "1" THEN
-OPEN "FQSAVE1.DAT" FOR INPUT AS #2
-INPUT #2, save2name$
-CLOSE #2
-END IF
-IF xx$ = "1" THEN
-OPEN "FQSAVE2.DAT" FOR INPUT AS #2
-INPUT #2, save3name$
-CLOSE #2
-END IF
-IF ww$ = "1" THEN
-OPEN "FQSAVE3.DAT" FOR INPUT AS #2
-INPUT #2, save4name$
-CLOSE #2
-END IF
-IF vv$ = "1" THEN
-OPEN "FQSAVE4.DAT" FOR INPUT AS #2
-INPUT #2, save5name$
-CLOSE #2
-END IF
-
+nx:
 PRINT "Done."
-PRINT "Beta Version..."
-PRINT "Beginning Game..."
-SLEEP 1
-OPEN file$ FOR BINARY AS #1
+
+IF cc = 2 THEN SLEEP 1
+
+
+PRINT "Looking for Level Ref File..."; SPC(0);
+OPEN "FQREFS.DAT" FOR BINARY AS #9
+IF LOF(9) < 2 THEN
+CLOSE #9
+KILL "FQREFS.DAT"
+PRINT "Not Found."
+GOTO errorer1
+END IF
+CLOSE #9
+PRINT "Found."
+IF cc = 2 THEN SLEEP 1
+
+PRINT "Looking for saved games..."; SPC(0);
+
+
+FOR xv = 1 TO 5
+LOCATE , 27
+PRINT "Saved Game"; xv; SPC(0);
+IF cc = 2 THEN SLEEP 1
+xv$ = LTRIM$(RTRIM$(STR$(xv - 1)))
+OPEN "FQSAVE" + xv$ + ".DAT" FOR BINARY AS #1
+file$(xv) = "1"
+IF LOF(1) < 2 THEN
+CLOSE #1
+KILL "FQSAVE" + xv$ + ".DAT"
+file$(xv) = "0"
+END IF
+CLOSE #1
+NEXT xv
+
+
+
+save1name$ = "Empty"
+save2name$ = "Empty"
+save3name$ = "Empty"
+save4name$ = "Empty"
+save5name$ = "Empty"
+
+
+FOR bx = 1 TO 5
+IF file$(bx) = "1" THEN
+bx$ = LTRIM$(RTRIM$(STR$(bx - 1)))
+OPEN "FQSAVE" + bx$ + ".DAT" FOR BINARY AS #2
+save1name$ = SPACE$(15)
+GET #2, 1, save1name$
+save1name$ = LTRIM$(RTRIM$(save1name$))
+CLOSE #2
+END IF
+NEXT bx
+
+
+LOCATE , 27
+PRINT "Done.           "
+
+IF cc = 2 THEN LOCATE 6, 1
+PRINT COMP2$ + " Development " + version2$ + " " + revision$ + "..."
+PRINT "Loading Graphics..."
+
+
+IF cc = 2 THEN SLEEP 1
+
+
+OPEN "FQMAPS.DAT" FOR BINARY AS #1
 COLOR 7, 0
 CLS
 COLOR 15, 0
 o = 1
 load:
+IF cc = 2 THEN dd = 4
+COLOR 7, 0
 CLS
-SCREEN 12
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+findit1:
+IF EOF(36) THEN GOTO NOINTRO
+LINE INPUT #36, data$
+IF LEFT$(data$, 7) = "@#INTRO" THEN
+k = 1
+GOTO invscr3
+END IF
+GOTO findit1
+invscr3:
+
+INPUT #36, data$
+color11 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+color12 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+INPUT #36, data$
+color21 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+color22 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 
 
-'F
-LINE (0, 50)-(0, 430), 5
-LINE (0, 430)-(50, 430), 5
-LINE (50, 430)-(50, 220), 5
-LINE (50, 220)-(170, 220), 5
-LINE (170, 220)-(170, 170), 5
-LINE (170, 170)-(50, 170), 5
-LINE (50, 170)-(50, 100), 5
-LINE (50, 100)-(200, 100), 5
-LINE (200, 100)-(200, 50), 5
-LINE (200, 50)-(0, 50), 5
-'F 3d
-LINE (90, 390)-(90, 220), 5
-LINE (210, 180)-(210, 130), 5
-LINE (210, 130)-(90, 130), 5
-LINE (90, 130)-(90, 100), 5
-LINE (240, 60)-(240, 10), 5
-LINE (240, 10)-(40, 10), 5
-LINE (50, 430)-(90, 390), 5
-LINE (170, 220)-(210, 180), 5
-LINE (170, 170)-(210, 130), 5
-LINE (50, 170)-(90, 130), 5
-LINE (200, 100)-(240, 60), 5
-LINE (200, 50)-(240, 10), 5
-LINE (0, 50)-(40, 10), 5
-'Q
-LINE (419, 50)-(419, 430), 5
-LINE (419, 430)-(499, 430), 5
-LINE (569, 400)-(569, 80), 5
-LINE (569, 80)-(449, 80), 5
-LINE (449, 400)-(449, 80), 5
-LINE (449, 400)-(499, 400), 5
-LINE (419, 50)-(599, 50), 5
-LINE (599, 430)-(599, 50), 5
-LINE (544, 400)-(569, 400), 5
-LINE (544, 430)-(599, 430), 5
-LINE (544, 380)-(544, 400), 5
-LINE (499, 380)-(499, 400), 5
-LINE (544, 450)-(544, 430), 5
-LINE (499, 450)-(499, 430), 5
-LINE (544, 450)-(499, 450), 5
-LINE (544, 380)-(499, 380), 5
-LINE (544, 450)-(564, 430), 5
-'Q 3d
-LINE (544, 400)-(569, 375), 5
-LINE (489, 360)-(489, 80), 5
-LINE (489, 360)-(519, 360), 5
-LINE (459, 10)-(639, 10), 5
-LINE (639, 390)-(639, 10), 5
-LINE (569, 340)-(539, 340), 5
-LINE (539, 340)-(499, 380), 5
-LINE (569, 355)-(544, 380), 5
-LINE (419, 50)-(459, 10), 5
-LINE (599, 50)-(639, 10), 5
-LINE (599, 430)-(639, 390), 5
-LINE (449, 400)-(489, 360), 5
-'2
-LINE (260, 30)-(260, 50), 5
-LINE (260, 50)-(350, 50), 5
-LINE (260, 30)-(370, 30), 5
-LINE (350, 50)-(350, 100), 5
-LINE (370, 30)-(370, 120), 5
-LINE (370, 120)-(280, 120), 5
-LINE (350, 100)-(260, 100), 5
-LINE (260, 100)-(260, 190), 5
-LINE (260, 190)-(370, 190), 5
-LINE (370, 190)-(370, 170), 5
-LINE (370, 170)-(280, 170), 5
-LINE (280, 170)-(280, 120), 5
-'2 3d
-LINE (280, 10)-(260, 30), 5
-LINE (390, 10)-(370, 30), 5
-LINE (390, 100)-(370, 120), 5
-LINE (280, 10)-(390, 10), 5
-LINE (390, 10)-(390, 100), 5
-LINE (350, 80)-(280, 80), 5
-LINE (260, 100)-(280, 80), 5
-LINE (390, 170)-(390, 150), 5
-LINE (390, 150)-(300, 150), 5
-LINE (300, 150)-(300, 120), 5
-LINE (390, 170)-(370, 190), 5
-LINE (370, 170)-(390, 150), 5
-LINE (300, 150)-(280, 170), 5
-'"Main Menu" box
-LINE (110, 297)-(210, 297), 5
-LINE (210, 297)-(210, 337), 5
-LINE (210, 337)-(110, 337), 5
-LINE (110, 337)-(110, 297), 5
-'3d "Main Menu" box
-LINE (120, 287)-(220, 287), 5
-LINE (220, 287)-(220, 327), 5
-LINE (220, 327)-(210, 337), 5
-LINE (210, 297)-(220, 287), 5
-LINE (110, 297)-(120, 287), 5
-'Main Menu Box
-LINE (250, 240)-(250, 430), 5
-LINE (250, 430)-(370, 430), 5
-LINE (370, 430)-(370, 240), 5
-LINE (370, 240)-(250, 240), 5
-'Main Menu Box 3d
-LINE (390, 410)-(390, 220), 5
-LINE (390, 220)-(270, 220), 5
-LINE (250, 240)-(270, 220), 5
-LINE (370, 240)-(390, 220), 5
-LINE (370, 430)-(390, 410), 5
-'Paints for F
-PAINT (1, 1), 1, 5
-PAINT (550, 200), 1, 5
-PAINT (20, 40), 2, 5
-PAINT (20, 80), 4, 5
-PAINT (202, 49), 6, 5
-PAINT (150, 150), 2, 5
-PAINT (60, 150), 6, 5
-PAINT (190, 175), 6, 5
-PAINT (89, 250), 6, 5
-'Paints for menu box
-PAINT (260, 235), 2, 5
-PAINT (380, 235), 6, 5
-'Paints for "Menu BOX"
-PAINT (120, 290), 2, 5
-PAINT (219, 290), 6, 5
-'Paints for 2
-PAINT (265, 35), 11, 5
-PAINT (265, 26), 2, 5
-PAINT (375, 31), 6, 5
-PAINT (375, 155), 2, 5
-PAINT (375, 166), 6, 5
-PAINT (281, 155), 6, 5
-PAINT (281, 90), 2, 5
-'Paints for Q
-' LINE (419, 50)-(599, 50), 5
-PAINT (425, 55), 14, 5
-PAINT (425, 45), 2, 5
-PAINT (630, 45), 6, 5
-PAINT (455, 150), 6, 5
-PAINT (460, 399), 2, 5
-PAINT (510, 370), 2, 5
-PAINT (545, 390), 6, 5
-PAINT (555, 390), 2, 5
-PAINT (555, 431), 6, 5
+FOR isdf = 1 TO 6
+INPUT #36, data$
+opy = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+opx = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+opname$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";")), LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))  '- 1)
+IF isdf = 1 THEN
+op1y = opy
+op1x = opx
+op1name$ = opname$
+END IF
+IF isdf = 2 THEN
+op2y = opy
+op2x = opx
+op2name$ = opname$
+END IF
+IF isdf = 3 THEN
+op3y = opy
+op3x = opx
+op3name$ = opname$
+END IF
+IF isdf = 4 THEN
+op4y = opy
+op4x = opx
+op4name$ = opname$
+END IF
+IF isdf = 5 THEN
+op5y = opy
+op5x = opx
+op5name$ = opname$
+END IF
+IF isdf = 6 THEN
+op6y = opy
+op6x = opx
+op6name$ = opname$
+END IF
+NEXT
 
-clump "V0.9B", 580, 460, 30, 15
 
-GOTO load1
+
+
+'INPUT #36, data$
+'op1y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op1x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op1name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+'INPUT #36, data$
+'op2y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op2x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op2name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+'INPUT #36, data$
+'op3y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op3x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op3name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+'INPUT #36, data$
+'op4y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op4x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op4name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+'INPUT #36, data$
+'op5y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op5x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op5name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+'INPUT #36, data$
+'op6y = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+'op6x = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+'op6name$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
+
+
+invscr1:
+LINE INPUT #36, iner$
+IF iner$ = "@END" THEN GOTO waiter4
+printer 0, iner$, k
+k = k + 1
+GOTO invscr1
+waiter4:
 load1:
-n = 0
-COLOR 10
-LOCATE 27, 1
-COLOR 15
-IF cc = 1 THEN PRINT "Debug Mode On..."
-LOCATE 28, 1
-IF cc = 1 THEN PRINT "(S)et Settings..."
-IF cc = 1 THEN dd = 4
-PALETTE 0, 65536 * 63 + 256
-COLOR 15
-clump "Main Menu", 117, 312, 30, 15
+LOCATE 1, 1, 0
+N = 0
+COLOR color21, color22
+LOCATE op1y, op1x: PRINT op1name$
+LOCATE op2y, op2x: PRINT op2name$
+LOCATE op3y, op3x: PRINT op3name$
+LOCATE op4y, op4x: PRINT op4name$
+LOCATE op5y, op5x: PRINT op5name$
+LOCATE op6y, op6x: PRINT op6name$
+                             
+COLOR color11, color12
+LOCATE op1y, op1x: IF o = 1 THEN PRINT op1name$
+LOCATE op2y, op2x: IF o = 2 THEN PRINT op2name$
+LOCATE op3y, op3x: IF o = 3 THEN PRINT op3name$
+LOCATE op4y, op4x: IF o = 4 THEN PRINT op4name$
+LOCATE op5y, op5x: IF o = 5 THEN PRINT op5name$
+LOCATE op6y, op6x: IF o = 6 THEN PRINT op6name$
 
-clump "Begin Game", 257, 255, 30, 12
-clump "Save Game", 257, 285, 30, 12
-clump "Load Game", 257, 315, 30, 12
-clump "Help", 257, 345, 30, 12
-clump "Resume Game", 257, 375, 30, 12
-clump "Quit", 257, 405, 30, 12
-
-IF o = 1 THEN clump "Begin Game", 257, 255, 30, 15
-IF o = 2 THEN clump "Save Game", 257, 285, 30, 15
-IF o = 3 THEN clump "Load Game", 257, 315, 30, 15
-IF o = 4 THEN clump "Help", 257, 345, 30, 15
-IF o = 5 THEN clump "Resume Game", 257, 375, 30, 15
-IF o = 6 THEN clump "Quit", 257, 405, 30, 15
+IF cc = 2 THEN LOCATE 25, 1
+IF cc = 2 THEN COLOR 7, 0
+IF cc = 2 THEN PRINT "S - Set game settings"; SPC(0);
 DO
 check$ = INKEY$
 LOOP WHILE check$ = ""
 SELECT CASE check$
 CASE "S"
-IF cc = 1 THEN
-SCREEN 0
+IF cc = 2 THEN
 pk = 2
 GOTO setsettings
 END IF
-GOTO begin
+GOTO load1
 CASE "s"
-IF cc = 1 THEN
-SCREEN 0
+IF cc = 2 THEN
 pk = 2
 GOTO setsettings
 END IF
-GOTO begin
+GOTO load1
 CASE CHR$(27)
-SCREEN 0
 GOTO no1
 CASE CHR$(13)
-SCREEN 0
+COLOR 7, 0
 IF o = 1 GOTO noload
 IF o = 2 GOTO savegame11
 IF o = 3 GOTO yesload
 IF o = 4 GOTO help
-IF o = 5 THEN GOTO loadmap
+IF o = 5 THEN
+towait1 = FIX(TIMER)
+GOTO loadmap
+END IF
 IF o = 6 GOTO no1
 help:
-SCREEN 12
-clump "       Welcome to Final Quest 2 V0.9B by Akori Software.", 10, 10, 30, 2
-clump "                            KEYS:", 10, 50, 30, 10
-clump "                     " + CHR$(27) + " = Moves you Left", 10, 70, 30, 14
-clump "                     " + CHR$(26) + " = Moves you Right", 10, 90, 30, 14
-clump "                     " + CHR$(25) + " = Moves you Down", 10, 110, 30, 14
-clump "                     " + CHR$(24) + " = Moves you Up", 10, 130, 30, 14
-clump "                        I = Inventory", 10, 150, 30, 14
-clump "                      ESC = Quit to menu", 10, 170, 30, 14
-clump "                       Q = Quit to Menu", 10, 190, 30, 14
-clump "A Centery ago, a witch, the most lethal, attacked an old city. ", 10, 230, 30, 12
-clump "There, she built herself a castle and appointed herself ruler. ", 10, 250, 30, 12
-clump "Along came a hero. This hero worked hard and long on perserving", 10, 270, 30, 12
-clump "his country.  He eventually be came strong enough to confront", 10, 290, 30, 12
-clump "the witch.  From there, he defeated the witch and was declared", 10, 310, 30, 12
-clump "a hero.  This game tells the story of that witches daughter.", 10, 330, 30, 12
-clump "The secret and spoiled descendent of that witch.  She has", 10, 350, 30, 12
-clump "taken over the entire country now instead, and there are more", 10, 370, 30, 12
-clump "areas to explore and conquer.", 10, 390, 30, 12
-clump "Good Luck Adventurer.", 10, 430, 30, 14
-clump "Press any key...", 10, 450, 30, 15
+
+COLOR 7, 0
+CLS
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+findit13:
+IF EOF(36) THEN GOTO NOHELP
+LINE INPUT #36, data$
+IF LEFT$(data$, 6) = "@#HELP" THEN
+k = 1
+GOTO invscr4
+END IF
+GOTO findit13
+invscr4:
+LINE INPUT #36, iner1$
+IF iner1$ = "@END" THEN GOTO waiter6
+IF iner1$ = "@NEXT" THEN GOTO nexter52
+printer 0, iner1$, k
+k = k + 1
+GOTO invscr4
+waiter6:
+LOCATE 1, 1, 0
 i$ = INPUT$(1)
-SCREEN 0
 GOTO load
+nexter52:
+LOCATE 1, 1, 0
+i$ = INPUT$(1)
+GOTO invscr4
+CASE Null$ + CHR$(75)
+GOTO righter
+CASE Null$ + CHR$(77)
+GOTO lefter
+
 CASE Null$ + CHR$(72)
-IF o = 1 GOTO o6
-IF o = 2 GOTO o1
-IF o = 3 GOTO o2
-IF o = 4 GOTO o3
-IF o = 5 GOTO o4
-IF o = 6 GOTO o5
-o6:
-o = 6
+righter:
+IF o = 1 THEN o = 7
+o = o - 1
 GOTO load1
-o5:
-o = 5
-GOTO load1
-o1:
-o = 1
-GOTO load1
-o2:
-o = 2
-GOTO load1
-o3:
-o = 3
-GOTO load1
-o4:
-o = 4
-GOTO load1
+
 CASE Null$ + CHR$(80)
-IF o = 1 GOTO o25
-IF o = 2 GOTO o35
-IF o = 3 GOTO o45
-IF o = 4 GOTO o55
-IF o = 5 GOTO o65
-IF o = 6 GOTO o15
-o65:
-o = 6
+lefter:
+IF o = 6 THEN o = 0
+o = o + 1
 GOTO load1
-o55:
-o = 5
-GOTO load1
-o15:
-o = 1
-GOTO load1
-o25:
-o = 2
-GOTO load1
-o35:
-o = 3
-GOTO load1
-o45:
-o = 4
-GOTO load1
+
 CASE ELSE
 GOTO load1
 END SELECT
 savegame11:
-SCREEN 12
+CLS
 ooo = 1
+COLOR 10, 0
+LOCATE 9, 30: PRINT "Save a Game..."
+COLOR 4, 0
+LOCATE 17, 30: PRINT "Enter a Choice."
 savegame1:
-clump "Save a Game...", 250, 130, 30, 10
-clump "Enter a Choice.", 250, 290, 30, 4
-clump save1name$, 250, 170, 30, 15
-clump save2name$, 250, 190, 30, 15
-clump save3name$, 250, 210, 30, 15
-clump save4name$, 250, 230, 30, 15
-clump save5name$, 250, 250, 30, 15
+COLOR 15, 0
+LOCATE 11, 30: PRINT save1name$ + "..."
+LOCATE 12, 30: PRINT save2name$ + "..."
+LOCATE 13, 30: PRINT save3name$ + "..."
+LOCATE 14, 30: PRINT save4name$ + "..."
+LOCATE 15, 30: PRINT save5name$ + "..."
 
-IF ooo = 1 THEN
-clump save1name$, 250, 170, 30, 12
-END IF
-IF ooo = 2 THEN
-clump save2name$, 250, 190, 30, 12
-END IF
-IF ooo = 3 THEN
-clump save3name$, 250, 210, 30, 12
-END IF
-IF ooo = 4 THEN
-clump save4name$, 250, 230, 30, 12
-END IF
-IF ooo = 5 THEN
-clump save5name$, 250, 250, 30, 12
-END IF
+
+COLOR 12, 0
+LOCATE 11, 30: IF ooo = 1 THEN PRINT save1name$ + "..."
+LOCATE 12, 30: IF ooo = 2 THEN PRINT save2name$ + "..."
+LOCATE 13, 30: IF ooo = 3 THEN PRINT save3name$ + "..."
+LOCATE 14, 30: IF ooo = 4 THEN PRINT save4name$ + "..."
+LOCATE 15, 30: IF ooo = 5 THEN PRINT save5name$ + "..."
 
 
 DO
@@ -498,178 +439,89 @@ CASE CHR$(27)
 CLS
 GOTO load
 CASE CHR$(13)
-IF ooo = 1 THEN GOTO overwrite1
-IF ooo = 2 THEN GOTO overwrite2
-IF ooo = 3 THEN GOTO overwrite3
-IF ooo = 4 THEN GOTO overwrite4
-IF ooo = 5 THEN GOTO overwrite5
+IF ooo >= 1 AND ooo <= 5 THEN GOTO overwrite1
 GOTO load
 overwrite1:
-IF zz$ = "1" THEN clump "Overwrite Existing Saved Game? Y/N", 10, 10, 30, 2
-IF zz$ = "1" THEN i$ = INPUT$(1)
-i$ = UCASE$(i$)
-IF zz$ = "1" AND i$ = "Y" THEN pkd = 6
-IF zz$ = "1" THEN IF i$ = "Y" THEN GOTO saveover1
-IF zz$ = "1" THEN IF i$ = "N" THEN GOTO load
-IF zz$ = "1" THEN GOTO load
+IF file$(ooo) = "1" THEN GOTO zz
+
 GOTO saveover1
-overwrite2:
-IF yy$ = "1" THEN clump "Overwrite Existing Saved Game? Y/N", 10, 10, 30, 2
-IF yy$ = "1" THEN i$ = INPUT$(1)
+zz:
+LOCATE 1, 1
+COLOR 2, 0
+PRINT "Overwrite Existing Saved Game? Y/N"
+i$ = INPUT$(1)
 i$ = UCASE$(i$)
-IF yy$ = "1" AND i$ = "Y" THEN pkd = 6
-IF yy$ = "1" THEN IF i$ = "y" THEN GOTO saveover1
-IF yy$ = "1" THEN IF i$ = "Y" THEN GOTO saveover1
-IF yy$ = "1" THEN IF i$ = "n" THEN GOTO load
-IF yy$ = "1" THEN IF i$ = "N" THEN GOTO load
-IF yy$ = "1" THEN GOTO load
-GOTO saveover1
-overwrite3:
-IF xx$ = "1" THEN clump "Overwrite Existing Saved Game? Y/N", 10, 10, 30, 2
-IF xx$ = "1" THEN i$ = INPUT$(1)
-i$ = UCASE$(i$)
-IF xx$ = "1" AND i$ = "Y" THEN pkd = 6
-IF xx$ = "1" THEN IF i$ = "y" THEN GOTO saveover1
-IF xx$ = "1" THEN IF i$ = "Y" THEN GOTO saveover1
-IF xx$ = "1" THEN IF i$ = "n" THEN GOTO load
-IF xx$ = "1" THEN IF i$ = "N" THEN GOTO load
-IF xx$ = "1" THEN GOTO load
-GOTO saveover1
-overwrite4:
-IF ww$ = "1" THEN clump "Overwrite Existing Saved Game? Y/N", 10, 10, 30, 2
-IF ww$ = "1" THEN i$ = INPUT$(1)
-i$ = UCASE$(i$)
-IF ww$ = "1" AND i$ = "Y" THEN pkd = 6
-IF ww$ = "1" THEN IF i$ = "y" THEN GOTO saveover1
-IF ww$ = "1" THEN IF i$ = "Y" THEN GOTO saveover1
-IF ww$ = "1" THEN IF i$ = "n" THEN GOTO load
-IF ww$ = "1" THEN IF i$ = "N" THEN GOTO load
-IF ww$ = "1" THEN GOTO load
-GOTO saveover1
-overwrite5:
-IF vv$ = "1" THEN clump "Overwrite Existing Saved Game? Y/N", 10, 10, 30, 2
-IF vv$ = "1" THEN i$ = INPUT$(1)
-i$ = UCASE$(i$)
-IF vv$ = "1" AND i$ = "Y" THEN pkd = 6
-IF vv$ = "1" THEN IF i$ = "y" THEN GOTO saveover1
-IF vv$ = "1" THEN IF i$ = "Y" THEN GOTO saveover1
-IF vv$ = "1" THEN IF i$ = "n" THEN GOTO load
-IF vv$ = "1" THEN IF i$ = "N" THEN GOTO load
-IF vv$ = "1" THEN GOTO load
-GOTO saveover1
+IF i$ = "Y" THEN pkd = 6
+IF i$ = "Y" THEN GOTO saveover1
+GOTO savegame11
+
 CASE Null$ + CHR$(72)
-IF ooo = 1 GOTO oo5
-IF ooo = 2 GOTO oo1
-IF ooo = 3 GOTO oo2
-IF ooo = 4 GOTO oo3
-IF ooo = 5 GOTO oo4
-oo5:
-ooo = 5
+IF ooo = 1 THEN ooo = 6
+ooo = ooo - 1
 GOTO savegame1
-oo1:
-ooo = 1
-GOTO savegame1
-oo2:
-ooo = 2
-GOTO savegame1
-oo3:
-ooo = 3
-GOTO savegame1
-oo4:
-ooo = 4
-GOTO savegame1
+
+
 CASE Null$ + CHR$(80)
-IF ooo = 1 GOTO oo25
-IF ooo = 2 GOTO oo35
-IF ooo = 3 GOTO oo45
-IF ooo = 4 GOTO oo55
-IF ooo = 5 GOTO oo15
-oo55:
-ooo = 5
+IF ooo = 5 THEN ooo = 0
+ooo = ooo + 1
 GOTO savegame1
-oo15:
-ooo = 1
-GOTO savegame1
-oo25:
-ooo = 2
-GOTO savegame1
-oo35:
-ooo = 3
-GOTO savegame1
-oo45:
-ooo = 4
-GOTO savegame1
+
 CASE ELSE
 GOTO savegame1
 END SELECT
 saveover1:
-IF ooo = 2 THEN GOTO next2
-IF ooo = 3 THEN GOTO next3
-IF ooo = 4 THEN GOTO next4
-IF ooo = 5 THEN GOTO next5
-IF NOT zz$ = "1" THEN GOTO saveover1notexist
-GOTO saveover1go
-next2:
-IF NOT yy$ = "1" THEN GOTO saveover1notexist
-GOTO saveover1go
-next3:
-IF NOT xx$ = "1" THEN GOTO saveover1notexist
-GOTO saveover1go
-next4:
-IF NOT ww$ = "1" THEN GOTO saveover1notexist
-GOTO saveover1go
-next5:
-IF NOT vv$ = "1" THEN GOTO saveover1notexist
+IF file$(ooo) <> "1" THEN GOTO saveover1notexist
 GOTO saveover1go
 saveover1notexist:
 saveover1go:
-clump "Save a Game...", 250, 130, 30, 10
-clump "Enter a Choice.", 250, 290, 30, 4
-clump save1name$, 250, 170, 30, 15
-clump save2name$, 250, 190, 30, 15
-clump save3name$, 250, 210, 30, 15
-clump save4name$, 250, 230, 30, 15
-clump save5name$, 250, 250, 30, 15
-IF ooo = 1 THEN LINE (250, 170)-STEP(200, 14), 0, BF
-IF ooo = 2 THEN LINE (250, 190)-STEP(200, 14), 0, BF
-IF ooo = 3 THEN LINE (250, 210)-STEP(200, 14), 0, BF
-IF ooo = 4 THEN LINE (250, 230)-STEP(200, 14), 0, BF
-IF ooo = 5 THEN LINE (250, 250)-STEP(200, 14), 0, BF
+CLS
+COLOR 10, 0
+LOCATE 9, 30: PRINT "Save a Game..."
+COLOR 4, 0
+LOCATE 17, 30: PRINT "Enter a Choice."
+COLOR 15, 0
 
-IF ooo = 1 THEN linestart = 170
-IF ooo = 2 THEN linestart = 190
-IF ooo = 3 THEN linestart = 210
-IF ooo = 4 THEN linestart = 230
-IF ooo = 5 THEN linestart = 250
-xstart = 250
+LOCATE 11, 30: IF ooo <> 1 THEN PRINT save1name$ + "..."
+LOCATE 12, 30: IF ooo <> 2 THEN PRINT save2name$ + "..."
+LOCATE 13, 30: IF ooo <> 3 THEN PRINT save3name$ + "..."
+LOCATE 14, 30: IF ooo <> 4 THEN PRINT save4name$ + "..."
+LOCATE 15, 30: IF ooo <> 5 THEN PRINT save5name$ + "..."
+
+LOCATE ooo + 10, 30
+
 savename$ = ""
 wordenter:
-LINE (xstart, linestart + 14)-STEP(10, 2), 15, BF
+
 DO
+COLOR 15, 0
+LOCATE , , 1, 6, 7
 id$ = INKEY$
 LOOP WHILE id$ = ""
 
-LINE (xstart, linestart + 14)-STEP(10, 2), 0, BF
 
 IF id$ = CHR$(8) THEN
-IF xstart = 250 THEN GOTO wordenter
-xstart = xstart - 10
-LINE (xstart, linestart - 1)-STEP(9, 14), 0, BF
+IF POS(0) = 30 THEN GOTO wordenter
+LOCATE , POS(0) - 1, 1, 6, 7
+PRINT " "; SPC(0);
+LOCATE , POS(0) - 1, 1, 6, 7
 asdf = LEN(savename$)
 savename$ = LEFT$(savename$, asdf - 1)
 GOTO wordenter
 END IF
 
+
 IF id$ = CHR$(13) THEN GOTO pressenter
 
-savename$ = savename$ + id$
+IF LEN(savename$) >= 15 THEN GOTO wordenter
 
-letters id$, xstart, linestart, 30, 15
-xstart = xstart + 10
+savename$ = savename$ + id$
+LOCATE , , 1, 6, 7
+PRINT id$; SPC(0);
 GOTO wordenter
 
 pressenter:
-
+IF savename$ = "" THEN savename$ = "NoName"
+IF savename$ = "Empty" THEN savename$ = "NoName"
 IF ooo = 1 THEN save1name$ = savename$
 IF ooo = 2 THEN save2name$ = savename$
 IF ooo = 3 THEN save3name$ = savename$
@@ -680,96 +532,114 @@ IF ooo = 2 THEN SHELL "IF EXIST FQSAVE1.DAT DEL FQSAVE1.DAT"
 IF ooo = 3 THEN SHELL "IF EXIST FQSAVE2.DAT DEL FQSAVE2.DAT"
 IF ooo = 4 THEN SHELL "IF EXIST FQSAVE3.DAT DEL FQSAVE3.DAT"
 IF ooo = 5 THEN SHELL "IF EXIST FQSAVE4.DAT DEL FQSAVE4.DAT"
-IF ooo = 1 THEN OPEN "FQSAVE0.DAT" FOR OUTPUT AS #2
-IF ooo = 2 THEN OPEN "FQSAVE1.DAT" FOR OUTPUT AS #2
-IF ooo = 3 THEN OPEN "FQSAVE2.DAT" FOR OUTPUT AS #2
-IF ooo = 4 THEN OPEN "FQSAVE3.DAT" FOR OUTPUT AS #2
-IF ooo = 5 THEN OPEN "FQSAVE4.DAT" FOR OUTPUT AS #2
-IF i = 1 THEN i = 2783234
-IF i = 2 THEN i = 6766233
-IF i = 4 THEN i = 9607033
-IF i = 3 THEN i = 7223546
-s = s + 578345
-h = h + 368833
-w = w + 670022
-x = x + 562026
-y = y + 390847
-defs = defs + 602332
-record = record + 623495
-rp = rp + 259072
-IF z = 1 THEN z = 537683
-IF z = 2 THEN z = 691152
-IF z = 3 THEN z = 767911
-IF z = 4 THEN z = 296922
-IF monsters$ = "ON" THEN monsters$ = "gJlgggGGGQ#%%"
-IF monsters$ = "OFF" THEN monsters$ = "jgMflsoT&"
-PRINT #2, savename$
-PRINT #2, monsters$
-PRINT #2, i
-PRINT #2, s
-PRINT #2, h
-PRINT #2, x
-PRINT #2, y
-PRINT #2, w
-PRINT #2, z
-PRINT #2, record
-PRINT #2, rp
-PRINT #2, defs
-CLOSE #2
-IF i = 9607033 THEN i = 4
-IF i = 6766233 THEN i = 2
-IF i = 2783234 THEN i = 1
-IF i = 7223546 THEN i = 3
-defs = defs - 602332
-IF monsters$ = "gJlgggGGGQ#%%" THEN monsters$ = "ON"
-IF monsters$ = "jgMflsoT&" THEN monsters$ = "OFF"
-s = s - 578345
-h = h - 368833
-w = w - 670022
-x = x - 562026
-y = y - 390847
-record = record - 623495
-rp = rp - 259072
-IF z = 537683 THEN z = 1
-IF z = 691152 THEN z = 2
-IF z = 767911 THEN z = 3
-IF z = 296922 THEN z = 4
-IF ooo = 1 THEN zz$ = "1"
-IF ooo = 2 THEN yy$ = "1"
-IF ooo = 3 THEN xx$ = "1"
-IF ooo = 4 THEN ww$ = "1"
-IF ooo = 5 THEN vv$ = "1"
-SCREEN 0
+ooo$ = LTRIM$(RTRIM$(STR$(ooo - 1)))
+OPEN "FQSAVE" + ooo$ + ".DAT" FOR BINARY AS #2
+IF monsters$ = "YES" THEN monsters5$ = "1"
+IF monsters$ = "NO" THEN monsters5$ = "0"
+
+'easy
+EXPER$ = MKD$(EXPER)
+i$ = MKD$(i)
+s$ = MKD$(s)
+h$ = MKD$(h)
+x$ = MKD$(x)
+y$ = MKD$(y)
+w$ = MKD$(w)
+z$ = MKD$(z)
+record$ = MKD$(record)
+rp$ = MKD$(rp)
+defs$ = MKD$(defs)
+
+
+toput$ = savename$ + STRING$(15 - LEN(savename$), " ")
+PUT #2, 1, toput$
+PUT #2, 16, EXPER$
+PUT #2, 24, i$
+PUT #2, 32, s$
+PUT #2, 40, h$
+PUT #2, 48, x$
+PUT #2, 56, y$
+PUT #2, 64, w$
+PUT #2, 72, z$
+PUT #2, 80, record$
+PUT #2, 88, rp$
+PUT #2, 96, defs$
+PUT #2, 104, monsters5$
+
+OPEN "SETTINGS.DAT" FOR INPUT AS #222
+
+records = 0
+nexter4:
+IF EOF(222) THEN GOTO nexter5
+INPUT #222, junk$
+INPUT #222, junk$
+records = records + 1
+GOTO nexter4
+
+nexter5:
+
+
+CLOSE #222
+OPEN "SETTINGS.DAT" FOR INPUT AS #222
+records$ = CHR$(records)
+
+
+PUT #2, 105, records$
+
+filespace = 106
+
+nnx = 0
+continue:
+IF nnx = records THEN GOTO done
+LINE INPUT #222, data$
+LINE INPUT #222, data1$
+data$ = RTRIM$(LTRIM$(data$))
+data1 = VAL(data1$)
+dat$ = MKD$(data1)
+xb = LEN(data$)
+xb$ = LTRIM$(CHR$(xb))
+PUT #2, filespace, xb$
+filespace = filespace + 1
+PUT #2, filespace, data$
+filespace = filespace + xb
+PUT #2, filespace, dat$
+filespace = filespace + 8
+nnx = nnx + 1
+GOTO continue
+
+done:
+
+
+
+CLOSE #2, #222
+
+file$(ooo) = "1"
 GOTO load
 
 yesload:
 loadgame11:
-SCREEN 12
+CLS
 op = 1
+COLOR 10, 0
+LOCATE 9, 30: PRINT "Load a Game..."
+COLOR 4, 0
+LOCATE 17, 30: PRINT "Enter a Choice."
 loadgame1:
-clump "Load a Game...", 250, 130, 30, 10
-clump "Enter a Choice.", 250, 290, 30, 4
-clump save1name$, 250, 170, 30, 15
-clump save2name$, 250, 190, 30, 15
-clump save3name$, 250, 210, 30, 15
-clump save4name$, 250, 230, 30, 15
-clump save5name$, 250, 250, 30, 15
+COLOR 15, 0
+LOCATE 11, 30: PRINT save1name$ + "..."
+LOCATE 12, 30: PRINT save2name$ + "..."
+LOCATE 13, 30: PRINT save3name$ + "..."
+LOCATE 14, 30: PRINT save4name$ + "..."
+LOCATE 15, 30: PRINT save5name$ + "..."
 
-IF op = 1 THEN
-clump save1name$, 250, 170, 30, 12
-END IF
-IF op = 2 THEN
-clump save2name$, 250, 190, 30, 12
-END IF
-IF op = 3 THEN
-clump save3name$, 250, 210, 30, 12
-END IF
-IF op = 4 THEN
-clump save4name$, 250, 230, 30, 12
-END IF
-IF op = 5 THEN
-clump save5name$, 250, 250, 30, 12
-END IF
+
+COLOR 12, 0
+LOCATE 11, 30: IF op = 1 THEN PRINT save1name$ + "..."
+LOCATE 12, 30: IF op = 2 THEN PRINT save2name$ + "..."
+LOCATE 13, 30: IF op = 3 THEN PRINT save3name$ + "..."
+LOCATE 14, 30: IF op = 4 THEN PRINT save4name$ + "..."
+LOCATE 15, 30: IF op = 5 THEN PRINT save5name$ + "..."
+
 
 DO
 docheck$ = INKEY$
@@ -778,583 +648,499 @@ SELECT CASE docheck$
 CASE CHR$(27)
 GOTO load
 CASE CHR$(13)
-IF op = 1 THEN GOTO gameload1
-IF op = 2 THEN GOTO gameload1
-IF op = 3 THEN GOTO gameload1
-IF op = 4 THEN GOTO gameload1
-IF op = 5 THEN GOTO gameload1
+IF op >= 1 AND op <= 5 THEN GOTO gameload1
 GOTO load
 CASE Null$ + CHR$(72)
-IF op = 1 THEN GOTO op5
-IF op = 2 THEN GOTO op1
-IF op = 3 THEN GOTO op2
-IF op = 4 THEN GOTO op3
-IF op = 5 THEN GOTO op4
-GOTO load
-op5:
-op = 5
+IF op = 1 THEN op = 6
+op = op - 1
 GOTO loadgame1
-op1:
-op = 1
-GOTO loadgame1
-op2:
-op = 2
-GOTO loadgame1
-op3:
-op = 3
-GOTO loadgame1
-op4:
-op = 4
-GOTO loadgame1
+
 CASE Null$ + CHR$(80)
-IF op = 1 THEN GOTO op21
-IF op = 2 THEN GOTO op31
-IF op = 3 THEN GOTO op41
-IF op = 4 THEN GOTO op51
-IF op = 5 THEN GOTO op11
-GOTO load
-op51:
-op = 5
+
+IF op = 5 THEN op = 0
+op = op + 1
 GOTO loadgame1
-op11:
-op = 1
-GOTO loadgame1
-op21:
-op = 2
-GOTO loadgame1
-op31:
-op = 3
-GOTO loadgame1
-op41:
-op = 4
-GOTO loadgame1
+
+
 CASE ELSE
 GOTO loadgame1
 END SELECT
 gameload1:
-IF op = 1 THEN IF NOT zz$ = "1" THEN GOTO loadgame1
-IF op = 2 THEN IF NOT yy$ = "1" THEN GOTO loadgame1
-IF op = 3 THEN IF NOT xx$ = "1" THEN GOTO loadgame1
-IF op = 4 THEN IF NOT ww$ = "1" THEN GOTO loadgame1
-IF op = 5 THEN IF NOT vv$ = "1" THEN GOTO loadgame1
-IF op = 1 THEN OPEN "FQSAVE0.DAT" FOR INPUT AS #2
-IF op = 2 THEN OPEN "FQSAVE1.DAT" FOR INPUT AS #2
-IF op = 3 THEN OPEN "FQSAVE2.DAT" FOR INPUT AS #2
-IF op = 4 THEN OPEN "FQSAVE3.DAT" FOR INPUT AS #2
-IF op = 5 THEN OPEN "FQSAVE4.DAT" FOR INPUT AS #2
-INPUT #2, savename$
-INPUT #2, monsters$
-INPUT #2, i
-INPUT #2, s
-INPUT #2, h
-INPUT #2, x
-INPUT #2, y
-INPUT #2, w
-INPUT #2, z
-INPUT #2, record
-INPUT #2, rp
-INPUT #2, defs
-CLOSE #2
-IF i = 9607033 THEN i = 4
-IF i = 6766233 THEN i = 2
-IF i = 2783234 THEN i = 1
-IF i = 7223546 THEN i = 3
-defs = defs - 602332
-s = s - 578345
-h = h - 368833
-w = w - 670022
-x = x - 562026
-y = y - 390847
-IF monsters$ = "gJlgggGGGQ#%%" THEN monsters$ = "ON"
-IF monsters$ = "jgMflsoT&" THEN monsters$ = "OFF"
-record = record - 623495
-rp = rp - 259072
-IF z = 537683 THEN z = 1
-IF z = 691152 THEN z = 2
-IF z = 767911 THEN z = 3
-IF z = 296922 THEN z = 4
-SCREEN 0
+
+IF file$(op) <> "1" THEN GOTO loadgame1
+op$ = LTRIM$(RTRIM$(STR$(op - 1)))
+OPEN "FQSAVE" + op$ + ".DAT" FOR BINARY AS #2
+
+savename$ = SPACE$(15)
+monsters5$ = SPACE$(1)
+EXPER$ = SPACE$(8)
+i$ = SPACE$(8)
+s$ = SPACE$(8)
+h$ = SPACE$(8)
+x$ = SPACE$(8)
+y$ = SPACE$(8)
+w$ = SPACE$(8)
+z$ = SPACE$(8)
+record$ = SPACE$(8)
+rp$ = SPACE$(8)
+defs$ = SPACE$(8)
+
+GET #2, 1, savename$
+GET #2, 16, EXPER$
+GET #2, 24, i$
+GET #2, 32, s$
+GET #2, 40, h$
+GET #2, 48, x$
+GET #2, 56, y$
+GET #2, 64, w$
+GET #2, 72, z$
+GET #2, 80, record$
+GET #2, 88, rp$
+GET #2, 96, defs$
+GET #2, 104, monsters5$
+
+
+
+filespace = 106
+numrecords$ = SPACE$(1)
+GET #2, 105, numrecords$
+numrecords = ASC(numrecords$)
+
+
+
+xb = 0
+OPEN "SETTINGS.DAT" FOR OUTPUT AS #234
+conte5:
+IF xb = numrecords THEN GOTO done1
+chra$ = SPACE$(1)
+GET #2, filespace, chra$
+abx = ASC(chra$)
+filespace = filespace + 1
+cbx$ = SPACE$(abx)
+GET #2, filespace, cbx$
+PRINT #234, cbx$
+filespace = filespace + abx
+data$ = SPACE$(8)
+GET #2, filespace, data$
+filespace = filespace + 8
+xbx = CVD(data$)
+xbx$ = LTRIM$(STR$(xbx))
+PRINT #234, xbx$
+xb = xb + 1
+GOTO conte5:
+
+done1:
+EXPER = CVD(EXPER$)
+i = CVD(i$)
+s = CVD(s$)
+h = CVD(h$)
+x = CVD(x$)
+y = CVD(y$)
+w = CVD(w$)
+z = CVD(z$)
+record = CVD(record$)
+rp = CVD(rp$)
+defs = CVD(defs$)
+IF monsters5$ = "1" THEN monsters$ = "YES"
+IF monsters5$ = "0" THEN monsters$ = "NO"
+
+CLOSE #234, #2
+towait1 = FIX(TIMER)
 GOTO loadmap
 noload:
 COLOR 7, 0
 CLS
-rp = 12
+OPEN "SETTINGS.DAT" FOR OUTPUT AS #5
+OPEN "VARIABLE.DAT" FOR INPUT AS #60
+INPUT #60, COMP1$
+INPUT #60, COMP2$
+INPUT #60, gamename$
+
+IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
+IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
+IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
+IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
+
+INPUT #60, version1$
+INPUT #60, version2$
+INPUT #60, revision$
+INPUT #60, superhuman$
+INPUT #60, superminus
+INPUT #60, h
+INPUT #60, hitmax
+INPUT #60, s
+INPUT #60, x
+INPUT #60, y
+dkdk = y - 1
+record = dkdk * 79 + x
+INPUT #60, w
+INPUT #60, defs
+INPUT #60, i
+INPUT #60, z
+INPUT #60, rp
+INPUT #60, thescreen
+INPUT #60, weapon1name$
+INPUT #60, weapon2name$
+INPUT #60, weapon3name$
+INPUT #60, weapon4name$
+INPUT #60, armour1name$
+INPUT #60, armour2name$
+INPUT #60, armour3name$
+INPUT #60, armour4name$
+INPUT #60, weapon1power
+INPUT #60, weapon2power
+INPUT #60, weapon3power
+INPUT #60, weapon4power
+INPUT #60, armour1power
+INPUT #60, armour2power
+INPUT #60, armour3power
+INPUT #60, armour4power
+'INPUT #60, toprintline1$
+'INPUT #60, toprintline2$
+'INPUT #60, toprintline3$
+'INPUT #60, toprintline4$
+'INPUT #60, toprintline5$
+'INPUT #60, toprintline6$
+'INPUT #60, toprintline7$
+'INPUT #60, toprintline8$
+'INPUT #60, toprintline9$
+'INPUT #60, toprintline10$
+EXPER = 0
+gh3:
+IF EOF(60) THEN GOTO gh2
+INPUT #60, data$
+PRINT #5, data$
+GOTO gh3:
+gh2:
+CLOSE #60
+CLOSE #5
 tt = 0
-dd = 0
+towait1 = FIX(TIMER)
+dd1 = 0
 d = 2
-i = 1
-s = 0
-h = 250
-defs = 10
-z = 1
-w = 10
-y = 18
-x = 11
 qy = 1
 qx = 1
-record = 1354
 mm = 1
 COLOR 14, 2
 loadmap:
+printline$ = "YES"
+gbbn = 0
 qy = 1
 qx = 1
 COLOR 7, 0
-CLS
-a$ = SPACE$(5)
-bk = rp * 8690 - 8689
-kb = rp * 8690
-FOR l = bk TO kb STEP 5
+
+'CLS
+'COLOR 7, 0
+'LOCATE 24, 1: PRINT STRING$(79, " "); SPC(0);
+'LOCATE 25, 1: PRINT STRING$(79, " "); SPC(0);
+'FOR sdi = 1 TO 23
+'LOCATE sdi, 80: PRINT " "; SPC(0);
+'NEXT sdi
+
+
+'i$ = INPUT$(1)
+
+IF rp < 1 THEN rp = 1
+IF rp > 1920 THEN rp = 1920
+
+dd = map2(rp)
+
+IF dd = 0 THEN
+        dd = 1
+        rp = 1
+        END IF
+
+yes:
+LOCATE 1, 1
+'bk = dd * 5219 - 5213
+'kb = dd * 5219
+        bk = dd + 5
+        kb = dd + 5219
+FOR l = bk TO kb STEP 3
+a$ = SPACE$(3)
 GET #1, l, a$
-LOCATE qy, qx
+IF POS(0) = 80 THEN
+LOCATE CSRLIN + 1, 1
+END IF
 d$ = LEFT$(a$, 1)
-IF d$ = "1" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-j$ = RIGHT$(a$, 1)
-IF j$ = "/" THEN GOTO continue111111
-PRINT j$
-GOTO continue111112
-continue111111:
-PRINT " "
-continue111112:
-COLOR 7, 0
-g = 7
+d = ASC(d$)
+bg = FIX(d / 16)
+fg = d - (bg * 16)
+COLOR fg, bg
+IF fg = 0 AND bg = 0 THEN COLOR 15
+
+IF RIGHT$(a$, 1) = CHR$(32) THEN
+COLOR 15
+PRINT " "; SPC(0);
+GOTO redo
 END IF
-IF d$ = "2" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT CHR$(6)
-COLOR 7, 0
+
+
+IF RIGHT$(a$, 1) = CHR$(0) THEN
+COLOR 15
+PRINT " "; SPC(0);
+GOTO redo
 END IF
-IF d$ = "3" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT CHR$(5)
-COLOR 7, 0
-END IF
-IF d$ = "4" THEN
-COLOR 0, 0
-PRINT " "
-COLOR 7, 0
-END IF
-IF d$ = "5" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT "/"
-COLOR 7, 0
-END IF
-IF d$ = "6" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT "\"
-COLOR 7, 0
-END IF
-IF d$ = "7" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT "-"
-COLOR 7, 0
-END IF
-IF d$ = "8" THEN
-l$ = LEFT$(a$, 3)
-g$ = RIGHT$(l$, 1)
-IF g$ = "0" THEN g = 0
-IF g$ = "1" THEN g = 1
-IF g$ = "2" THEN g = 2
-IF g$ = "3" THEN g = 3
-IF g$ = "4" THEN g = 4
-IF g$ = "5" THEN g = 5
-IF g$ = "6" THEN g = 6
-IF g$ = "7" THEN g = 7
-IF g$ = "8" THEN g = 8
-IF g$ = "9" THEN g = 9
-IF g$ = "A" THEN g = 10
-IF g$ = "B" THEN g = 11
-IF g$ = "C" THEN g = 12
-IF g$ = "D" THEN g = 13
-IF g$ = "E" THEN g = 14
-IF g$ = "F" THEN g = 15
-k$ = LEFT$(a$, 2)
-e$ = RIGHT$(k$, 1)
-IF e$ = "0" THEN e = 0
-IF e$ = "1" THEN e = 1
-IF e$ = "2" THEN e = 2
-IF e$ = "3" THEN e = 3
-IF e$ = "4" THEN e = 4
-IF e$ = "5" THEN e = 5
-IF e$ = "6" THEN e = 6
-IF e$ = "7" THEN e = 7
-IF e$ = "8" THEN e = 8
-IF e$ = "9" THEN e = 9
-IF e$ = "A" THEN e = 10
-IF e$ = "B" THEN e = 11
-IF e$ = "C" THEN e = 12
-IF e$ = "D" THEN e = 13
-IF e$ = "E" THEN e = 14
-IF e$ = "F" THEN e = 15
-COLOR g, e
-PRINT "|"
-COLOR 7, 0
-END IF
-IF qx = 80 THEN qy = qy + 1
-IF qx = 80 THEN qx = 1
-qx = qx + 1
-IF qx = 80 THEN qy = qy + 1
-IF qx = 80 THEN qx = 1
+
+PRINT RIGHT$(a$, 1); SPC(0);
+
+redo:
 NEXT l
+towait1 = FIX(TIMER)
+
+
+ghs = 5
+
+dl1:
+
+IF printline$ = "NO" THEN GOTO doneloading
+
+LOCATE 23, 2: COLOR 15, 1
+PRINT STRING$(77, 32); SPC(0);
+COLOR 1, 0
+LOCATE 23, 1
+PRINT CHR$(176) + CHR$(177); SPC(0);
+LOCATE 23, 78
+PRINT CHR$(177) + CHR$(176); SPC(0);
+COLOR 15, 1
+LOCATE 23, 2
+bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
+stg = LEN(bottomline$)
+stxy = stg \ 2
+stxy = FIX(stxy)
+startx = 40 - stxy
+LOCATE , startx
+
+PRINT bottomline$; SPC(0);
+
 doneloading:
+
 begin:
-IF tt = 5 THEN
-tt = 1
+CLOSE #36, #53
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+DO
+IF EOF(36) THEN EXIT DO
+gotothenext:
+INPUT #36, iner$
+IF alwaysdo = 5 AND iner$ = "@END" THEN GOTO dones3
+IF iner$ = "@#ALWAYSDO" THEN
+IF alwaysdo = 0 THEN INPUT #36, iner$
+IF iner$ = "@END" THEN GOTO dones3
+alwaysdo = 5
+GOTO togo2
+END IF
+LOOP
+dones3:
+alwaysdo = 0
+CLOSE #36
+
+
+
+
+
+
+IF ghs = 5 THEN
+ghs = 0
+CLOSE #36, #53
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+rp$ = STR$(rp)
+DO
+IF EOF(36) THEN EXIT DO
+INPUT #36, aggggf$
+IF aggggf$ = "@#SCR" + rp$ THEN
+what = 5
+waypoint = 0
+GOTO doiter
+END IF
+LOOP
+CLOSE #36
+END IF
+bg1:
+
+what = 0
+IF helpmecode = 7 THEN
+s = 0
+h = h + 25
+helpmecode = 1
+GOTO cc66
+END IF
+
+
+IF tt = 1 THEN
+tt = 0
 ccp = 2
 GOTO setsettings
 END IF
 COLOR 7, 0
-IF cc = 1 THEN LOCATE 1, 1
-IF cc = 1 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
-IF cc = 1 THEN LOCATE 1, 13
-IF cc = 1 THEN PRINT "S=SET"
-IF dd = 4 THEN LOCATE 1, 1
-IF dd = 4 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
-LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
-LOCATE 23, 1
-COLOR 15, 1: PRINT "Final Quest 2 -- By Akori Software"; : LOCATE 22: LOCATE , 1
-COLOR , 1: PRINT "" + CHR$(10) + ""; : LOCATE , 34:
-PRINT " -- You have:"; h; SPC(0); : PRINT "hitpoints--Score:"; s; SPC(0); : PRINT "!";
-COLOR$ = SPACE$(1)
-dk = rp * 8690 - 8689
-mk = record * 5 - 4
+IF cc = 2 THEN LOCATE 1, 1
+IF cc = 2 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
+IF cc = 2 THEN LOCATE 1, 75
+IF cc = 2 THEN PRINT "S=SET"
+IF dd1 = 1 THEN LOCATE 1, 1
+IF dd1 = 1 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
+color$ = SPACE$(1)
+
+
+
+dd = map2(rp)
+dk = dd + 5
+mk = record * 3 - 3
 m = mk + dk
-GET #1, m, COLOR$
-IF COLOR$ = "0" THEN color1 = 0
-IF COLOR$ = "1" THEN color1 = 1
-IF COLOR$ = "2" THEN color1 = 2
-IF COLOR$ = "3" THEN color1 = 3
-IF COLOR$ = "4" THEN color1 = 4
-IF COLOR$ = "5" THEN color1 = 5
-IF COLOR$ = "6" THEN color1 = 6
-IF COLOR$ = "7" THEN color1 = 7
-IF COLOR$ = "8" THEN color1 = 8
-IF COLOR$ = "9" THEN color1 = 9
-IF COLOR$ = "A" THEN color1 = 10
-IF COLOR$ = "B" THEN color1 = 11
-IF COLOR$ = "C" THEN color1 = 12
-IF COLOR$ = "D" THEN color1 = 13
-IF COLOR$ = "E" THEN color1 = 14
-IF COLOR$ = "F" THEN color1 = 15
+
+GET #1, m, color$
+d$ = LEFT$(color$, 1)
+dg = ASC(d$)
+color1 = FIX(dg / 16)
+
+nomap1:
 COLOR 14, color1
 LOCATE y, x
 PRINT CHR$(1)
 
 'don't do these screens with monsters
-IF rp = 12 THEN GOTO doer1
-IF rp = 92 THEN GOTO doer1
-IF rp = 23 THEN GOTO doer1
-IF rp = 91 THEN GOTO doer1
+OPEN "NOSCR.DAT" FOR INPUT AS #62
+INPUT #62, firstanswer$
+IF monsters$ = "YES" THEN GOTO ghb
+IF LTRIM$(UCASE$(firstanswer$)) = "NO" THEN
+monsters$ = "NO"
+CLOSE #62
+GOTO doer1
+END IF
+ghb:
+INPUT #62, newrp
+IF newrp = 1921 THEN GOTO mon5
+IF newrp = rp THEN
+CLOSE #62
+GOTO doer1
+END IF
+GOTO ghb
 
-
+mon5:
+IF monsters$ = "NO" THEN
+CLOSE #62
+GOTO doer1
+END IF
+theg = 50
+INPUT #62, nummonsters
+INPUT #62, numifscores
+INPUT #62, chance
 RANDOMIZE TIMER
-IF monsters$ = "OFF" THEN GOTO doer1
-R = INT(RND * 50) + 1
-IF R = 5 THEN GOTO enemy
+r = INT(RND * chance) + 1
+IF r = 5 THEN GOTO enemy
+CLOSE #62
 GOTO doer1
 enemy:
+FOR gdc = 1 TO numifscores
+RANDOMIZE TIMER
+INPUT #62, ifscore
+INPUT #62, monrand
+
+IF EXPER < ifscore THEN
+ra = INT(RND * monrand) + 1
+GOTO m1
+END IF
+
+NEXT gdc
+ra = INT(RND * nummonsters) + 1
+GOTO jun
+m1:
+FOR gs = gdc + 1 TO numifscores
+INPUT #62, junk$
+INPUT #62, junk$
+NEXT gs
+
+jun:
 LOCATE 23, 1
 COLOR 15, 1
-IF s < 100 THEN
-RANDOMIZE TIMER
-ra = INT(RND * 3) + 1
-GOTO m1
-END IF
-IF s < 1000 THEN
-RANDOMIZE TIMER
-ra = INT(RND * 6) + 1
-GOTO m1
-END IF
+FOR ghs = 1 TO ra
+INPUT #62, data$
+NEXT ghs
 
-RANDOMIZE TIMER
-ra = INT(RND * 10) + 1
-m1:
-IF ra = 1 THEN b = 10
-IF ra = 2 THEN b = 25
-IF ra = 3 THEN b = 35
-IF ra = 4 THEN b = 60
-IF ra = 5 THEN b = 75
-IF ra = 6 THEN b = 110
-IF ra = 7 THEN b = 120
-IF ra = 8 THEN b = 130
-IF ra = 9 THEN b = 140
-IF ra = 10 THEN b = 150
 
-IF ra = 1 THEN mn = 10
-IF ra = 2 THEN mn = 25
-IF ra = 3 THEN mn = 32
-IF ra = 4 THEN mn = 100
-IF ra = 5 THEN mn = 125
-IF ra = 6 THEN mn = 200
-IF ra = 7 THEN mn = 300
-IF ra = 8 THEN mn = 400
-IF ra = 9 THEN mn = 500
-IF ra = 10 THEN mn = 600
 
-COLOR 10, 0
-IF ra = 1 THEN m$ = "Baby Monster"
-IF ra = 2 THEN m$ = "Pig Cop"
-IF ra = 3 THEN m$ = "Lizard Face"
-IF ra = 4 THEN m$ = "Your Mother"
-IF ra = 5 THEN m$ = "T-REX"
-IF ra = 6 THEN m$ = "GODZILLA"
-IF ra = 7 THEN m$ = "Redneck"
-IF ra = 8 THEN m$ = "The Living Dead"
-IF ra = 9 THEN m$ = "Cactus Face"
-IF ra = 10 THEN m$ = "Death Ray"
-COLOR 15, 0
-g = INT(RND * 2) + 1
-IF g = 1 THEN GOTO m1hitf
+FOR ghs = 1 TO nummonsters - ra
+INPUT #62, junk$
+NEXT ghs
+
+
+b = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
+mn = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
+togetscore = VAL(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";")))
+expertoget = VAL(RIGHT$(data$, LEN(data$) - INSTR(INSTR(INSTR(data$, ";") + 1, data$, ";") + 1, data$, ";")))
+m$ = RIGHT$(data$, LEN(data$) - INSTR(INSTR(INSTR(INSTR(data$, ";") + 1, data$, ";") + 1, data$, ";") + 1, data$, ";"))
+
+
+FOR ghs = 1 TO ra
+INPUT #62, tosay$
+NEXT ghs
+
+
+
+CLOSE #62
+monster:
+monstermax = b
+
+
+
+LOCATE 24, 1
+COLOR 14, 0
+PRINT "                                                                               "; SPC(0);
+printer 0, tosay$, 24
+
+COLOR 14, 0
+
+G = INT(RND * 2) + 1
+IF G = 1 THEN GOTO m1hitf
+
 m1fight:
-COLOR 15, 1
+COLOR 14, 1
 o = 1
 hitpointer:
 LOCATE 23, 1
-PRINT "                                                                               "
-COLOR 15, 1
+COLOR 14, 1
+PRINT "                                                                               "; SPC(0);
 LOCATE 23, 1
-PRINT "Your hitpoints - "; h; "  "; m$; "'s Hitpoints - "; b; SPC(1);
+PRINT "Your Hitpoints - ("; LTRIM$(STR$(h)); "/"; LTRIM$(STR$(hitmax)); ") "; m$; "'s hitpoints - ("; LTRIM$(STR$(b)); "/"; LTRIM$(STR$(monstermax)); ")"; SPC(0);
 IF o = 1 THEN
+LOCATE 25, 1
 COLOR 15, 1
-PRINT "Attack"; SPC(1);
-COLOR 2, 1
-PRINT "Run"
+PRINT "Attack"; SPC(0);
+COLOR 15, 0
+PRINT "  Run for it "; SPC(0);
 END IF
 IF o = 2 THEN
-COLOR 2, 1
-PRINT "Attack"; SPC(1);
+LOCATE 25, 1
+COLOR 15, 0
+PRINT "Attack  "; SPC(0);
 COLOR 15, 1
-PRINT "Run"
+PRINT "Run for it"; SPC(0);
+COLOR 15, 0
+PRINT " "; SPC(0);
 END IF
 DO
 ccc$ = INKEY$
 LOOP WHILE ccc$ = ""
 SELECT CASE ccc$
 CASE Null$ + CHR$(77)
+IF o = 2 THEN
+o = 1
+GOTO hitpointer
+END IF
 o = 2
 GOTO hitpointer
 CASE Null$ + CHR$(75)
+IF o = 1 THEN
+o = 2
+GOTO hitpointer
+END IF
 o = 1
 GOTO hitpointer
 CASE CHR$(13)
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+PRINT "                                                                               "; SPC(0);
 IF o = 1 THEN GOTO attackm1
 IF o = 2 THEN GOTO m1ifhit
 GOTO hitpointer
@@ -1362,195 +1148,567 @@ CASE ELSE
 GOTO hitpointer
 END SELECT
 m1ifhit:
-c = INT(RND * 10) + 1
+c = INT(RND * 10)
 IF c = 5 THEN GOTO m1hitsyou
-IF c = 9 THEN GOTO m1hitsyou
-GOTO begin
+IF c = 10 THEN GOTO m1hitsyou
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+PRINT "                                                                               "; SPC(0);
+IF deg = 5 THEN
+toset$ = "LASTMONSTER"
+tosetto$ = "0"
+cb562 = 0
+OPEN "SETTINGS.DAT" FOR INPUT AS #67
+OPEN "set2.dat" FOR OUTPUT AS #68
+eofer13:
+IF EOF(67) THEN GOTO endnext13
+INPUT #67, junk$
+PRINT #68, junk$
+IF junk$ = toset$ THEN
+INPUT #67, junk6$
+PRINT #68, tosetto$
+cb562 = 5
+END IF
+GOTO eofer13
+endnext13:
+IF cb562 = 5 THEN GOTO nex61
+PRINT #68, toset$
+PRINT #68, tosetto$
+nex61:
+CLOSE #5, #68, #66, #67, #69, #222, #234
+KILL "SETTINGS.DAT"
+NAME "SET2.DAT" AS "settings.dat"
+GOTO monster1
+END IF
+
+GOTO dl1
 m1hitsyou:
-LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
-LOCATE 23, 1
-PRINT "As you attempt to leave, "; m$; " sees you and attacks! Any key..."
-kjbhn$ = INPUT$(1)
+LOCATE 24, 1
+COLOR 15, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+PRINT "As you attempt to leave, "; m$; " sees you and attacks!"; SPC(0);
 GOTO m1hitf
 attackm1:
-IF z = 1 THEN a = INT(RND * 10) + 1
-IF z = 2 THEN a = INT(RND * 20) + 1
-IF z = 3 THEN a = INT(RND * 35) + 1
-IF z = 4 THEN a = INT(RND * 50) + 1
+IF i = 1 THEN a = INT(RND * 10) + 1
+IF i = 2 THEN a = INT(RND * 20) + 1
+IF i = 3 THEN a = INT(RND * 35) + 1
+IF i = 4 THEN a = INT(RND * 50) + 1
 a = a + w
+IF i = 1 THEN a = a + weapon1power
+IF i = 2 THEN a = a + weapon2power
+IF i = 3 THEN a = a + weapon3power
+IF i = 4 THEN a = a + weapon4power
 b = b - a
+
+IF superhuman$ = "YES" THEN
+b = b - (a * superminus)
+END IF
+
+LOCATE 24, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+IF superhuman$ = "YES" THEN
+IF b > 0 THEN PRINT "You hit "; m$; " for"; a * superminus; "points damage."; SPC(0);
+IF b < 1 THEN PRINT "You hit "; m$; " for"; a * superminus; "points damage.  Press any key..."; SPC(0);
+GOTO consL
+END IF
+IF b > 0 THEN PRINT "You hit "; m$; " for"; a; "points damage."; SPC(0);
+IF b < 1 THEN PRINT "You hit "; m$; " for"; a; "points damage.  Press any key..."; SPC(0);
+consL:
 LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
+COLOR 14, 1
+PRINT "                                                                               "; SPC(0);
 LOCATE 23, 1
-PRINT "You hit "; m$; " for"; a; "points damage. Any Key..."
-sdafds$ = INPUT$(1)
+PRINT "Your Hitpoints - ("; LTRIM$(STR$(h)); "/"; LTRIM$(STR$(hitmax)); ") "; m$; "'s hitpoints - ("; LTRIM$(STR$(b)); "/"; LTRIM$(STR$(monstermax)); ")"; SPC(0);
+IF b < 1 THEN
 LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
+COLOR 14, 1
+PRINT "                                                                               "; SPC(0);
 LOCATE 23, 1
-IF b < 1 THEN PRINT "You killed "; m$; "!!! Press any key..."
-IF ra = 1 AND b < 1 THEN s = s + 10
-IF ra = 2 AND b < 1 THEN s = s + 35
-IF ra = 3 AND b < 1 THEN s = s + 20
-IF ra = 4 AND b < 1 THEN s = s + 25
-IF ra = 5 AND b < 1 THEN s = s + 35
-IF ra = 6 AND b < 1 THEN s = s + 100
-IF ra = 7 AND b < 1 THEN s = s + 20
-IF ra = 8 AND b < 1 THEN s = s + 40
-IF ra = 9 AND b < 1 THEN s = s + 30
-IF ra = 10 AND b < 1 THEN s = s + 75
+PRINT "Your Hitpoints - ("; LTRIM$(STR$(h)); "/"; LTRIM$(STR$(hitmax)); ") "; m$; "'s hitpoints - "; SPC(0);
+COLOR 4, 1
+PRINT "Dead"; SPC(0);
+END IF
+IF b < 1 THEN s = s + togetscore
+IF b < 1 THEN EXPER = EXPER + expertoget
 IF b < 1 THEN i$ = INPUT$(1)
-IF b < 1 GOTO begin
+IF b < 1 THEN
+LOCATE 24, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+togetscore3$ = LTRIM$(STR$(togetscore))
+expertoget$ = LTRIM$(STR$(expertoget))
+togetscore4$ = "`2You killed `@" + m$ + "`2!  You find `$$" + togetscore3$ + " `2Gold and get `%" + expertoget$ + "`2 Experience.."
+printer 0, togetscore4$, 24
+i$ = INPUT$(1)
+END IF
+IF b < 1 THEN
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+PRINT "                                                                               "; SPC(0);
+END IF
+IF b < 1 AND deg = 5 THEN
+toset$ = "LASTMONSTER"
+tosetto$ = "1"
+cb562 = 0
+OPEN "SETTINGS.DAT" FOR INPUT AS #67
+OPEN "set2.dat" FOR OUTPUT AS #68
+eofer131:
+IF EOF(67) THEN GOTO endnext131
+INPUT #67, junk$
+PRINT #68, junk$
+IF junk$ = toset$ THEN
+INPUT #67, junk6$
+PRINT #68, tosetto$
+cb562 = 5
+END IF
+GOTO eofer131
+endnext131:
+IF cb562 = 5 THEN GOTO nex611
+PRINT #68, toset$
+PRINT #68, tosetto$
+nex611:
+CLOSE #5, #68, #66, #67, #69, #222, #234
+KILL "SETTINGS.DAT"
+NAME "SET2.DAT" AS "settings.dat"
+GOTO monster1
+END IF
+IF b < 1 GOTO dl1
 GOTO m1hitf
 m1hitf:
 COLOR 14, 0
-a = INT(RND * 3) + 1
-IF i = 1 THEN t = mn - 1
-IF i = 2 THEN t = mn - 20
-IF i = 3 THEN t = mn - 30
+a = INT(RND * 5) + 1
+IF z = 1 THEN t = mn - armour1power
+IF z = 2 THEN t = mn - armour2power
+IF z = 3 THEN t = mn - armour3power
+IF z = 4 THEN t = mn - armour4power
 t = t - defs
 IF t < 0 THEN t = 0
 IF t = 0 THEN a = 0
 ccvb:
-LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
-LOCATE 23, 1
-IF i = 4 THEN PRINT ; m$; " is scared to death!! It doesn't attack. Hit Enter.."
-IF i = 4 THEN sdklj$ = INPUT$(1)
-IF i = 4 AND sdklj$ <> CHR$(13) THEN GOTO ccvb
-IF i = 4 THEN GOTO m1fight
 t = t + a
 IF t < 0 THEN t = 0
+h = h - t
+IF superhuman$ = "YES" THEN
+h = h + t
+t = FIX(t / 3)
+h = h - t
+END IF
 bbcc:
-LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
-LOCATE 23, 1
-PRINT ; m$; " hits you for"; t; "points damage. Hit Enter..."
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 25, 1
+PRINT ; m$; " hits you for"; t; "points damage. Hit Enter..."; SPC(0);
+LOCATE 23, 1, 0
+COLOR 14, 1
+PRINT "                                                                               "; SPC(0);
+LOCATE 23, 1, 0
+PRINT "Your Hitpoints - ("; LTRIM$(STR$(h)); "/"; LTRIM$(STR$(hitmax)); ") "; m$; "'s hitpoints - ("; LTRIM$(STR$(b)); "/"; LTRIM$(STR$(monstermax)); ")"; SPC(0);
 wedlsdjkf$ = INPUT$(1)
 IF wedlsdjkf$ <> CHR$(13) THEN GOTO bbcc
-h = h - t
+LOCATE 25, 1, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
 LOCATE 24, 1
-IF h < 0 THEN GOTO fordead
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+IF h <= 0 THEN GOTO fordead
 GOTO m1fight
 fordead:
 LOCATE 23, 1
-COLOR 15, 1
-PRINT "                                                                               "
+COLOR 14, 1
+PRINT "                                                                               "; SPC(0);
 LOCATE 23, 1
-PRINT "You have been killed... You score is divided in half. Press any key.."
-s = s / 2
-IF s < 0 THEN s = 0
+PRINT "You are deafeated... You Gold and Experience have been lowered unfortunatly.."; SPC(0);
+exper1 = FIX(EXPER / 10)
+EXPER = EXPER - exper1
+IF EXPER < 0 THEN EXPER = 0
+s = 0
 h = 10
 i$ = INPUT$(1)
-GOTO begin
-
-doer1:
-DO
-check$ = INKEY$
-LOOP WHILE check$ = ""
-check$ = UCASE$(check$)
-SELECT CASE check$
-CASE "I"
-IF hh = 6 THEN
-hh = 7
-GOTO begin
+LOCATE 25, 1
+COLOR 7, 0
+PRINT "                                                                               "; SPC(0);
+LOCATE 24, 1
+PRINT "                                                                               "; SPC(0);
+IF deg = 5 THEN
+toset$ = "LASTMONSTER"
+tosetto$ = "0"
+cb562 = 0
+OPEN "SETTINGS.DAT" FOR INPUT AS #67
+OPEN "set2.dat" FOR OUTPUT AS #68
+eofer132:
+IF EOF(67) THEN GOTO endnext132
+INPUT #67, junk$
+PRINT #68, junk$
+IF junk$ = toset$ THEN
+INPUT #67, junk6$
+PRINT #68, tosetto$
+cb562 = 5
 END IF
-IF hh = 2 THEN
-hh = 3
-GOTO begin
+GOTO eofer132
+endnext132:
+IF cb562 = 5 THEN GOTO nex612
+PRINT #68, toset$
+PRINT #68, tosetto$
+nex612:
+CLOSE #5, #68, #66, #67, #69, #222, #234
+KILL "SETTINGS.DAT"
+NAME "SET2.DAT" AS "settings.dat"
+GOTO monster1
 END IF
-GOTO inventory
-CASE "K"
-tt = 2
-GOTO begin
-CASE "A"
-aer:
-IF hh = 4 THEN
-hh = 5
-GOTO begin
-END IF
-GOTO begin
-CASE "C"
-cer:
-IF jjddkk = 2 THEN
-hh = 1
-jjddkk = 1
-GOTO begin
-END IF
-IF hh = 7 THEN
-hh = 8
-jjddkk = 2
-GOTO begin
-END IF
-GOTO begin
-CASE "N"
-ner:
-IF hh = 5 THEN
-hh = 6
-GOTO begin
-END IF
-GOTO begin
-CASE "T"
-IF tt = 4 THEN tt = 5
-IF hh = 3 THEN
-hh = 4
-GOTO begin
-END IF
-hh = 2
-GOTO begin
-CASE "S"
-IF cc = 1 THEN
-ccc = 1
-GOTO setsettings
-conte:
-ccc = 0
+IF theg = 50 THEN
+theg = 0
 GOTO loadmap
 END IF
-dd = 1
-GOTO begin
-CASE "D"
-tt = 0
-IF dd = 1 THEN dd = 2
-GOTO begin
-CASE "E"
-IF tt = 3 THEN tt = 4
-IF dd = 2 THEN dd = 3
-GOTO begin
-CASE "B"
-IF dd = 3 THEN dd = 4
-GOTO begin
-CASE "L"
-IF tt = 2 THEN tt = 3
-GOTO begin
+GOTO dl1
+ssave:
+RANDOMIZE TIMER
+COLOR 7, 0
+LOCATE , , 0
+CLS
+a$ = "Screen Protection System, Press any key to continue..."
+COLOR 14
+begin5:
+ydf = INT(RND * 25) + 1
+xdf = 79
+
+FOR ixv = 1 TO 79
+        idler = 0
+        DO
+        idler = idler + 1
+        LOOP WHILE idler <= 15000
+        IF INKEY$ <> "" THEN GOTO NOT2
+                b$ = LEFT$(a$, ixv)
+                LOCATE ydf, xdf
+                PRINT b$ + " "; SPC(0);
+                xdf = xdf - 1
+NEXT ixv
+        vdf = LEN(a$) - 1
+FOR ixv = 1 TO LEN(a$)
+                idler = 0
+                DO
+                idler = idler + 1
+                LOOP WHILE idler <= 15000
+                IF INKEY$ <> "" THEN GOTO NOT2
+        b$ = RIGHT$(a$, vdf)
+        vdf = vdf - 1
+        LOCATE ydf, 1
+        PRINT b$ + " "; SPC(0);
+NEXT ixv
+GOTO begin5
+NOT2:
+GOTO loadmap
+doer1:
+
+                  IF printcheater = 1 THEN
+                  printcheater = 0
+                  writer "`CCheater!!! You got 25 more hitpoints for a total of `h."
+                  ggb = 5
+                  towait1 = FIX(TIMER) + 4
+                  END IF
+
+
+ssave = FIX(TIMER) + 180
+DO
+IF FIX(TIMER) >= ssave THEN
+GOTO ssave
+END IF
+check$ = INKEY$
+
+IF FIX(TIMER) >= 86396 AND ggb = 5 THEN
+ggb = 3
+GOTO cc66
+END IF
+
+IF FIX(TIMER) >= towait1 AND ggb = 5 THEN
+ggb = 3
+GOTO cc66
+END IF
+
+IF FIX(TIMER) < towait1 THEN LOCATE 23, doposx, 1, 6, 7
+IF FIX(TIMER) >= towait1 THEN LOCATE y, x, 1, 6, 7
+
+LOOP WHILE check$ = ""
+check$ = UCASE$(check$)
+
+IF FIX(TIMER) <= towait1 THEN GOTO cc56
+cc66:
+IF gbbn = 5 THEN
+LOCATE 23, 1
+COLOR 7, 0
+PRINT STRING$(80, " "); SPC(0);
+END IF
+
+IF printline$ = "NO" THEN GOTO noline
+
+LOCATE 23, 2: COLOR 15, 1
+PRINT STRING$(77, 32); SPC(0);
+LOCATE 23, 1
+COLOR 1, 0
+PRINT CHR$(176) + CHR$(177); SPC(0);
+LOCATE 23, 78
+PRINT CHR$(177) + CHR$(176); SPC(0);
+COLOR 15, 1
+LOCATE 23, 2
+bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
+stg = LEN(bottomline$)
+stxy = stg \ 2
+stxy = FIX(stxy)
+startx = 40 - stxy
+LOCATE , startx
+PRINT bottomline$; SPC(0);
+
+noline:
+IF ggb = 3 THEN
+ggb = 0
+GOTO doer1
+END IF
+cc56:
+SELECT CASE check$
+
+
+
+CASE "Q"
+ LOCATE y, x
+ next$ = UCASE$(INPUT$(1))
+  IF next$ = "U" THEN
+   next$ = UCASE$(INPUT$(1))
+    IF next$ = "A" THEN
+     next$ = UCASE$(INPUT$(1))
+      IF next$ = "K" THEN
+       next$ = UCASE$(INPUT$(1))
+        IF next$ = "E" THEN ccp = 2: GOTO setsettings
+      END IF
+    END IF
+  END IF
+check$ = next$
+GOTO cc56
+
+CASE "T"
+ LOCATE y, x
+ next$ = UCASE$(INPUT$(1))
+  IF next$ = "I" THEN
+   next$ = UCASE$(INPUT$(1))
+    IF next$ = "T" THEN
+     next$ = UCASE$(INPUT$(1))
+      IF next$ = "A" THEN
+       next$ = UCASE$(INPUT$(1))
+        IF next$ = "N" THEN
+         next$ = UCASE$(INPUT$(1))
+          IF next$ = "I" THEN
+           next$ = UCASE$(INPUT$(1))
+            IF next$ = "C" THEN
+             IF hh = 1 THEN hh = -1
+             hh = hh + 1
+               IF hh = 1 THEN
+                 writer "`C`%No Cliping Mode on..."
+                 ggb = 5
+                 towait1 = FIX(TIMER) + 4
+               END IF
+               IF hh = 0 THEN
+                 writer "`C`%No Cliping Mode off..."
+                 ggb = 5
+                 towait1 = FIX(TIMER) + 4
+               GOTO begin
+               END IF
+            END IF
+          END IF
+        END IF
+      END IF
+    END IF
+  END IF
+check$ = next$
+GOTO cc56
+
+
+CASE "I"
+GOTO inventory
+
+
+CASE "M"
+GOTO map
+
+CASE "H"
+ LOCATE y, x
+ next$ = UCASE$(INPUT$(1))
+  IF next$ = "E" THEN
+   next$ = UCASE$(INPUT$(1))
+    IF next$ = "L" THEN
+     next$ = UCASE$(INPUT$(1))
+      IF next$ = "P" THEN
+       next$ = UCASE$(INPUT$(1))
+        IF next$ = "M" THEN
+         next$ = UCASE$(INPUT$(1))
+          IF next$ = "E" THEN
+             ggb = 3
+             printcheater = 1
+             s = 0
+             h = h + 25
+             hitmax = hitmax + 25
+             GOTO cc66
+          END IF
+        END IF
+      END IF
+    END IF
+  END IF
+check$ = next$
+GOTO cc56
+
+CASE "S"
+
+IF cc = 2 THEN
+ccc = 1: GOTO setsettings
+END IF
+
+LOCATE y, x
+ next$ = UCASE$(INPUT$(1))
+  IF next$ = "D" THEN
+   next$ = UCASE$(INPUT$(1))
+    IF next$ = "E" THEN
+     next$ = UCASE$(INPUT$(1))
+      IF next$ = "B" THEN
+        IF dd1 = 1 THEN dd1 = -1
+        dd1 = dd1 + 1
+                IF dd1 = 1 THEN
+                  writer "`C`%Debug Details On..."
+                  ggb = 5
+                  towait1 = FIX(TIMER) + 4: GOTO begin
+                END IF
+                IF dd1 = 0 THEN
+                  writer "`C`%Debug Details Off..."
+                  ggb = 5
+                  towait1 = FIX(TIMER) + 4: GOTO begin
+                END IF
+     
+      END IF
+    END IF
+  END IF
+check$ = next$
+GOTO cc56
+
+
+
 CASE "4"
-GOTO hardleft
+        direction$ = "L"
+GOTO hardhs
+
 CASE "6"
-GOTO hardright
+        direction$ = "R"
+GOTO hardhs
+
 CASE "8"
-GOTO hardup
+        direction$ = "U"
+GOTO hardhs
+
 CASE "2"
-GOTO harddown
+        direction$ = "D"
+GOTO hardhs
+
 CASE "Q"
 GOTO Quit
 CASE CHR$(27)
 GOTO Quit
 CASE Null$ + CHR$(75)
-GOTO hardleft
+        direction$ = "L"
+GOTO hardhs
 CASE Null$ + CHR$(72)
-GOTO hardup
+        direction$ = "U"
+GOTO hardhs
 CASE Null$ + CHR$(80)
-GOTO harddown
+        direction$ = "D"
+GOTO hardhs
 CASE Null$ + CHR$(77)
-GOTO hardright
+        direction$ = "R"
+GOTO hardhs
+
 CASE ELSE
 GOTO begin
+
 END SELECT
 GOTO begin
+map:
+VIEW PRINT 1 TO 25
+COLOR 7, 0
+CLS
+LOCATE 25, 1, 0
+COLOR 7, 0
+PRINT STRING$(80, " "); SPC(0);
+LOCATE 1, 1
+'printer 0, "`2" + gamename$ + " - Map`7`X25`FDB `%- `Y10represents a village or town`X65Press any key...", 25
+dd = 1
+ig = 1
+
+LOCATE 1, 1
+FOR xcc = 1 TO 1920
+xc = CSRLIN
+IF map(xcc) = 0 THEN
+COLOR 15, 1: PRINT " "; SPC(0);
+END IF
+IF map(xcc) = 1 THEN
+COLOR 15, 2: PRINT " "; SPC(0);
+END IF
+IF map(xcc) = 2 THEN
+COLOR 15, 1: PRINT " "; SPC(0);
+END IF
+IF map(xcc) = 3 THEN
+COLOR 15, 7: PRINT " "; SPC(0);
+END IF
+
+
+IF xcc = thescreen THEN
+LOCATE xc, POS(0) - 1
+
+bs = SCREEN(CSRLIN, POS(0), 1)
+b = FIX(bs / 16)
+COLOR 20, b
+PRINT CHR$(1); SPC(0);
+END IF
+
+NEXT xcc
+
+
+LOCATE 1, 1
+
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+
+gs:
+IF EOF(36) THEN GOTO NOMAPERROR
+INPUT #36, da$
+IF da$ = "@#MAP" THEN GOTO mapsx
+GOTO gs:
+
+mapsx:
+k = 1
+invscr63:
+LINE INPUT #36, iner$
+IF LTRIM$(RTRIM$(iner$)) = "@END" THEN GOTO waiter62
+printer 0, iner$, k
+k = k + 1
+GOTO invscr63
+
+
+waiter62:
+
+CLOSE #36
+LOCATE 1, 1
+i$ = INPUT$(1)
+towait1 = FIX(TIMER)
+COLOR 7, 0
+CLS
+GOTO loadmap
+
 setsettings:
 COLOR 15, 0
 CLS
@@ -1560,69 +1718,32 @@ PRINT
 PRINT "Screen #: ", rp
 PRINT "X: ", x
 PRINT "Y: ", y
+PRINT "Experience: ", EXPER
 PRINT "Hitpoints: ", h
 PRINT "Strength: ", w
 PRINT "Defense: ", defs
-PRINT "Score: ", s
-PRINT "Weapon: ", z
-PRINT "Armour: ", i
+PRINT "Gold: ", s
+PRINT "Weapon: ", i
+PRINT "Armour: ", z
 PRINT "Monsters: ", monsters$
 PRINT
 COLOR 7
 PRINT "New Settings:"
 PRINT
 COLOR 2, 0
-reenterrg:
-INPUT "SCREEN #: ", rg
-FOR bk = 1 TO 20
-IF rg = bk THEN GOTO nexter
-NEXT bk
-GOTO reenterrg
-nexter:
-rp = rg
-chx:
-INPUT "INPUT X-CRT:", x
-FOR bbbk = 1 TO 79
-IF x = bbbk THEN GOTO chy:
-NEXT bbbk
-GOTO chx
-chy:
-INPUT "INPUT Y-CRT:", y
-FOR bbbk = 1 TO 22
-IF y = bbbk THEN GOTO ccccc
-NEXT bbbk
-GOTO chy
-ccccc:
-dkdk = y - 1
-record = dkdk * 79 + x
-INPUT "INPUT Hitpoints:", h
-INPUT "INPUT Strength:", w
-INPUT "INPUT Defense:", defs
-INPUT "INPUT Score:", s
-cha:
-INPUT "INPUT Armour(1-4):", i
-IF i > 4 THEN GOTO cha
-IF i < 0 THEN GOTO cha
-chw:
-INPUT "INPUT Weapon(1-4):", z
-IF z > 4 THEN GOTO chw
-IF z < 0 THEN GOTO chw
-monst:
-PRINT "INPUT Monsters(Y/N):"
-monsters$ = INPUT$(1)
-monsters$ = UCASE$(monsters$)
-IF monsters$ = "Y" THEN GOTO contttt
-IF monsters$ = "N" THEN GOTO contttt
-GOTO monst
-contttt:
-IF monsters$ = "Y" THEN monsters$ = "ON"
-IF monsters$ = "N" THEN monsters$ = "OFF"
+
+setsettings
+COLOR 7, 0
+CLS
+
 IF ccp = 1 THEN
 ccp = 0
 GOTO loadmap
 END IF
-IF ccc = 1 THEN GOTO conte
-IF cc = 1 THEN GOTO load
+IF ccc = 1 THEN
+ccc = 0: GOTO loadmap
+END IF
+IF cc = 2 THEN GOTO load
 tt = 0
 IF pk = 2 THEN
 pk = 0
@@ -1631,1414 +1752,2092 @@ END IF
 GOTO loadmap
 
 
-hardleft:
-
-'Set up Hotspots
-IF x = 1 THEN
-rp = rp - 1
-x = 79
-kkkk = y - 1
-kkk = kkkk * 79
-record = kkk + x
-GOTO loadmap
+hardhs:
+IF x = 1 AND direction$ = "L" THEN
+thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
+END IF
+IF x = 79 AND direction$ = "R" THEN
+thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
+END IF
+IF y = 1 AND direction$ = "U" THEN
+rp = rp - 80: thescreen = thescreen - 80: y = 22: record = 21 * 79 + x: GOTO loadmap
+END IF
+IF y = 22 AND direction$ = "D" THEN
+thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
 END IF
 
-'End setup
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+rp$ = STR$(rp)
+DO
+IF EOF(36) THEN EXIT DO
+INPUT #36, aggggf$
+IF aggggf$ = "@#SCR" + rp$ THEN
+        IF direction$ = "L" THEN
+        way = 1: what = 1
+        END IF
+        IF direction$ = "R" THEN
+        way = 2: what = 2
+        END IF
+        IF direction$ = "U" THEN
+        way = 3: what = 3
+        END IF
+        IF direction$ = "D" THEN
+        way = 4: what = 4
+        END IF
+GOTO dofunction
+END IF
+LOOP
+CLOSE #36
+GOTO hard
 
-IF hh = 8 THEN GOTO left
-record = record - 1
-bk$ = SPACE$(5)
-LK = rp * 8690 - 8689
-dfdf = record * 5 - 5
-m = LK + dfdf
+
+
+'LRUD  1234, what and way
+
+
+
+
+hard:
+dd = map2(rp)
+
+IF hh = 1 THEN GOTO l56
+IF direction$ = "L" THEN record = record - 1
+IF direction$ = "R" THEN record = record + 1
+IF direction$ = "U" THEN record = record - 79
+IF direction$ = "D" THEN record = record + 79
+
+bk$ = SPACE$(3): lk = dd + 5:
+dfdf = record * 3 - 3: m = lk + dfdf
 GET #1, m, bk$
-kb$ = RIGHT$(bk$, 2)
-bk1$ = LEFT$(kb$, 1)
-IF bk1$ = "1" THEN
-record = record + 1
-GOTO begin
+kb$ = RIGHT$(bk$, 2): bk1$ = LEFT$(kb$, 1)
+
+IF bk1$ = CHR$(1) THEN
+        IF direction$ = "L" THEN record = record + 1
+        IF direction$ = "R" THEN record = record - 1
+        IF direction$ = "U" THEN record = record + 79
+        IF direction$ = "D" THEN record = record - 79
+        GOTO doer1
 END IF
-IF bk1$ = "0" THEN
-record = record + 1
-GOTO left
-END IF
-GOTO begin
-
-hardright:
-
-'Set up hotspots
-
-IF x = 79 THEN
-rp = rp + 1
-x = 1
-kkkk = y - 1
-kkk = kkkk * 79
-record = kkk + x
-GOTO loadmap
+IF bk1$ = CHR$(0) THEN
+        IF direction$ = "L" THEN record = record + 1
+        IF direction$ = "R" THEN record = record - 1
+        IF direction$ = "U" THEN record = record + 79
+        IF direction$ = "D" THEN record = record - 79
+        GOTO l56
 END IF
 
-'End setup
-
-IF hh = 8 THEN GOTO right
-record = record + 1
-bk$ = SPACE$(5)
-LK = rp * 8690 - 8689
-dfdf = record * 5 - 5
-m = LK + dfdf
-GET #1, m, bk$
-kb$ = RIGHT$(bk$, 2)
-bk1$ = LEFT$(kb$, 1)
-IF bk1$ = "1" THEN
-record = record - 1
-GOTO begin
-END IF
-IF bk1$ = "0" THEN
-record = record - 1
-GOTO right
-END IF
 GOTO begin
 
-hardup:
 
-'Setup Hotspots
-
-IF rp = 12 AND x = 58 AND y = 10 THEN
-rp = 92
-record = 1145
-x = 39
-y = 15
-GOTO loadmap
-END IF
-
-IF rp = 12 AND x = 11 AND y = 18 THEN
-rp = 91
-record = 1305
-x = 41
-y = 17
-GOTO loadmap
-END IF
-
-IF y = 1 THEN
-rp = rp - 10
-y = 22
-record = 21 * 79 + x
-GOTO loadmap
-END IF
-
-'End setup
-
-IF hh = 8 THEN GOTO up
-record = record - 79
-bk$ = SPACE$(5)
-LK = rp * 8690 - 8689
-dfdf = record * 5 - 5
-m = LK + dfdf
-GET #1, m, bk$
-kb$ = RIGHT$(bk$, 2)
-bk1$ = LEFT$(kb$, 1)
-IF bk1$ = "1" THEN
-record = record + 79
-GOTO begin
-END IF
-IF bk1$ = "0" THEN
-record = record + 79
-GOTO up
-END IF
-GOTO begin
-
-harddown:
-
-'Set up Hotspots
-
-IF rp = 92 AND x = 39 AND y = 15 THEN
-rp = 12
-record = 769
-x = 58
-y = 10
-GOTO loadmap
-END IF
-
-IF rp = 91 AND x = 41 AND y = 17 THEN
-rp = 12
-record = 1354
-x = 11
-y = 18
-GOTO loadmap
-END IF
-
-IF y = 22 THEN
-rp = rp + 10
-y = 1
-record = x
-GOTO loadmap
-END IF
-
-'End setup
-
-IF hh = 8 THEN GOTO down
-record = record + 79
-bk$ = SPACE$(5)
-LK = rp * 8690 - 8689
-dfdf = record * 5 - 5
-m = LK + dfdf
-GET #1, m, bk$
-kb$ = RIGHT$(bk$, 2)
-bk1$ = LEFT$(kb$, 1)
-IF bk1$ = "1" THEN
-record = record - 79
-GOTO begin
-END IF
-IF bk1$ = "0" THEN
-record = record - 79
-GOTO down
-END IF
-GOTO begin
 inventory:
+COLOR 7, 0
 CLS
-inv
-LOCATE 2, 21
-COLOR 15, 0
-PRINT "Your Hitpoints: "; h
-LOCATE 3, 21
-PRINT "Your Score: "; s
-LOCATE 4, 21
-IF i = 1 THEN PRINT "Your Armour: Vest"
-IF i = 2 THEN PRINT "Your Armour: Heavy Coat"
-IF i = 3 THEN PRINT "Your Armour: Chain Mail"
-IF i = 4 THEN PRINT "Your Armour: Death Armour"
-LOCATE 5, 21
-IF z = 1 THEN PRINT "Your Weapon: Stick"
-IF z = 2 THEN PRINT "Your Weapon: Shotgun"
-IF z = 3 THEN PRINT "Your Weapon: Chaingun"
-IF z = 4 THEN PRINT "Your Weapon: RPG"
-LOCATE 6, 21
-PRINT "Your Strength: "; w
-LOCATE 7, 21
-PRINT "Your Defense: "; defs
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+findit:
+IF EOF(36) THEN GOTO SUCKIT
+LINE INPUT #36, data$
+IF LEFT$(data$, 8) = "@#INVSCR" THEN
+k = 1
+GOTO invscr
+END IF
+GOTO findit
+invscr:
+LINE INPUT #36, iner$
+IF iner$ = "@END" THEN GOTO waiter
+printer 1, iner$, k
+k = k + 1
+GOTO invscr
+waiter:
+LOCATE , , 0, 6, 7
 i$ = INPUT$(1)
+towait1 = FIX(TIMER)
+CLOSE #36
 GOTO loadmap
-GOTO begin
-left:
-kk = 1
+
+
+l56:
+IF direction$ = "L" THEN kk = 1
+IF direction$ = "R" THEN kk = 2
+IF direction$ = "U" THEN kk = 3
+IF direction$ = "D" THEN kk = 4
 GOTO doer
-left1:
-x = x - 1
-record = record - 1
+l56b:
+IF kk = 1 THEN
+x = x - 1: record = record - 1
+END IF
+IF kk = 2 THEN
+x = x + 1: record = record + 1
+END IF
+IF kk = 3 THEN
+y = y - 1: record = record - 79
+END IF
+IF kk = 4 THEN
+y = y + 1: record = record + 79
+END IF
+
 GOTO begin
-right:
-kk = 2
-GOTO doer
-right1:
-x = x + 1
-record = record + 1
-GOTO begin
-up:
-kk = 3
-GOTO doer
-up1:
-y = y - 1
-record = record - 79
-GOTO begin
-down:
-kk = 4
-GOTO doer
-down1:
-y = y + 1
-record = record + 79
-GOTO begin
+
+
+
 doer:
-LK = rp * 8690 - 8689
-dfdf = record * 5 - 5
-m = LK + dfdf
-aaa$ = SPACE$(5)
-GET #1, m, aaa$
-aaaa$ = LEFT$(aaa$, 1)
-IF aaaa$ = "1" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-ab$ = RIGHT$(aaa$, 1)
-IF ab$ = "/" THEN GOTO cont11111
-LOCATE y, x
-PRINT ab$
-GOTO cont12111
-cont11111:
-LOCATE y, x
-PRINT " "
-cont12111:
+dd = map2(rp)
+yes2:
+
+
+IF doer = 5 THEN
+dkdk = cury - 1
+record1 = dkdk * 79 + curx
+lk = dd + 5
+dfdf = record1 * 3 - 3
+m = lk + dfdf
+GOTO getstuff
 END IF
-IF aaaa$ = "2" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
+
+
+
+
+lk = dd + 5
+dfdf = record * 3 - 3
+m = lk + dfdf
+
+
+getstuff:
 LOCATE y, x
-PRINT CHR$(6)
+a$ = SPACE$(3)
+GET #1, m, a$
+d$ = LEFT$(a$, 1)
+dhg = ASC(d$)
+bg1 = FIX(dhg / 16)
+fg1 = dhg - (bg1 * 16)
+COLOR fg1, bg1
+IF doer = 5 THEN GOTO gotcolor
+e$ = RIGHT$(a$, 1)
+IF e$ = CHR$(0) THEN
+PRINT " "; SPC(0);
+GOTO doner
 END IF
-IF aaaa$ = "3" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT CHR$(5)
-END IF
-IF aaaa$ = "4" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT " "
-END IF
-IF aaaa$ = "5" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT "/"
-END IF
-IF aaaa$ = "6" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT "\"
-END IF
-IF aaaa$ = "7" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT "-"
-END IF
-IF aaaa$ = "8" THEN
-bgg$ = LEFT$(aaa$, 2)
-bg$ = RIGHT$(bgg$, 1)
-IF bg$ = "0" THEN d = 0
-IF bg$ = "1" THEN d = 1
-IF bg$ = "2" THEN d = 2
-IF bg$ = "3" THEN d = 3
-IF bg$ = "4" THEN d = 4
-IF bg$ = "5" THEN d = 5
-IF bg$ = "6" THEN d = 6
-IF bg$ = "7" THEN d = 7
-IF bg$ = "8" THEN d = 8
-IF bg$ = "9" THEN d = 9
-IF bg$ = "A" THEN d = 10
-IF bg$ = "B" THEN d = 11
-IF bg$ = "C" THEN d = 12
-IF bg$ = "D" THEN d = 13
-IF bg$ = "E" THEN d = 14
-IF bg$ = "F" THEN d = 15
-fgg$ = LEFT$(aaa$, 3)
-fg$ = RIGHT$(fgg$, 1)
-IF fg$ = "0" THEN k = 0
-IF fg$ = "1" THEN k = 1
-IF fg$ = "2" THEN k = 2
-IF fg$ = "3" THEN k = 3
-IF fg$ = "4" THEN k = 4
-IF fg$ = "5" THEN k = 5
-IF fg$ = "6" THEN k = 6
-IF fg$ = "7" THEN k = 7
-IF fg$ = "8" THEN k = 8
-IF fg$ = "9" THEN k = 9
-IF fg$ = "A" THEN k = 10
-IF fg$ = "B" THEN k = 11
-IF fg$ = "C" THEN k = 12
-IF fg$ = "D" THEN k = 13
-IF fg$ = "E" THEN k = 14
-IF fg$ = "F" THEN k = 15
-COLOR k, d
-LOCATE y, x
-PRINT "|"
-END IF
+PRINT e$; SPC(0);
+
 doner:
-IF kk = 1 THEN GOTO left1
-IF kk = 2 THEN GOTO right1
-IF kk = 3 THEN GOTO up1
-IF kk = 4 THEN GOTO down1
+IF kk = 1 THEN GOTO l56b  'eft1
+IF kk = 2 THEN GOTO l56b  'right1
+IF kk = 3 THEN GOTO l56b  'up1
+IF kk = 4 THEN GOTO l56b  'down1
 GOTO begin
 Quit:
 GOTO load
-errorer:
-CLS
+SUCKIT:
 PRINT
-COLOR 4, 0
-PRINT "ERROR!!!!!! FQMAPS.DAT NOT FOUND!!!"
-PRINT "PLEASE REINSTALL!!!!"
+PRINT "The following error(s) were detected... Cannot find @#INVSCR in REF file."
 PRINT
 GOTO ender5
+NOMAPERROR:
+PRINT
+PRINT "The following error(s) were detected... Cannot find @#MAP in REF file."
+PRINT
+GOTO ender5
+NOHELP:
+PRINT
+PRINT "The following error(s) were detected... Cannot find @#HELP in REF file."
+PRINT
+GOTO ender5
+NOINTRO:
+PRINT
+PRINT "The following error(s) were detected... Cannot find @#INTRO in REF file."
+PRINT
+GOTO ender5
+novariabledat:
+PRINT
+PRINT "The following error(s) were detected... Cannot find VARIABLE.DAT file."
+PRINT
+GOTO ender5
+noscrdat:
+PRINT
+PRINT "The following error(s) were detected... Cannot find NOSCR.DAT file."
+PRINT
+GOTO ender5
+errorer:
+PRINT
+PRINT "The following error(s) were detected... Cannot find FQMAPS.DAT file."
+PRINT
+GOTO ender5
+errorer1:
+PRINT
+PRINT "The following error(s) were detected... Cannot find FQREFS.DAT file."
+PRINT
+GOTO ender5
+leaver1:
+dofunction:
+IF way = 1 THEN
+x = x - 1: waypoint = 1
+END IF
+IF way = 2 THEN
+x = x + 1: waypoint = 2
+END IF
+IF way = 3 THEN
+y = y - 1: waypoint = 3
+END IF
+IF way = 4 THEN
+y = y + 1: waypoint = 4
+END IF
+
+doiter:
+DO
+INPUT #36, adsg$
+adsg$ = LTRIM$(adsg$)
+IF adsg$ = "@DO" THEN GOTO dothe
+IF LEFT$(adsg$, 3) = "@IF" THEN
+iner$ = adsg$
+GOTO ifer
+END IF
+IF LEFT$(adsg$, 4) = "@IPS" THEN GOTO ifposition
+IF adsg$ = "@END" THEN GOTO leaver
+
+IF runref$ <> "YES" THEN
+IF EOF(36) THEN GOTO leaver
+END IF
+IF runref$ = "YES" THEN
+IF EOF(53) THEN GOTO ins
+END IF
+LOOP
+dothe:
+INPUT #36, iner$
+iner$ = LTRIM$(iner$)
+iner$ = UCASE$(iner$)
+IF iner$ = "@END" THEN GOTO donewith
+dothe = 5
+GOTO togo2
+donewith:
+dothe = 0
+GOTO doiter
+
+ifposition:
+dfdf$ = RTRIM$(LTRIM$(RIGHT$(adsg$, LEN(adsg$) - 4)))
+COLOR 15, 1
+
+xpos1 = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
+ypos1 = VAL(RIGHT$(dfdf$, LEN(dfdf$) - INSTR(dfdf$, " ")))
+
+
+IF x = xpos1 AND y = ypos1 THEN GOTO itisonit
+GOTO doiter
+
+itisonit:
+DO
+IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ = "YES" THEN INPUT #53, iner$
+iner$ = LTRIM$(iner$)
+
+
+togo2:
+iner$ = UCASE$(iner$)
+IF iner$ = "#DONE" THEN
+doit3 = 0
+cb = 0
+doit = 0
+runref$ = "NO"
+GOTO doiter
+END IF
+
+
+IF LEFT$(iner$, 5) = "#WAIT" THEN
+if$ = LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 5)))
+IF if$ = "1" THEN LOCATE , , 1
+IF if$ = "0" THEN LOCATE , , 0
+i$ = INPUT$(1)
+END IF
+
+IF LEFT$(iner$, 6) = "#SLEEP" THEN
+rp6 = VAL(LTRIM$(RIGHT$(iner$, LEN(iner$) - 6)))
+ts = TIMER
+DO
+LOOP WHILE TIMER < ts + rp6
+'SLEEP rp6
+END IF
+
+IF LEFT$(iner$, 6) = "#SUPER" THEN
+superhuman$ = "YES"
+END IF
+
+IF LEFT$(iner$, 8) = "#NOSUPER" THEN
+superhuman$ = "NO"
+END IF
+
+IF LEFT$(iner$, 10) = "#MAPSCREEN" THEN
+thescreen = VAL(LTRIM$(RIGHT$(iner$, LEN(iner$) - 10)))
+END IF
+
+
+IF LEFT$(iner$, 5) = "#GOTO" THEN
+rp = VAL(LTRIM$(RIGHT$(iner$, LEN(iner$) - 5)))
+reloadscreen = 2
+END IF
+
+IF LEFT$(iner$, 7) = "#NEWPOS" THEN
+dfdf$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 7))
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+LOCATE y, x
+COLOR , color1
+PRINT " "; SPC(0);
+
+x = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
+y = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
+
+END IF
+
+
+IF iner$ = "#MOVEOBJ" THEN
+IF runref$ <> "YES" THEN INPUT #36, kind$
+IF runref$ = "YES" THEN INPUT #53, kind$
+ret = 0
+ghs = 5
+returnhere:
+        ts = TIMER
+        DO
+        LOOP WHILE TIMER < ts + VAL(kind$)
+
+IF runref$ <> "YES" THEN INPUT #36, dfdf$
+IF runref$ = "YES" THEN INPUT #53, dfdf$
+dfdf$ = UCASE$(dfdf$)
+IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
+
+curx = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
+cury = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
+
+
+xb = SCREEN(cury, curx)
+toprint$ = CHR$(xb)
+xb1 = SCREEN(cury, curx, 1)
+d = xb1
+
+IF xb1 >= 16 THEN
+d = FIX(xb1 / 16)
+xb1 = xb1 - (d * 16)
+
+END IF
+
+'PRINT xb1: END
+
+doer = 5
+GOTO doer
+gotcolor:
+LOCATE cury, curx
+PRINT " "
+doer = 0
+
+IF runref$ <> "YES" THEN INPUT #36, dfdf$
+IF runref$ = "YES" THEN INPUT #53, dfdf$
+dfdf$ = UCASE$(dfdf$)
+
+IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
+
+
+curx = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
+cury = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
+
+LOCATE cury, curx
+COLOR xb1, d
+PRINT toprint$; SPC(0);
+GOTO returnhere:
+
+donemove:
+END IF
+
+
+IF iner$ = "#ANIMATE" THEN
+IF RUNRUF$ = "YES" THEN GOTO donet
+INPUT #36, ani$
+ret1 = 0
+IF ani$ = "1" THEN ret1 = 3
+todo:
+cb = 0
+INPUT #36, newthing$
+IF newthing$ = "#DONEANIMATE" THEN GOTO doneanimate
+iner$ = newthing$
+iner$ = UCASE$(iner$)
+cb = 56
+IF ret1 = 3 THEN SLEEP 1
+GOTO togo2:
+doneanimate:
+CLOSE #36
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+GOTO dl1
+END IF
+donet:
+
+IF LEFT$(iner$, 7) = "#CHOICE" THEN
+LOCATE , , 0
+howmany = VAL(RIGHT$(iner$, LEN(iner$) - 7))
+'OPEN "OPTION.DAT" FOR OUTPUT AS #52
+FOR hg = 1 TO howmany
+IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ = "YES" THEN INPUT #53, data$
+opt$(hg) = data$
+'PRINT #52, data$
+NEXT hg
+'CLOSE #52
+
+op4 = 1
+PRINT
+cury = CSRLIN
+beg6:
+LOCATE cury, 1
+'OPEN "OPTION.DAT" FOR INPUT AS #52
+LOCATE , 1
+COLOR 15, 0
+FOR hg = 1 TO (op4 - 1)
+'INPUT #52, data$
+data$ = opt$(hg)
+
+printer 1, data$, cury + hg - 1
+NEXT hg
+
+
+'INPUT #52, option$
+option$ = opt$(op4)
+
+
+
+'option$ =
+
+COLOR 15, 1
+
+printer 3, option$, cury + hg - 1
+doposx1 = doposx
+COLOR 15, 0
+
+sssg = 1
+fds = 1
+curg:
+IF op4 + fds > howmany THEN GOTO curg1
+sssg = sssg - 1
+'IF EOF(52) THEN GOTO curg1
+'INPUT #52, junk$
+junk$ = opt$(op4 + fds)
+fds = fds + 1
+printer 1, junk$, cury + hg - sssg
+GOTO curg
+curg1:
+'CLOSE #52
+
+DO
+LOCATE cury + (op4 - 1), doposx1, 1, 6, 7
+newcheck$ = INKEY$
+LOOP WHILE newcheck$ = ""
+SELECT CASE newcheck$
+CASE CHR$(27)
+GOTO donefunc
+CASE CHR$(13)
+GOTO enterpress
+CASE Null$ + CHR$(77)
+GOTO downer
+CASE Null$ + CHR$(75)
+GOTO uper
+CASE Null$ + CHR$(72)
+uper:
+IF op4 = 1 THEN
+op4 = howmany
+GOTO beg6
+END IF
+op4 = op4 - 1
+GOTO beg6
+CASE Null$ + CHR$(80)
+downer:
+IF op4 = howmany THEN
+op4 = 1
+GOTO beg6
+END IF
+op4 = op4 + 1
+GOTO beg6
+CASE ELSE
+GOTO beg6
+END SELECT
+GOTO beg6
+
+enterpress:
+op4$ = STR$(op4)
+toGET$ = "#IF" + op4$
+
+gg:
+IF runref$ <> "YES" THEN
+IF EOF(36) THEN GOTO nothing
+END IF
+IF runref$ = "YES" THEN
+IF EOF(53) THEN GOTO nothing
+END IF
+IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ = "YES" THEN INPUT #53, data$
+IF data$ = toGET$ THEN GOTO dofunc
+GOTO gg
+dofunc:
+in:
+IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ = "YES" THEN INPUT #53, iner$
+iner$ = LTRIM$(iner$)
+
+iner$ = UCASE$(iner$)
+IF iner$ = "@DONE" THEN GOTO donefunc
+doits = 5
+GOTO togo2
+donefunc:
+IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ = "YES" THEN INPUT #53, data$
+data$ = UCASE$(data$)
+IF data$ = "@DONECHOICE" THEN GOTO nothing
+GOTO donefunc
+nothing:
+doits = 0
+'KILL "OPTION.DAT"
+END IF
+
+IF LEFT$(iner$, 6) = "#CLEAR" THEN
+clear$ = RIGHT$(iner$, LEN(iner$) - 6)
+ab = VAL(clear$)
+IF ab = 0 THEN ab = 25
+LOCATE ab, 1
+COLOR 7, 0
+PRINT STRING$(80, " "); SPC(0);
+END IF
+
+
+IF LEFT$(iner$, 5) = "@GOTO" THEN
+togoto$ = LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 5)))
+IF LEFT$(togoto$, 2) <> "@#" THEN togoto$ = "@#" + togoto$
+
+
+IF runref$ <> "YES" THEN
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+gos:
+IF EOF(36) THEN GOTO getout6
+INPUT #36, dat$
+IF dat$ = togoto$ THEN GOTO itisonit
+GOTO gos
+END IF
+
+
+IF runref$ = "YES" THEN
+CLOSE #53
+OPEN reffile$ FOR INPUT AS #53
+gos1:
+IF EOF(53) THEN GOTO getout6
+INPUT #53, dat$
+IF dat$ = togoto$ THEN GOTO itisonit
+GOTO gos1:
+END IF
+
+getout6:
+CLOSE #36, #53
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+kkkk = y - 1
+kkk = kkkk * 79
+record = kkk + x
+GOTO getout
+END IF
+
+
+IF iner$ = "#NOLINE" THEN
+COLOR 7, 0
+IF gbbn = 5 THEN GOTO nothing3
+gbbn = 5
+LOCATE 23, 1
+PRINT STRING$(80, " "); SPC(0);
+nothing3:
+printline$ = "NO"
+END IF
+
+IF LEFT$(iner$, 7) = "#RUNREF" THEN
+data$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 7))
+label$ = LEFT$(data$, INSTR(data$, "|") - 1)
+reffile$ = RIGHT$(data$, LEN(data$) - INSTR(data$, "|"))
+
+
+newgfh1:
+label$ = LTRIM$(label$)
+reffile$ = LTRIM$(reffile$)
+
+OPEN reffile$ FOR BINARY AS #53
+IF LOF(53) < 2 THEN
+CLOSE #53
+KILL reffile$
+GOTO returnit
+END IF
+returnref:
+CLOSE #53
+OPEN reffile$ FOR INPUT AS #53
+junky:
+
+IF EOF(53) THEN GOTO endrefit
+INPUT #53, iner$
+IF iner$ = "@#" + label$ THEN
+bg = 0
+GOTO ins
+END IF
+
+GOTO junky
+
+
+ins:
+IF EOF(53) THEN GOTO endrefit
+INPUT #53, iner$
+iner$ = UCASE$(iner$)
+IF iner$ = "#DONE" THEN GOTO ins
+IF iner$ = "@END" THEN GOTO endrefit
+runref$ = "YES"
+GOTO togo2
+endrefit:
+startplay = 0
+CLOSE #53
+runref$ = "NO"
+IF doit3 = 5 THEN GOTO INR
+GOTO itisonit
+returnit:
+END IF
+
+
+IF iner$ = "#CLS" THEN
+reloadscreen = 3
+doposy = 1
+COLOR 7, 0
+CLS
+END IF
+
+
+IF LEFT$(iner$, 5) = "#SHOW" THEN
+data$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 5))
+leftof$ = LEFT$(data$, INSTR(data$, "|") - 1)
+rightof$ = RIGHT$(data$, LEN(data$) - INSTR(data$, "|"))
+OPEN leftof$ FOR INPUT AS #252
+dg:
+IF EOF(252) THEN GOTO done2
+INPUT #252, data$
+IF data$ = "@#" + LTRIM$(rightof$) THEN GOTO showit1
+GOTO dg
+showit1:
+IF EOF(252) THEN GOTO done2
+INPUT #252, toprint$
+IF toprint$ = "@END" THEN GOTO done2
+printer 1, toprint$, doposy
+doposy = doposy + 1
+GOTO showit1
+done2:
+CLOSE #252
+END IF
+
+
+
+IF LEFT$(iner$, 6) = "#PRINT" THEN
+
+IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) = "P" THEN
+IF runref$ <> "YES" THEN LINE INPUT #36, toprint$
+IF runref$ = "YES" THEN LINE INPUT #53, toprint$
+printer 1, toprint$, doposy
+GOTO g55
+END IF
+
+howmany = VAL(RIGHT$(iner$, LEN(iner$) - 6))
+FOR doingit = 1 TO howmany
+IF runref$ <> "YES" THEN LINE INPUT #36, toprint$
+IF runref$ = "YES" THEN LINE INPUT #53, toprint$
+printer 2, toprint$, doposy
+doposy = doposy + 1
+NEXT
+g55:
+IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) <> "P" THEN reloadscreen = 3
+towait1 = FIX(TIMER)
+END IF
+
+IF iner$ = "#MONSTER" THEN
+
+IF runref$ = "YES" THEN INPUT #53, tosay$
+IF runref$ = "YES" THEN INPUT #53, m$
+IF runref$ = "YES" THEN INPUT #53, b$
+IF runref$ = "YES" THEN INPUT #53, togetscore
+IF runref$ = "YES" THEN INPUT #53, expertoget
+
+IF runref$ <> "YES" THEN INPUT #36, tosay$
+IF runref$ <> "YES" THEN INPUT #36, m$
+IF runref$ <> "YES" THEN INPUT #36, b$
+IF runref$ <> "YES" THEN INPUT #36, togetscore
+IF runref$ <> "YES" THEN INPUT #36, expertoget
+
+IF i = 1 THEN weapon = weapon1power
+IF i = 2 THEN weapon = weapon2power
+IF i = 3 THEN weapon = weapon3power
+IF i = 4 THEN weapon = weapon4power
+
+IF z = 1 THEN armour = armour1power
+IF z = 2 THEN armour = armour2power
+IF z = 3 THEN armour = armour3power
+IF z = 4 THEN armour = armour4power
+
+IF b$ = "MAXENERGY" THEN
+b = hitmax
+mn = w * 2 + weapon + armour
+GOTO deg1
+END IF
+b = VAL(b$)
+mn = VAL(b$)
+deg1:
+deg = 5
+GOTO monster
+monster1:
+deg = 0
+END IF
+
+
+IF LEFT$(iner$, 6) = "#GOLD+" THEN
+newscore$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 6))
+newscore = VAL(newscore$)
+s = s + newscore
+END IF
+
+
+
+IF LEFT$(iner$, 6) = "#SHELL" THEN
+newscore$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 6))
+SHELL newscore$
+END IF
+
+
+IF LEFT$(iner$, 6) = "#GOLD-" THEN
+newscore$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 6))
+newscore = VAL(newscore$)
+IF s < newscore THEN GOTO cantdo
+s = s - newscore
+GOTO coner13
+cantdo:
+CLS
+printer 1, "`2Your funds aren't exactly what they used to be...", 1
+printer 1, "`2You decide to pass up this glorious opportunity to spend money...", 2
+printer 1, "`4Press a key...", 4
+iss$ = INPUT$(1)
+GOTO getout
+coner13:
+END IF
+
+
+IF iner$ = "#INPUT" THEN
+IF runref$ <> "YES" THEN INPUT #36, random1$
+IF runref$ = "YES" THEN INPUT #53, random1$
+IF runref$ <> "YES" THEN INPUT #36, x$
+IF runref$ = "YES" THEN INPUT #53, x$
+IF runref$ <> "YES" THEN INPUT #36, y$
+IF runref$ = "YES" THEN INPUT #53, y$
+thex = VAL(x$)
+they = VAL(y$)
+length = VAL(random1$)
+LOCATE they, thex
+COLOR 15, 1
+PRINT STRING$(length, " "); SPC(0);
+LOCATE they, thex
+theprint$ = ""
+ig$ = ""
+gd64:
+ig$ = INPUT$(1)
+IF ig$ = CHR$(13) THEN GOTO enter
+IF ig$ = CHR$(27) THEN GOTO enter
+IF ig$ = CHR$(8) THEN
+IF LEN(theprint$) <= 0 THEN GOTO gd64
+theprint$ = LEFT$(theprint$, LEN(theprint$) - 1)
+LOCATE they, thex
+COLOR 15, 1
+PRINT STRING$(length, " "); SPC(0);
+LOCATE they, thex
+PRINT theprint$; SPC(0);
+GOTO gd64
+END IF
+IF LEN(theprint$) >= length - 1 THEN GOTO gd64
+theprint$ = theprint$ + ig$
+LOCATE they, thex
+PRINT theprint$; SPC(0);
+GOTO gd64
+enter:
+IF theprint$ = "" THEN theprint$ = "0"
+what$ = "<>"
+toset$ = "LASTRESPONSE"
+tosetto$ = theprint$
+GOTO setnow
+END IF
+
+
+IF LEFT$(iner$, 9) = "#RANDOMIF" THEN
+rand1 = VAL(RIGHT$(iner$, LEN(iner$) - 9))
+RANDOMIZE TIMER
+rag = INT(RND * rand1) + 1
+IF rag = 1 THEN GOTO ifit1
+
+idg:
+IF runref$ <> "YES" THEN
+IF EOF(36) THEN GOTO donerandom
+END IF
+IF runref$ = "YES" THEN
+IF EOF(53) THEN GOTO donerandom
+END IF
+IF runref$ <> "YES" THEN INPUT #36, junk$
+IF runref$ = "YES" THEN INPUT #53, junk$
+IF UCASE$(junk$) = "#ENDRANDOM" THEN GOTO donerandom
+GOTO idg
+
+ifit1:
+IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ = "YES" THEN INPUT #53, iner$
+iner$ = LTRIM$(iner$)
+iner$ = UCASE$(iner$)
+IF iner$ = "#ENDRANDOM" THEN GOTO donerandom
+doit2 = 5
+GOTO togo2
+donerandom:
+doit2 = 0
+GOTO itisonit
+END IF
+
+
+IF LEFT$(iner$, 4) = "#SET" THEN
+cb562 = 0
+
+junk$ = ""
+junk6$ = ""
+
+what$ = ""
+toset$ = ""
+tosetto$ = ""
+gsb = 6
+
+spacer11:
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = CHR$(32) THEN GOTO spacer21
+toset$ = toset$ + ghg1$
+gsb = gsb + 1
+GOTO spacer11
+
+spacer21:
+gsb = gsb + 1
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = CHR$(32) THEN GOTO spacer31
+what$ = what$ + ghg1$
+GOTO spacer21
+
+spacer31:
+gsb = gsb + 1
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = ";" THEN GOTO spacer41
+tosetto$ = tosetto$ + ghg1$
+GOTO spacer31
+
+spacer41:
+
+hyes = 5
+GOTO getready
+
+setnow:
+
+OPEN "SETTINGS.DAT" FOR INPUT AS #67
+OPEN "set2.dat" FOR OUTPUT AS #68
+eofer:
+IF EOF(67) THEN GOTO endnext
+INPUT #67, junk$
+junk$ = LTRIM$(RTRIM$(junk$))
+
+
+IF what$ = "-1" AND junk$ = tosetto$ THEN GOTO speci
+IF what$ = "=1" AND junk$ = tosetto$ THEN GOTO speci
+IF what$ = "+1" AND junk$ = tosetto$ THEN
+speci:
+nodata = 50
+INPUT #67, dataforone$
+PRINT #68, junk$
+PRINT #68, dataforone$
+GOTO eofer
+END IF
+
+IF what$ <> "+1" AND what$ <> "-1" AND what$ <> "=1" THEN GOTO prit
+IF junk$ = toset$ THEN GOTO thie3
+
+prit:
+
+PRINT #68, junk$
+
+thie3:
+
+IF junk$ = toset$ THEN
+INPUT #67, junk6$
+
+IF what$ = "+" THEN
+jf = VAL(junk6$) + VAL(tosetto$)
+jf$ = RTRIM$(LTRIM$(STR$(jf)))
+PRINT #68, jf$
+GOTO ender6
+END IF
+
+IF what$ = "-" THEN
+jf = VAL(junk6$) - VAL(tosetto$)
+jf$ = RTRIM$(LTRIM$(STR$(jf)))
+PRINT #68, jf$
+GOTO ender6
+END IF
+
+IF what$ = "-1" THEN GOTO spec
+IF what$ = "=1" THEN GOTO spec
+IF what$ = "+1" THEN
+spec:
+
+IF nodata = 50 THEN
+nodata = 0
+GOTO doit3
+END IF
+
+eofer1:
+IF EOF(67) THEN GOTO endnext5
+INPUT #67, junk7$
+PRINT #68, junk7$
+
+IF junk7$ = tosetto$ THEN
+INPUT #67, dataforone$
+PRINT #68, dataforone$
+GOTO doit3
+END IF
+
+
+GOTO eofer1
+endnext5:
+dataforone$ = "0"
+
+doit3:
+
+jf = 0
+IF what$ = "+1" THEN jf = VAL(junk6$) + VAL(dataforone$)
+IF what$ = "-1" THEN jf = VAL(junk6$) - VAL(dataforone$)
+IF what$ = "=1" THEN jf$ = dataforone$
+IF what$ <> "=1" THEN jf$ = STR$(jf)
+jf$ = RTRIM$(LTRIM$(jf$))
+PRINT #68, junk$
+PRINT #68, jf$
+GOTO ender6
+END IF
+
+PRINT #68, tosetto$
+
+
+ender6:
+cb562 = 5
+END IF
+
+
+GOTO eofer
+endnext:
+IF cb562 = 5 THEN GOTO nex6
+PRINT #68, toset$
+PRINT #68, tosetto$
+nex6:
+cb562 = 0
+CLOSE #5, #68, #66, #67, #69, #222, #234
+KILL "SETTINGS.DAT"
+NAME "SET2.DAT" AS "settings.dat"
+
+IF hyes = 5 THEN
+hyes = 0
+OPEN "SETTINGS.DAT" FOR INPUT AS #241
+eofer62:
+IF EOF(241) THEN GOTO doneit2
+INPUT #241, thes$
+
+
+IF thes$ = "MAXENERGY" THEN
+INPUT #241, thes1$
+hitmax = VAL(thes1$)
+END IF
+
+IF thes$ = "HITPOINT" THEN
+INPUT #241, thes1$
+h = VAL(thes1$)
+IF h > hitmax THEN h = hitmax
+END IF
+
+
+
+IF thes$ = "STRENGTH" THEN
+INPUT #241, thes1$
+w = VAL(thes1$)
+END IF
+
+IF thes$ = "DEFENSE" THEN
+INPUT #241, thes1$
+defs = VAL(thes1$)
+END IF
+
+IF thes$ = "GOLD" THEN
+INPUT #241, thes1$
+s = VAL(thes1$)
+END IF
+
+IF thes$ = "EXPERIENCE" THEN
+INPUT #241, thes1$
+EXPER = VAL(thes1$)
+END IF
+
+GOTO eofer62
+doneit2:
+CLOSE #241
+END IF
+END IF
+
+
+IF iner$ = "#MAXENERGY" THEN
+h = hitmax
+END IF
+
+
+IF LEFT$(iner$, 3) = "#IF" THEN
+ifer:
+iner$ = UCASE$(iner$)
+whatif$ = ""
+how$ = ""
+whatequal$ = ""
+gsb = 5
+
+spacer1:
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = CHR$(32) THEN GOTO spacer2
+whatif$ = whatif$ + ghg1$
+gsb = gsb + 1
+GOTO spacer1
+
+spacer2:
+gsb = gsb + 1
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = CHR$(32) THEN GOTO spacer3
+how$ = how$ + ghg1$
+GOTO spacer2
+
+spacer3:
+gsb = gsb + 1
+ghg$ = LEFT$(iner$, gsb)
+ghg1$ = RIGHT$(ghg$, 1)
+IF ghg1$ = CHR$(32) THEN GOTO spacer4
+whatequal$ = whatequal$ + ghg1$
+GOTO spacer3
+
+spacer4:
+GOTO getready
+getre2:
+
+CLOSE #69
+OPEN "SETTINGS.DAT" FOR INPUT AS #69
+EOF1:
+IF EOF(69) THEN GOTO donenext
+INPUT #69, whatif1$
+IF whatif1$ = "STARTVARIABLE" THEN GOTO EOF1
+
+IF whatif$ = whatif1$ THEN
+INPUT #69, whatequal1$
+
+INR:
+
+
+IF whatequal$ = whatequal1$ AND how$ = "=" THEN
+GOTO runit
+END IF
+
+IF VAL(whatequal$) >= VAL(whatequal1$) AND how$ = "<=" THEN
+GOTO runit
+END IF
+
+IF VAL(whatequal$) <= VAL(whatequal1$) AND how$ = ">=" THEN
+GOTO runit
+END IF
+
+IF VAL(whatequal$) > VAL(whatequal1$) AND how$ = "<" THEN
+GOTO runit
+END IF
+
+IF VAL(whatequal$) < VAL(whatequal1$) AND how$ = ">" THEN
+GOTO runit
+END IF
+
+IF how$ = "=1" THEN
+CLOSE #69
+OPEN "SETTINGS.DAT" FOR INPUT AS #69
+eof2:
+IF EOF(69) THEN GOTO donenext
+INPUT #69, whatif3$
+IF whatif3$ = "STARTVARIABLE" THEN GOTO eof2
+IF whatequal$ = whatif3$ THEN
+INPUT #69, whatequal3$
+IF whatequal1$ = whatequal3$ THEN
+GOTO runit
+END IF
+END IF
+GOTO eof2:
+END IF
+
+
+IF how$ = "<2" THEN GOTO l553
+IF how$ = "<1" THEN
+l553:
+CLOSE #69
+OPEN "SETTINGS.DAT" FOR INPUT AS #69
+eof3:
+IF EOF(69) THEN GOTO donenext
+INPUT #69, whatif3$
+IF whatif3$ = "STARTVARIABLE" THEN GOTO eof2
+IF whatequal$ = whatif3$ THEN
+INPUT #69, whatequal3$
+IF VAL(whatequal1$) <= VAL(whatequal3$) AND how$ = "<1" THEN
+GOTO runit
+END IF
+IF VAL(whatequal1$) < VAL(whatequal3$) AND how$ = "<2" THEN
+GOTO runit
+END IF
+END IF
+GOTO eof3
+END IF
+
+
+
+
+IF how$ = ">2" THEN GOTO l5533
+IF how$ = ">1" THEN
+l5533:
+CLOSE #69
+OPEN "SETTINGS.DAT" FOR INPUT AS #69
+eof4:
+IF EOF(69) THEN GOTO donenext
+INPUT #69, whatif3$
+IF whatif3$ = "STARTVARIABLE" THEN GOTO eof2
+IF whatequal$ = whatif3$ THEN
+INPUT #69, whatequal3$
+IF VAL(whatequal1$) >= VAL(whatequal3$) AND how$ = ">1" THEN
+GOTO runit
+END IF
+IF VAL(whatequal1$) > VAL(whatequal3$) AND how$ = ">2" THEN
+GOTO runit
+END IF
+END IF
+GOTO eof4
+END IF
+
+
+
+GOTO donenext
+END IF
+
+INPUT #69, junk$
+GOTO EOF1:
+
+runit:
+IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ = "YES" THEN INPUT #53, iner$
+iner$ = LTRIM$(iner$)
+IF iner$ = "#ENDIF" THEN GOTO donenext1
+IF iner$ = "#ENDIF1" THEN
+doit3 = 0
+CLOSE #69
+IF runref$ = "YES" THEN GOTO ins
+GOTO itisonit
+END IF
+doit3 = 5
+GOTO togo2
+
+donenext:
+gog:
+IF runref$ <> "YES" THEN INPUT #36, junk$
+IF runref$ = "YES" THEN INPUT #53, junk$
+IF junk$ = "#ENDIF" THEN GOTO donenext1
+IF junk$ = "#ENDIF1" THEN
+CLOSE #69
+doit3 = 0
+IF runref$ = "YES" THEN GOTO ins
+GOTO itisonit
+END IF
+GOTO gog
+dn1:
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+donenext1:
+doit3 = 0
+CLOSE #69
+IF runref$ = "YES" THEN GOTO ins
+GOTO itisonit
+END IF
+
+
+IF LEFT$(iner$, 7) = "#WEAPON" THEN i = VAL(RIGHT$(iner$, LEN(iner$) - 7))
+
+IF LEFT$(iner$, 8) = "#WEAPON+" THEN
+i = i + VAL(RIGHT$(iner$, LEN(iner$) - 8))
+IF i > 4 THEN i = 4
+END IF
+
+
+IF LEFT$(iner$, 8) = "#WEAPON-" THEN
+i = i - VAL(RIGHT$(iner$, LEN(iner$) - 8))
+IF i < 1 THEN i = 1
+END IF
+
+IF LEFT$(iner$, 6) = "#ARMOR" THEN z = VAL(RIGHT$(iner$, LEN(iner$) - 6))
+
+IF LEFT$(iner$, 7) = "#ARMOR+" THEN
+z = z + VAL(RIGHT$(iner$, LEN(iner$) - 7))
+IF z > 4 THEN z = 4
+END IF
+
+IF LEFT$(iner$, 7) = "#ARMOR-" THEN
+z = z - VAL(RIGHT$(iner$, LEN(iner$) - 7))
+IF z < 1 THEN z = 1
+END IF
+
+'IF iner$ = "#HITPOINT+" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'h = h + newscore
+'IF h > hitmax THEN h = hitmax
+'END IF
+
+'IF iner$ = "#HITPOINT-" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'h = h - newscore
+'END IF
+
+'IF iner$ = "#DEFENSE+" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'defs = defs + newscore
+'END IF
+
+'IF iner$ = "#DEFENSE-" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'defs = defs - newscore
+'END IF
+
+'IF iner$ = "#EXPERIENCE+" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'exper = exper + newscore
+'END IF
+
+'IF iner$ = "#EXPERIENCE-" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'exper = exper - newscore
+'END IF
+
+'IF iner$ = "#ATTACK+" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'w = w + newscore
+'END IF
+
+'IF iner$ = "#ATTACK-" THEN
+'IF runref$ <> "YES" THEN INPUT #36, newscore$
+'IF runref$ = "YES" THEN INPUT #53, newscore$
+'newscore = VAL(newscore$)
+'w = w - newscore
+'END IF
+
+
+IF LEFT$(iner$, 12) = "#RANDOMWRITE" THEN
+hmr = VAL(RIGHT$(iner$, LEN(iner$) - 12))
+RANDOMIZE TIMER
+rand1 = INT(RND * hmr)
+FOR i12 = 1 TO rand1
+IF runref$ <> "YES" THEN INPUT #36, D5342$
+IF runref$ = "YES" THEN INPUT #53, D5342$
+
+NEXT i12
+IF runref$ <> "YES" THEN INPUT #36, towrite$
+IF runref$ = "YES" THEN INPUT #53, towrite$
+writer towrite$
+towait1 = FIX(TIMER) + 4
+ggb = 5
+END IF
+
+
+IF LEFT$(iner$, 6) = "#WRITE" THEN
+IF runref$ <> "YES" THEN INPUT #36, towrite$
+IF runref$ = "YES" THEN INPUT #53, towrite$
+writer towrite$
+towait1 = FIX(TIMER) + 4
+ggb = 5
+END IF
+
+IF iner$ = "#RETURN" THEN
+GOTO getout
+END IF
+
+IF EXPER < 0 THEN EXPER = 0
+IF w < 0 THEN w = 0
+IF defs < 0 THEN defs = 0
+IF h < 0 THEN h = 0
+
+IF alwaysdo = 5 THEN GOTO gotothenext
+IF dothe = 5 THEN GOTO dothe
+IF jg = 5 THEN GOTO invscr
+IF doit2 = 5 THEN GOTO ifit1
+IF cb = 56 THEN GOTO todo
+IF doits = 5 THEN GOTO in
+IF runref$ = "YES" THEN GOTO ins
+IF doit3 = 5 THEN GOTO INR
+LOOP
+GOTO leaver
+
+leaver:
+doposy = 5
+CLOSE #36
+
+IF reloadscreen = 3 THEN
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+kkkk = y - 1
+kkk = kkkk * 79
+record = kkk + x
+reloadscreen = 0
+GOTO loadmap
+END IF
+
+IF reloadscreen = 2 THEN
+kkkk = y - 1
+kkk = kkkk * 79
+record = kkk + x
+reloadscreen = 0
+GOTO loadmap
+END IF
+
+IF waypoint = 1 THEN x = x + 1
+IF waypoint = 2 THEN x = x - 1
+IF waypoint = 3 THEN y = y + 1
+IF waypoint = 4 THEN y = y - 1
+
+kkkk = y - 1
+kkk = kkkk * 79
+record = kkk + x
+
+IF what = 1 THEN GOTO hard   'left
+IF what = 2 THEN GOTO hard   'right
+IF what = 3 THEN GOTO hard   'up
+IF what = 4 THEN GOTO hard   'down
+IF what = 5 THEN GOTO bg1
+unable:
+PRINT "ERROR, Unable to Do Function!!!"
+GOTO nottt
 eeeeerrrrr:
 PRINT
 PRINT "Error, User tried to Cheat!"
 GOTO nottt
 no1:
-SHELL "del Null"
-COLOR 15, 0
+COLOR 7, 0
 CLS
-COLOR 15, 0
-PRINT
-PRINT "Final Quest 2 V0.9B (C) 1998 HHSOFT"
-PRINT "All Rights Reserved..."
-PRINT
+endscreen
 ender5:
 CLOSE #8
 COLOR 7, 0
+SHELL "IF EXIST SETTINGS.BAK DEL SETTINGS.BAK"
+SHELL "IF EXIST SETTINGS.DAT DEL SETTINGS.DAT"
 END
+getready:
+OPEN "SETTINGS.DAT" FOR INPUT AS #66
+OPEN "SET3.DAT" FOR OUTPUT AS #67
+ghsg:
+IF EOF(66) THEN GOTO startvariable
+INPUT #66, data$
+INPUT #66, data1$
+
+IF data$ = "MAXENERGY" THEN
+max1 = 1
+PRINT #67, data$
+PRINT #67, hitmax
+GOTO ghsg
+END IF
+
+IF data$ = "HITPOINT" THEN
+max2 = 1
+PRINT #67, data$
+PRINT #67, h
+GOTO ghsg
+END IF
+
+IF data$ = "GOLD" THEN
+max3 = 1
+PRINT #67, data$
+PRINT #67, s
+GOTO ghsg
+END IF
+
+IF data$ = "STRENGTH" THEN
+max4 = 1
+PRINT #67, data$
+PRINT #67, w
+GOTO ghsg
+END IF
+
+IF data$ = "DEFENSE" THEN
+max5 = 1
+PRINT #67, data$
+PRINT #67, defs
+GOTO ghsg
+END IF
+
+IF data$ = "WEAPON" THEN
+max6 = 1
+PRINT #67, data$
+PRINT #67, i
+GOTO ghsg
+END IF
+
+IF data$ = "ARMOUR" THEN
+max7 = 1
+PRINT #67, data$
+PRINT #67, z
+GOTO ghsg
+END IF
+
+IF data$ = "EXPERIENCE" THEN
+max8 = 1
+PRINT #67, data$
+PRINT #67, EXPER
+GOTO ghsg
+END IF
+
+PRINT #67, data$
+PRINT #67, data1$
+
+GOTO ghsg
+
+startvariable:
+IF max1 <> 1 THEN PRINT #67, "MAXENERGY"
+IF max1 <> 1 THEN PRINT #67, hitmax
+IF max2 <> 1 THEN PRINT #67, "HITPOINT"
+IF max2 <> 1 THEN PRINT #67, h
+IF max3 <> 1 THEN PRINT #67, "GOLD"
+IF max3 <> 1 THEN PRINT #67, s
+IF max4 <> 1 THEN PRINT #67, "STRENGTH"
+IF max4 <> 1 THEN PRINT #67, w
+IF max5 <> 1 THEN PRINT #67, "DEFENSE"
+IF max5 <> 1 THEN PRINT #67, defs
+IF max6 <> 1 THEN PRINT #67, "WEAPON"
+IF max6 <> 1 THEN PRINT #67, i
+IF max7 <> 1 THEN PRINT #67, "ARMOUR"
+IF max7 <> 1 THEN PRINT #67, z
+IF max8 <> 1 THEN PRINT #67, "EXPERIENCE"
+IF max8 <> 1 THEN PRINT #67, EXPER
+max1 = 1
+max2 = 1
+max3 = 1
+max4 = 1
+max5 = 1
+max6 = 1
+max7 = 1
+max8 = 1
+CLOSE #5, #66, #67, #69, #222, #234
+KILL "SETTINGS.DAT"
+NAME "SET3.DAT" AS "settings.dat"
+
+IF hyes = 5 THEN GOTO setnow
+
+GOTO getre2
+
+getout:
+IF runref$ = "YES" THEN GOTO returnref
+CLOSE #36
+OPEN "FQREFS.DAT" FOR INPUT AS #36
+rp$ = STR$(rp)
+scr$ = "@#SCR" + rp$
+DO
+IF EOF(36) THEN EXIT DO
+INPUT #36, agggg$
+IF agggg$ = scr$ THEN EXIT DO
+LOOP
+GOTO doiter
 nottt:
 COLOR 7, 0
+SHELL "IF EXIST SETTINGS.BAK DEL SETTINGS.BAK"
+SHELL "IF EXIST SETTINGS.DAT DEL SETTINGS.DAT"
 END
 
-SUB clump (CLUMP1$, posx, posy, size, collor)
-FOR i = 1 TO LEN(CLUMP1$)
-d$ = LEFT$(CLUMP1$, i)
-letter$ = RIGHT$(d$, 1)
-letters letter$, posx, posy, size, collor
-IF posx >= 620 THEN
-y = y + 20
-x = 10
+SUB cole (pressed, toprint$, cole1$)
+
+IF pressed = 1 THEN
+gg = gdi
 END IF
-posx = posx + 10
-NEXT i
-END SUB
-
-SUB inv
-COLOR 7, 0: CLS
-COLOR 7: CLS : LOCATE , 20: COLOR 0, 5: PRINT "               "; : COLOR 15
-PRINT "Inventory!               "; : LOCATE 2, 1: LOCATE , 20: PRINT " "; : LOCATE , 59
-PRINT " "; : LOCATE 3, 1: LOCATE , 20: PRINT " "; : LOCATE , 59: PRINT " "; : LOCATE 4, 1
-LOCATE , 20: PRINT " "; : LOCATE , 59: PRINT " "; : LOCATE 5, 1: LOCATE , 20: PRINT " ";
-LOCATE , 59: PRINT " "; : LOCATE 6, 1: LOCATE , 20: PRINT " "; : LOCATE , 59: PRINT " ";
-LOCATE 7, 1
-LOCATE , 20
-COLOR 0, 5
-PRINT " "
-LOCATE 7, 59
-PRINT " "
-LOCATE 8, 20: PRINT "                                        ";
-LOCATE 9, 1: LOCATE , 20: PRINT " "; : LOCATE , 32: COLOR 15, 0: PRINT "Press any key..";
-LOCATE , 59: LOCATE 8: LOCATE , 1: PRINT "" + CHR$(10) + ""; : LOCATE , 59: COLOR , 5
-PRINT " "; : LOCATE 10, 1: LOCATE , 20
-PRINT "                                        ";
-END SUB
-
-SUB letters (which$, px, py, sz, col)
-which$ = UCASE$(which$)
-IF px < 1 THEN GOTO noletter
-IF px > 639 THEN GOTO noletter
-IF py > 479 THEN GOTO noletter
-IF py < 1 THEN GOTO noletter
-IF sz < 1 THEN GOTO noletter
-IF col < 1 THEN GOTO noletter
-IF col > 15 THEN GOTO noletter
-IF which$ = "" THEN GOTO noletter
-IF which$ = "A" THEN GOTO lettera
-IF which$ = "B" THEN GOTO letterb
-IF which$ = "C" THEN GOTO letterc
-IF which$ = "D" THEN GOTO letterd
-IF which$ = "E" THEN GOTO lettere
-IF which$ = "F" THEN GOTO letterf
-IF which$ = "G" THEN GOTO letterg
-IF which$ = "H" THEN GOTO letterh
-IF which$ = "I" THEN GOTO letteri
-IF which$ = "J" THEN GOTO letterj
-IF which$ = "K" THEN GOTO letterk
-IF which$ = "L" THEN GOTO letterl
-IF which$ = "M" THEN GOTO letterm
-IF which$ = "N" THEN GOTO lettern
-IF which$ = "O" THEN GOTO lettero
-IF which$ = "P" THEN GOTO letterp
-IF which$ = "Q" THEN GOTO letterq
-IF which$ = "R" THEN GOTO letterr
-IF which$ = "S" THEN GOTO letters
-IF which$ = "T" THEN GOTO lettert
-IF which$ = "U" THEN GOTO letteru
-IF which$ = "V" THEN GOTO letterv
-IF which$ = "W" THEN GOTO letterw
-IF which$ = "X" THEN GOTO letterx
-IF which$ = "Y" THEN GOTO lettery
-IF which$ = "Z" THEN GOTO letterz
-IF which$ = "." THEN GOTO letterperiod
-IF which$ = "," THEN GOTO lettercomma
-IF which$ = "?" THEN GOTO letterques
-IF which$ = "!" THEN GOTO letterexlam
-IF which$ = "@" THEN GOTO at
-IF which$ = "#" THEN GOTO number
-IF which$ = "$" THEN GOTO dollar
-IF which$ = "%" THEN GOTO percent
-IF which$ = "^" THEN GOTO up12
-IF which$ = "&" THEN GOTO amp
-IF which$ = "*" THEN GOTO star
-IF which$ = "(" THEN GOTO lp
-IF which$ = ")" THEN GOTO rp
-IF which$ = "-" THEN GOTO minus
-IF which$ = "_" THEN GOTO under
-IF which$ = "=" THEN GOTO equal
-IF which$ = "+" THEN GOTO plus
-IF which$ = "/" THEN GOTO forslash
-IF which$ = ">" THEN GOTO rarrow
-IF which$ = "<" THEN GOTO larrow
-IF which$ = CHR$(34) THEN GOTO quote
-IF which$ = CHR$(24) THEN GOTO up14
-IF which$ = CHR$(25) THEN GOTO down14
-IF which$ = CHR$(26) THEN GOTO right14
-IF which$ = CHR$(27) THEN GOTO left14
-IF which$ = "'" THEN GOTO apost
-IF which$ = ";" THEN GOTO semicolon
-IF which$ = ":" THEN GOTO colon
-IF which$ = "]" THEN GOTO rbrac
-IF which$ = "[" THEN GOTO lbrac
-IF which$ = "}" THEN GOTO rbrackets
-IF which$ = "{" THEN GOTO lbrackets
-IF which$ = "\" THEN GOTO backslash
-IF which$ = "0" THEN GOTO number0
-IF which$ = "1" THEN GOTO number1
-IF which$ = "2" THEN GOTO number2
-IF which$ = "3" THEN GOTO number3
-IF which$ = "4" THEN GOTO number4
-IF which$ = "5" THEN GOTO number5
-IF which$ = "6" THEN GOTO number6
-IF which$ = "7" THEN GOTO number7
-IF which$ = "8" THEN GOTO number8
-IF which$ = "9" THEN GOTO number9
-
-
-GOTO noletter
-
-lettera:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brgefddduulluddd"
-GOTO noletter
-
-letterb:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrehehl"
-GOTO noletter
-
-
-letterc:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrbdhgddfe "
-
-
-GOTO noletter
-letterd:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddreuuhl"
-GOTO noletter
-
-lettere:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrrlluurrlluurr"
-GOTO noletter
-
-letterf:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrllddrrlldd"
-GOTO noletter
-letterg:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrbdhgddfeul"
-GOTO noletter
-
-
-letterh:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddduurruudddd"
-GOTO noletter
-
-
-letteri:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrlddddlrr"
-GOTO noletter
-
-
-letterj:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrlddddh"
-GOTO noletter
-
-
-letterk:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "DDDDUUeeggffhh"
-GOTO noletter
-
-letterl:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrr"
-GOTO noletter
-
-letterm:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddduuuu"
-DRAW "C" + color1$ + "S" + pl$ + "fe"
-DRAW "C" + color1$ + "S" + tik$ + "dddd"
-GOTO noletter
-
-lettern:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddduuuufddfuuuu"
-GOTO noletter
-
-lettero:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrbdhgddfeuu"
-GOTO noletter
-
-letterp:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddduurehl"
-GOTO noletter
-
-
-letterq:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrbdhgddfeblfhbruu"
-GOTO noletter
-
-letterr:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddduuffhhrehl"
-GOTO noletter
-
-letters:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brrlgdrrdgl"
-GOTO noletter
-
-lettert:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrldddd"
-GOTO noletter
-
-letteru:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrruuuu"
-GOTO noletter
-
-letterv:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddfeuuu"
-GOTO noletter
-
-letterw:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dddd"
-DRAW "C" + color1$ + "S" + pl$ + "EF"
-DRAW "C" + color1$ + "S" + tik$ + "uuuu"
-
-GOTO noletter
-
-letterx:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "fddfhgeuue"
-GOTO noletter
-
-lettery:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "fegddd"
-GOTO noletter
-
-letterz:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + pl$ + "rrrdgdgdgrrr"
-GOTO noletter
-
-lettercomma:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdbrrdg"
-GOTO noletter
-
-letterperiod:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdbru"
-GOTO noletter
-
-letterques:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdbr"
-DRAW "C" + color1$ + "S" + pl$ + "ubu"
-DRAW "C" + color1$ + "S" + tik$ + "uehg"
-GOTO noletter
-
-letterexlam:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-pl = sz / 3
-pl$ = STR$(pl)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdbr"
-DRAW "C" + color1$ + "S" + pl$ + "ubu"
-DRAW "C" + color1$ + "S" + tik$ + "uuu"
-GOTO noletter
-
-number0:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrruuuulldddEE"
-GOTO noletter
-
-number1:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brgeddddlrr"
-GOTO noletter
-
-number2:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrddllddrr"
-GOTO noletter
-
-number3:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrddllrrddll"
-GOTO noletter
-
-number4:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddrruudddd"
-GOTO noletter
-
-number5:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrllddrrddll"
-GOTO noletter
-
-number6:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrllddddrruull"
-GOTO noletter
-
-number7:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrdddd"
-GOTO noletter
-
-number8:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrruullrruull"
-GOTO noletter
-
-number9:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddrrlluurrddddll"
-GOTO noletter
-
-at:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddrrlluuuurrdddlurd"
-GOTO noletter
-
-number:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-plk = sz / 4
-pl = FIX(plk)
-pl$ = STR$(pl)
-tik = FIX(tik)
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddddbrbruuuubdllbdbdrr"
-DRAW "C" + color1$ + "s" + pl$ + "rrllllllllllrruuuuuullrrrrrrrrrr"
-GOTO noletter
-
-dollar:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrbdlldrrdll"
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brdbdbdd"
-GOTO noletter
-
-percent:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "dbdbdbdeuuebdbdbdd"
-GOTO noletter
-
-up12:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdef"
-GOTO noletter
-
-amp:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdefghfgdrreblblbuff"
-GOTO noletter
-
-star:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbdddurllreggefhh"
-GOTO noletter
-
-lp:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brgddf"
-GOTO noletter
-
-rp:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brfddg"
-GOTO noletter
-
-minus:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdrr"
-GOTO noletter
-
-under:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdrr"
-GOTO noletter
-
-equal:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdrrbdll"
-GOTO noletter
-
-plus:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbdddurll"
-GOTO noletter
-
-forslash:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdbdbdeuue"
-GOTO noletter
-
-rarrow:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ffgg"
-GOTO noletter
-
-larrow:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrggff"
-GOTO noletter
-
-quote:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "ddbrbruu"
-GOTO noletter
-
-apost:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brrdg"
-GOTO noletter
-
-semicolon:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brdbddg"
-GOTO noletter
-
-colon:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brdbdbdd"
-GOTO noletter
-
-rbrac:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrddddll"
-GOTO noletter
-
-lbrac:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "rrllddddrr"
-GOTO noletter
-
-lbrackets:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brbrgdlrdf"
-GOTO noletter
-
-rbrackets:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "fdrldg"
-GOTO noletter
-
-backslash:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "fddf"
-GOTO noletter
-
-up14:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdedddduuuuf"
-GOTO noletter
-
-down14:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "brddddegh"
-GOTO noletter
-
-right14:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbdrrhfg"
-GOTO noletter
-
-left14:
-posx$ = STR$(px)
-posy$ = STR$(py)
-color1$ = STR$(col)
-tik = sz / 2
-tik$ = STR$(tik)
-DRAW "BM" + posx$ + "," + posy$ + "C" + color1$ + "S" + tik$ + "bdbrgfhrr"
-GOTO noletter
-
-
-noletter:
-END SUB
-
-SUB query
-COLOR 4, 0
-l = 15
-startagain:
-IF l = 0 THEN GOTO next11
-PRINT CHR$(1); SPC(0);
-i = 0
-DO
-i = i + 1
-LOOP UNTIL i = 4000
-l = l - 1
-GOTO startagain
-next11:
-l = 15
-next1:
-IF l = 0 THEN GOTO next21
-COLOR 2, 0
-LOCATE , l:
-PRINT CHR$(1); SPC(0);
-i = 0
-DO
-i = i + 1
-LOOP UNTIL i = 4000
-l = l - 1
-GOTO next1
-
-
-next21:
-q = 15
-next222:
-IF q = 0 THEN GOTO ended
-LOCATE , q:
-PRINT " "; SPC(0);
-i = 0
-DO
-i = i + 1
-LOOP UNTIL i = 4000
-q = q - 1
-GOTO next222
-ended:
+IF pressed = 0 THEN
+gg = cgd
+END IF
+
+cole1$ = UCASE$(cole1$)
+
+IF cole1$ = "L" THEN
+gg = gg + 2
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 2)
+aa = VAL(aa$)
+PRINT STRING$(aa, " "); SPC(0);
+doposx = doposx + aa
+END IF
+
+IF cole1$ = "X" THEN
+gg = gg + 1
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 1)
+
+
+IF aa$ = ":" THEN
+tocollect$ = ""
+getnext:
+gg = gg + 1
+axx$ = LEFT$(toprint$, gg)
+ax$ = RIGHT$(axx$, 1)
+IF ax$ = ";" THEN GOTO donecollecting
+tocollect$ = tocollect$ + ax$
+GOTO getnext
+donecollecting:
+OPEN "SETTINGS.DAT" FOR INPUT AS #56
+getter:
+IF EOF(56) THEN
+data1$ = "1"
+GOTO dattify
+END IF
+INPUT #56, data$
+INPUT #56, data1$
+IF data$ = tocollect$ THEN GOTO dattify
+GOTO getter
+dattify:
+CLOSE #56
+vals = VAL(data1$)
+doposx = vals
+LOCATE , vals
+GOTO xxb
+END IF
+
+gg = gg + 1
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 2)
+aa = VAL(aa$)
+doposx = aa
+LOCATE , doposx
+xxb:
+END IF
+
+
+IF cole1$ = "Y" THEN
+gg = gg + 1
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 1)
+
+
+IF aa$ = ":" THEN
+tocollect$ = ""
+getnext1:
+gg = gg + 1
+axx$ = LEFT$(toprint$, gg)
+ax$ = RIGHT$(axx$, 1)
+IF ax$ = ";" THEN GOTO donecollecting1
+tocollect$ = tocollect$ + ax$
+GOTO getnext1
+donecollecting1:
+OPEN "SETTINGS.DAT" FOR INPUT AS #56
+getter1:
+IF EOF(56) THEN
+data1$ = "1"
+GOTO dattify1
+END IF
+INPUT #56, data$
+INPUT #56, data1$
+IF data$ = tocollect$ THEN GOTO dattify1
+GOTO getter1
+dattify1:
+CLOSE #56
+vals = VAL(data1$)
+doposy = vals
+LOCATE vals
+GOTO xxb1
+END IF
+
+gg = gg + 1
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 2)
+
+aa = VAL(aa$)
+doposy = aa
+k = doposy
+LOCATE doposy
+xxb1:
+END IF
+
+IF cole1$ = "C" THEN
+FOR gh = 1 TO LEN(toprint$)
+gh1$ = LEFT$(toprint$, gh)
+IF gh <> 1 THEN gh2$ = RIGHT$(gh1$, 1)
+IF gh = 1 THEN gh2$ = gh1$
+
+IF gh2$ = "`" THEN
+gh = gh + 1
+gh1$ = LEFT$(toprint$, gh)
+gh2$ = RIGHT$(gh1$, 1)
+gh2$ = UCASE$(gh2$)
+h$ = ""
+
+'IF VAL(gh2$) > 0 AND VAL(gh2$) < 10 THEN gh = gh + 1
+'IF gh2$ = "0" THEN gh = gh + 1
+'IF gh2$ = "!" THEN gh = gh + 1
+'IF gh2$ = "@" THEN gh = gh + 1
+'IF gh2$ = "#" THEN gh = gh + 1
+'IF gh2$ = "$" THEN gh = gh + 1
+'IF gh2$ = "%" THEN gh = gh + 1
+'IF gh2$ = "^" THEN gh = gh + 1
+
+IF gh2$ = "F" THEN gh = gh + 2
+IF gh2$ = "H" THEN h$ = LTRIM$(STR$(h))
+
+IF gh2$ = "E" THEN h$ = LTRIM$(STR$(EXPER))
+IF gh2$ = "G" THEN h$ = LTRIM$(STR$(G))
+IF gh2$ = "A" THEN h$ = LTRIM$(STR$(w))
+IF gh2$ = "D" THEN h$ = LTRIM$(STR$(defs))
+IF gh2$ = "I" THEN
+IF i = 1 THEN h$ = weapon1name$
+IF i = 2 THEN h$ = weapon2name$
+IF i = 3 THEN h$ = weapon3name$
+IF i = 4 THEN h$ = weapon4name$
+END IF
+IF gh2$ = "Z" THEN
+IF z = 1 THEN h$ = armour1name$
+IF z = 2 THEN h$ = armour2name$
+IF z = 3 THEN h$ = armour3name$
+IF z = 4 THEN h$ = armour4name$
+END IF
+IF gh2$ = "V" THEN
+hh:
+gh1$ = LEFT$(toprint$, gh)
+gh2$ = RIGHT$(gh1$, 1)
+IF gh2$ = "`" THEN GOTO ghhh
+gh = gh + 1
+GOTO hh
+ghhh:
+END IF
+IF gh2$ = "B" THEN gh = gh + 1
+
+
+thething$ = thething$ + h$
+
+GOTO con3
+END IF
+
+thething$ = thething$ + gh2$
+
+con3:
+NEXT gh
+
+stg = LEN(thething$)
+
+stxy = stg \ 2
+stxy = FIX(stxy)
+doposx = (40 - stxy) + 1
+LOCATE , doposx
+END IF
+
+
+IF cole1$ = "F" THEN
+gg = gg + 2
+aaa$ = LEFT$(toprint$, gg)
+aa$ = RIGHT$(aaa$, 2)
+d$ = UCASE$(LEFT$(aa$, 1))
+IF d$ = "A" THEN d$ = "10"
+IF d$ = "B" THEN d$ = "11"
+IF d$ = "C" THEN d$ = "12"
+IF d$ = "D" THEN d$ = "13"
+IF d$ = "E" THEN d$ = "14"
+IF d$ = "F" THEN d$ = "15"
+e$ = UCASE$(RIGHT$(aa$, 1))
+IF e$ = "A" THEN e$ = "10"
+IF e$ = "B" THEN e$ = "11"
+IF e$ = "C" THEN e$ = "12"
+IF e$ = "D" THEN e$ = "13"
+IF e$ = "E" THEN e$ = "14"
+IF e$ = "F" THEN e$ = "15"
+first = VAL(d$)
+last = VAL(e$)
+g1 = first * 16
+b1 = g1 + last
+h$ = CHR$(b1)
+PRINT h$; SPC(0);
+doposx = doposx + 1
+END IF
+
+
+IF cole1$ = "B" THEN
+gg = gg + 1
+d1$ = LEFT$(toprint$, gg)
+c1$ = RIGHT$(d1$, 1)
+bg = VAL(c1$)
+END IF
+
+
+IF cole1$ = "K" THEN
 COLOR 7, 0
+CLS
+doposy = 1
+doposx = 1
+END IF
+
+IF cole1$ = "H" THEN
+h$ = STR$(h)
+h$ = LTRIM$(RTRIM$(h$))
+PRINT h$; SPC(0);
+ doposx = doposx + LEN(h$)
+END IF
+
+IF cole1$ = "G" THEN
+G$ = STR$(s)
+G$ = LTRIM$(RTRIM$(G$))
+PRINT G$; SPC(0);
+ doposx = doposx + LEN(G$)
+END IF
+
+IF cole1$ = "E" THEN
+G$ = STR$(EXPER)
+G$ = LTRIM$(RTRIM$(G$))
+PRINT G$; SPC(0);
+doposx = doposx + LEN(G$)
+END IF
+
+IF cole1$ = "A" THEN
+a$ = STR$(w)
+a$ = LTRIM$(RTRIM$(a$))
+PRINT a$; SPC(0);
+doposx = doposx + LEN(a$)
+END IF
+
+IF cole1$ = "D" THEN
+h$ = STR$(defs)
+h$ = LTRIM$(RTRIM$(h$))
+PRINT h$; SPC(0);
+ doposx = doposx + LEN(h$)
+END IF
+
+IF cole1$ = "I" THEN
+IF i = 1 THEN G$ = weapon1name$
+IF i = 2 THEN G$ = weapon2name$
+IF i = 3 THEN G$ = weapon3name$
+IF i = 4 THEN G$ = weapon4name$
+G$ = LTRIM$(RTRIM$(G$))
+PRINT G$; SPC(0);
+doposx = doposx + LEN(G$)
+END IF
+
+IF cole1$ = "Z" THEN
+IF z = 1 THEN G$ = armour1name$
+IF z = 2 THEN G$ = armour2name$
+IF z = 3 THEN G$ = armour3name$
+IF z = 4 THEN G$ = armour4name$
+G$ = LTRIM$(RTRIM$(G$))
+PRINT G$; SPC(0);
+doposx = doposx + LEN(G$)
+END IF
+
+IF cole1$ = "V" THEN
+variable$ = ""
+gd:
+gg = gg + 1
+d1$ = LEFT$(toprint$, gg)
+thething$ = RIGHT$(d1$, 1)
+IF thething$ = "`" THEN GOTO doitnow
+variable$ = variable$ + thething$
+GOTO gd
+doitnow:
+variable$ = LTRIM$(RTRIM$(variable$))
+OPEN "SETTINGS.DAT" FOR INPUT AS #42
+opende:
+IF EOF(42) THEN GOTO dont
+INPUT #42, data$
+IF data$ = "STARTVARIABLE" THEN GOTO opende
+IF data$ = variable$ THEN GOTO showit
+INPUT #42, junk$
+GOTO opende
+showit:
+INPUT #42, thedata$
+thedata$ = RTRIM$(LTRIM$(thedata$))
+PRINT thedata$; SPC(0);
+doposx = doposx + LEN(thedata$)
+GOTO dont
+dont:
+CLOSE #42
+END IF
+
+
+IF pressed = 1 THEN
+gdi = gg
+END IF
+IF pressed = 0 THEN
+cgd = gg
+END IF
+
+END SUB
+
+SUB endscreen
+RANDOMIZE TIMER
+color$ = LTRIM$(RTRIM$(STR$(INT(RND * 7) + 1)))
+color$ = "`" + color$
+printer 1, color$ + "°°°°±±±²²²²`@`b" + RIGHT$(color$, 1) + "                                                          `b0" + color$ + "²²²²±±±°°°°", 1
+printer 1, color$ + "°°°°±±`8`b7ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»`b0" + color$ + "±±°°°°", 2
+printer 1, color$ + "°°°°±±`8`b7º                                                                  º`b0" + color$ + "±±°°°°", 3
+printer 1, color$ + "°°°°±±`8`b7ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´`$Credits`8ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶`b0" + color$ + "±±°°°°", 4
+printer 1, color$ + "°°°°±±`8`b7º`^         This game engine was orignally brought to you by     `8    º`b0" + color$ + "±±°°°°", 5
+printer 1, color$ + "°°°°±±`8`b7º`^          Author....... at Akori Software, a division of      `8    º`b0" + color$ + "±±°°°°", 6
+printer 1, color$ + "°°°°±±`8`b7º`^                      Hollow-Head Software.                   `8    º`b0" + color$ + "±±°°°°", 7
+printer 1, color$ + "°°°°±±`8`b7º                                                                  º`b0" + color$ + "±±°°°°", 8
+printer 1, color$ + "°°°°±±`8`b7º`^    The game you just played used the Final Quest 2 (tm) engine`8   º`b0" + color$ + "±±°°°°", 9
+printer 1, color$ + "°°°°±±`8`b7º`^                               to run.                         `8   º`b0" + color$ + "±±°°°°", 10
+printer 1, color$ + "°°°°±±`8`b7º                                                                  º`b0" + color$ + "±±°°°°", 11
+printer 1, color$ + "°°°°±±`8`b7º                                                                  º`b0" + color$ + "±±°°°°", 12
+printer 1, color$ + "°°°°±±`8`b7ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼`b0" + color$ + "±±°°°°", 13
+printer 1, color$ + "°°°°±±±²²²²`b" + RIGHT$(color$, 1) + "                                                          `b0" + color$ + "²²²²±±±°°°°", 14
+printer 1, "`C`^`b7Thank you for playing " + gamename$, 3
+printer 1, "`C`^`b7This gameplay brought to you by " + COMP2$ + "...", 12
+printer 1, "`C`%`b" + RIGHT$(color$, 1) + version2$ + " " + revision$, 14
+END SUB
+
+SUB printer (da, toprint$, doposy)
+bg = 0
+screenmode = 0
+collor = 15
+IF da = 3 THEN bg = 1
+doposx = 1
+FOR gdi = 1 TO LEN(toprint$)
+d$ = LEFT$(toprint$, gdi)
+letter$ = RIGHT$(d$, 1)
+
+IF letter$ = "`" THEN
+gdi = gdi + 1
+d1$ = LEFT$(toprint$, gdi)
+cole2$ = RIGHT$(d1$, 1)
+IF cole2$ = "1" THEN collor = 1
+IF cole2$ = "2" THEN collor = 2
+IF cole2$ = "3" THEN collor = 3
+IF cole2$ = "4" THEN collor = 4
+IF cole2$ = "5" THEN collor = 5
+IF cole2$ = "6" THEN collor = 6
+IF cole2$ = "7" THEN collor = 7
+IF cole2$ = "8" THEN collor = 8
+IF cole2$ = "9" THEN collor = 9
+IF cole2$ = "0" THEN collor = 10
+IF cole2$ = "!" THEN collor = 11
+IF cole2$ = "@" THEN collor = 12
+IF cole2$ = "#" THEN collor = 13
+IF cole2$ = "$" THEN collor = 14
+IF cole2$ = "%" THEN collor = 15
+IF cole2$ = "^" THEN collor = 0
+
+cole2$ = UCASE$(cole2$)
+
+IF cole2$ = "N" THEN
+gdi = gdi + 1
+aaa$ = LEFT$(toprint$, gdi)
+aa$ = RIGHT$(aaa$, 1)
+IF aa$ = "!" THEN aa$ = "11"
+IF aa$ = "@" THEN aa$ = "12"
+IF aa$ = "#" THEN aa$ = "13"
+IF aa$ = "$" THEN aa$ = "14"
+IF aa$ = "%" THEN aa$ = "15"
+IF aa$ = "^" THEN aa$ = "0"
+bb = VAL(aa$) + 16
+COLOR bb
+collor = bb
+END IF
+
+COLOR collor, bg
+
+cole 1, toprint$, cole2$
+GOTO cone3
+END IF
+
+
+IF doposx >= 81 THEN
+doposy = doposy + 1
+doposx = 1
+END IF
+
+LOCATE doposy, doposx
+COLOR collor, bg
+PRINT letter$; SPC(0);
+IF letter$ = CHR$(10) THEN GOTO cone3
+doposx = doposx + 1
+cone3:
+NEXT gdi
+IF da = 1 THEN PRINT
+IF da = 3 THEN PRINT
+END SUB
+
+SUB setsettings
+reenterrg:
+INPUT "SCREEN #: ", rg$
+IF rg$ = "" THEN GOTO chx
+IF FIX(VAL(rg$)) <= 1920 AND FIX(VAL(rg$)) >= 1 THEN GOTO nexter
+GOTO reenterrg
+nexter:
+rp = FIX(VAL(rg$))
+chx:
+INPUT "INPUT X-CRT:", xg$
+IF xg$ = "" THEN GOTO chy1
+xg = VAL(xg$)
+FOR bbbk = 1 TO 79
+IF xg = bbbk THEN GOTO chy:
+NEXT bbbk
+GOTO chx
+chy:
+x = xg
+chy1:
+INPUT "INPUT Y-CRT:", yg$
+yg = VAL(yg$)
+IF yg$ = "" THEN GOTO chy12
+FOR bbbk = 1 TO 22
+IF yg = bbbk THEN GOTO ccccc
+NEXT bbbk
+GOTO chy
+ccccc:
+y = yg
+chy12:
+dkdk = y - 1
+record = dkdk * 79 + x
+INPUT "INPUT Experience:", exi$
+IF exi$ = "" THEN GOTO ste1
+hi = VAL(exi$)
+EXPER = hi
+ste1:
+INPUT "INPUT Hitpoints:", hi$
+IF hi$ = "" THEN GOTO ste
+hi = VAL(hi$)
+h = hi
+ste:
+INPUT "INPUT Strength:", wi$
+IF wi$ = "" THEN GOTO defsg
+wi = VAL(wi$)
+w = wi
+defsg:
+INPUT "INPUT Defense:", defsi$
+IF defsi$ = "" THEN GOTO sgg
+defsi = VAL(defsi$)
+defs = defsi
+sgg:
+INPUT "INPUT Gold:", si$
+IF si$ = "" THEN GOTO cha
+si = VAL(si$)
+s = si
+cha:
+INPUT "INPUT Armour(1-4):", zi$
+IF zi$ = "" THEN GOTO chw
+zi = VAL(zi$)
+z = zi
+IF zi > 4 THEN GOTO cha
+IF zi < 1 THEN GOTO cha
+chw:
+INPUT "INPUT Weapon(1-4):", iz$
+IF iz$ = "" THEN GOTO monst
+iz = VAL(iz$)
+i = iz
+IF iz > 4 THEN GOTO chw
+IF iz < 1 THEN GOTO chw
+monst:
+PRINT "INPUT Monsters(Y/N):"
+monster$ = INPUT$(1)
+monster$ = UCASE$(monster$)
+IF monster$ = "Y" THEN monsters$ = "YES"
+IF monster$ = "N" THEN monsters$ = "NO"
+
+END SUB
+
+SUB writer (towrite$)
+collor = 15
+doposx = 1
+bg = 1
+
+COLOR 15, 1
+LOCATE 23, 3
+PRINT STRING$(77, 32); SPC(0);
+COLOR 1, 0
+LOCATE 23, 1
+PRINT CHR$(176) + CHR$(177); SPC(0);
+LOCATE 23, 78
+PRINT CHR$(177) + CHR$(176); SPC(0);
+
+FOR cgd = 1 TO LEN(towrite$)
+d$ = LEFT$(towrite$, cgd)
+letter$ = RIGHT$(d$, 1)
+
+IF letter$ = "`" THEN
+cgd = cgd + 1
+d1$ = LEFT$(towrite$, cgd)
+cole4$ = RIGHT$(d1$, 1)
+IF cole4$ = "1" THEN collor = 1
+IF cole4$ = "2" THEN collor = 2
+IF cole4$ = "3" THEN collor = 3
+IF cole4$ = "4" THEN collor = 4
+IF cole4$ = "5" THEN collor = 5
+IF cole4$ = "6" THEN collor = 6
+IF cole4$ = "7" THEN collor = 7
+IF cole4$ = "8" THEN collor = 8
+IF cole4$ = "9" THEN collor = 9
+IF cole4$ = "0" THEN collor = 10
+IF cole4$ = "!" THEN collor = 11
+IF cole4$ = "@" THEN collor = 12
+IF cole4$ = "#" THEN collor = 13
+IF cole4$ = "$" THEN collor = 14
+IF cole4$ = "%" THEN collor = 15
+IF cole4$ = "^" THEN collor = 0
+
+IF cole4$ = "N" THEN
+cgd = cgd + 1
+aaa$ = LEFT$(toprint$, cgd)
+aa$ = RIGHT$(aaa$, 1)
+IF aa$ = "!" THEN aa$ = "11"
+IF aa$ = "@" THEN aa$ = "12"
+IF aa$ = "#" THEN aa$ = "13"
+IF aa$ = "$" THEN aa$ = "14"
+IF aa$ = "%" THEN aa$ = "15"
+IF aa$ = "^" THEN aa$ = "0"
+bb = VAL(aa$) + 16
+COLOR bb
+collor = bb
+END IF
+
+
+cole 0, towrite$, cole4$
+GOTO cone2
+END IF
+
+
+COLOR collor, bg
+LOCATE 23, doposx
+PRINT letter$; SPC(0);
+doposx = doposx + 1
+cone2:
+NEXT cgd
+bg = 0
 END SUB
 

@@ -1,0 +1,417 @@
+@#INTRO
+11;1
+9;1
+17;33;Enter the Realm
+18;36;Save Game
+19;36;Load Game
+20;38;Help
+21;35;Resume Game
+22;33;Leave this place
+`Y01`X01`B7`L35`%Main Menu`L36`b0
+`B7 `B1`L78`b7 `b0
+`B7 `B1                               `$2222222222222222                               `b7 `b0
+`B7 `B1                               `$              22                               `b7 `b0
+`B7 `B1`!    FFFFF  IIIII  N   N    A    L        QQQQQ`$2`! U   U  EEEEE  SSSSS  TTTTT    `b7 `b0
+`b7 `b1`!    F        I    NN  N   A A   L        Q   Q`$2`! U   U  E      S        T      `b7 `b0
+`b7 `b1`!    FFFFF    I    N N N  A   A `$2`!L`$22222222`!Q`$222`!Q`$2`! U   U  EEEE   SSSSS    T      `B7 `B0
+`b7 `b1`!    F        I    N  NN  AAAAA `$2`!L        Q Q Q  U   U  E          S    T      `B7 `B0
+`b7 `b1`!    F      IIIII  N   N  A   A `$2`!LLLLL    QQQQQ  UUUUU  EEEEE  SSSSS    T      `B7 `B0
+`b7 `b1                               `$22`!           Q                                 `b7 `b0
+`B7 `B1                               `$2222222222222222                               `b7 `b0
+`B7 `B1`L78`b7 `b0
+`B7`L80`b0
+`Y15`X13//`X24//`X31`b7`L20`b0`X57\\`X68\\
+`X10////`X21////`X31`b7 `b1`L18`b7 `b0`X58\\\\`X69\\\\
+`X07/////`X18/////`X31`b7 `b1`L18`b7 `b0`X60\\\\\`X71\\\\\
+`X06////`X17////`X31`b7 `b1`L18`b7 `b0`X61\\\\`X72\\\\
+`X04////`X15////`X31`b7 `b1`L18`b7 `b0`X62\\\\`X73\\\\
+`X04\\\\`X15\\\\`X31`b7 `b1`L18`b7 `b0`X62////`X73////
+`X06\\\\`X17\\\\`X31`b7 `b1`L18`b7 `b0`X61////`X72////
+`X07\\\\\`X18\\\\\`X31`b7 `b1`L18`b7 `b0`X60/////`X71/////
+`X10\\\\`X21\\\\`X31`b7 `b1`L18`b7 `b0`X58////`X69////
+`X13\\`X24\\`X31`b7`L20`b0`X57//`X68//
+@END
+@#MAP
+`X30`Y03`%`b1Welcome to `$F`4inal `$Q`4uest `$2`%.
+`X28`Y05`%`b1A `b7 `b1 represents a town, and
+`X28`Y06`%`b1a `b2 `b1 represents land.
+@END
+@#INVSCR
+`Y08`X21`b4              `!I`#n`!v`#e`!n`#t`!o`#r`!y               `b0
+`X21`b4 `b0`2Experience: `%`e`X58`b4 `b0
+`X21`b4 `b0`2Hitpoints: `@`h`X58`b4 `b0
+`X21`b4 `b0`2Gold: `$$`g`X58`b4 `b0
+`X21`b4 `b0`2Gold in Bank: `$$`vBANK``x58`b4 `b0
+`X21`b4 `b0`2Strength: `!`a`X58`b4 `b0
+`X21`b4 `b0`2Defense: `!`d`X58`b4 `b0
+`X21`b4 `b0`2Weapon: `#`i`X58`b4 `b0
+`X21`b4 `b0`2Armour: `#`z`X58`b4 `b0
+`X21`b4 `b0`2Wildberries: `4`vBERRY``X58`b4 `b0
+`X21`b4                                      `b0
+`X21`b4 `b0 `%`X31Press any key...`X58`b4 `b0 
+`X21`b4                                      `b0
+@END
+@#HELP
+`$`CWelcome to Final Quest 2 V0.92 by Akori Software.
+
+`$`X37KEYS:
+`0`C = Moves you Left
+`0`C = Moves you Right
+`0`C = Moves you Down
+`0`X32 = Moves you Up 
+`0`CI = Inventory -- M = Map
+`0`CESC = Quit to Menu
+`0`CQ = Quit to Menu
+
+
+`X05`@Long ago a `%witch`@ the most `$lethal`@ attacked an old `9city`@. There she built
+`@herself a `!castle`@ and appointed herself `#ruler`@.  Along came a `%hero`@. This `%hero
+`@worked hard and long on perserving his country.  He eventually became `$strong
+`@enough to confront the `%witch`@.  From there he `!defeated`@ the `%witch`@ and was declared
+`@a `%hero`@. This game tells the story of that `%witch's`@ `0daughter`@. The `6secret and
+`6spoiled `@descendent of that `%witch`@.  She has taken over the `$entire`@ country now
+`@instead and there are more areas to `%explore`@ and `%conquer`@.
+
+
+`%Good Luck Adventurer.
+
+`$Press any key...
+`Y04`X31`0`F1B
+`Y05`X31`0`F1A
+`Y06`X31`0`F19
+`Y07`X31`0`F18
+@END
+@#ALWAYSDO
+@END
+@#SCR 321
+        @IPS 71 9
+                #WRITE
+                        `C`%The sign is blank...
+                #DONE
+
+        @IPS 60 17
+                #NEWPOS 75 12
+                #WRITE
+                        `!`CWhat appears to be a warp...
+                #DONE
+
+        @IPS 74 12
+                #NEWPOS 61 17
+                #WRITE
+                        `!`CWhat appears to be a warp`F2C again...
+                #DONE
+@END
+
+
+@#SCR 2
+
+        @IF GOLD1 = 1 THEN
+                #PRINT P
+`X40`Y19`$`b2`F6F
+                #ENDIF1
+                #DONE
+
+        @IPS 32 6
+                #WRITE
+                        `C`2The Sign Reads:  `F1B-- Hill Valley    `F19-- Stone Valley
+                #DONE
+
+        @IPS 40 19
+                #IF GOLD1 = 1 THEN
+                        #WRITE
+                                `C`%You find some gold lying around...
+                        #GOLD+ 25
+                        #SET GOLD1 = 0;
+                #ENDIF
+                #DONE
+                @DONE
+
+        @IPS 45 8
+        @IPS 46 8
+                #WRITE
+                        `C`$"A warm and cozy barn..."
+                #DONE
+@END
+
+
+@#SCR 81
+
+        @IPS 26 11
+                #WRITE
+                        `C`2The Sign Reads:  `F18-- Stone Valley   `F19-- Hill Valley
+                #DONE
+@END
+
+@#SCR 82
+
+        @IPS 47 22
+                #NEWPOS 79 22
+                #WRITE
+                        `C`!A warp`F2C wonder where it leads...
+                #DONE
+#DONE
+        @IPS 78 22
+                #NEWPOS 47 21
+                #WRITE
+                        `C`!Another warp`F2C back to where it came from...
+                #DONE
+
+        @IPS 27 20
+                #RUNREF BERRY|MAIN.REF
+                #DONE
+
+        @IPS 16 9
+                #RUNREF ROSHI|MAIN.REF
+                #DONE
+
+        @IPS 32 7
+                #WRITE
+                        `C`2The Sign Reads:  Village of Stone Valley...
+                #DONE
+
+        @IPS 65 17
+                #RUNREF TRAVELSTONE|MAIN.REF
+                #DONE
+
+        @IPS 26 14
+                #GOTO 725
+                #NEWPOS 31 15
+                #DONE
+
+        @IPS 58 9
+                #GOTO 722
+                #NEWPOS 39 16
+                #DONE
+
+        @IPS 43 17
+                #GOTO 723
+                #NEWPOS 39 16
+                #DONE
+
+        @IPS 11 17
+                #GOTO 721
+                #NEWPOS 41 18
+                #DONE
+@END
+
+
+@#SCR 86
+
+        @IPS 42 19
+        @IPS 43 19
+                #CLS
+                #PRINT 3
+`4You depart from the island and head back to the mainland...
+
+`0Press a key...
+                #WAIT 1
+                #GOTO 166
+                #MAPSCREEN 166
+                #NEWPOS 46 6
+                #DONE
+
+        @IPS 43 10
+                #WRITE
+                        `C`%A sign says "`4WARNING! `0Stay away from the dragon!`%"
+                #DONE
+@END
+
+@#SCR 161
+        @IPS 51 13
+                #WRITE
+                        `C`2The Sign Reads:  `F19-- The Ghost town   --`F1A  Hill Valley
+                #DONE
+@END
+
+@#SCR 163
+        @IPS 44 10
+                #WRITE
+                        `C`2<-- Hill Valley Bank    Hill Valley Travel Office -->
+                #DONE
+        @IPS 47 10
+                #RUNREF TRAVELHILL|MAIN.REF
+                #DONE
+        @IPS 27 10
+                #RUNREF BANKHILL|MAIN.REF
+                #DONE
+        @IPS 32 17
+                #GOTO 724
+                #NEWPOS 41 16
+                #DONE
+@END
+
+@#SCR 166
+        @IPS 46 5
+        @IPS 47 5
+                #CLS
+                #PRINT 8                 
+`0You see a `$boat `0sitting by the docks.
+
+`0You decide to get into the boat and head out to the
+`!island `0you can see from shore.
+
+`0After a short trip.. you arive at the island.
+
+`0Press any key...
+                #WAIT 1
+                #GOTO 86
+                #MAPSCREEN 86
+                #NEWPOS 42 18
+                #DONE
+@END
+
+@#SCR 242
+
+        @IPS 9 15
+                #WRITE
+                        `C`0An old and deserted town...
+                #DONE
+        @IPS 5 4
+                #WRITE
+                        `C`%An old deserted cabin...Locked..  In the window you see a rocking chair.
+                #DONE
+        @IPS 62 6
+                #WRITE
+                        `C`%An old man is in the backyard. When he sees you he runs into his house.
+                #DONE
+        @IPS 33 12
+                #WRITE
+                        `C`$The remnants of an old castle.. Nothing but ruins now...
+                #DONE
+        @IPS 21 19
+                #WRITE
+                        `C`%An old inn that is all borded up...
+                #DONE
+        @IPS 60 19
+                #WRITE
+                        `C`$What looks like an old hospital is locked.. In the window you see nothing..
+                #DONE
+@END
+@#SCR 721
+        @IPS 28 8
+                #IF ROOM = 1 THEN
+                        #WRITE
+                                `C`@Yuck!
+                #ENDIF
+                #IF ROOM = 0 THEN
+                        #WRITE
+                                `C`$Ahh.. Much better!
+                        #SET ROOM = 1;
+                #ENDIF
+                #DONE
+        @IPS 32 11
+                #WRITE
+                        `C`!"Nice and Comphy.."
+                #DONE
+        @IPS 44 9
+                #WRITE
+                        `C`$"A bed..."
+                #DONE
+        @IPS 46 9
+                #WRITE
+                        `C`$"Another bed..."
+                #DONE
+        @IPS 48 9
+                #WRITE
+                        `C`$"And another bed..."
+                #DONE
+        @IPS 50 9
+                #WRITE
+                        `C`$"Fancy that... Another bed..."
+                #DONE
+        @IPS 52 9
+                #WRITE
+                        `C`$"To many beds in this room..."
+                #DONE
+        @IPS 41 19
+                #GOTO 82
+                #NEWPOS 11 18
+                #DONE
+        @IPS 33 17
+                #IF WOMAN = 0 THEN
+                #RANDOMWRITE 5
+                        `C`%An old woman says "`$Get out of my home!!!`%"
+                        `C`%An old woman says "`$What are you doing here!!!`%"
+                        `C`%An old woman says "`$Get away from me!!!`%"
+                        `C`%An old woman says "`$Oh.. It's you again!?!?`%"
+                        `C`%An old woman says "`$What the held do you want!?!`%"
+                #ENDIF
+                #DONE
+        @IPS 33 17
+                #IF WOMAN = 1 THEN
+                        #RUNREF WOMAN|WOMAN.REF
+                #ENDIF
+                #DONE
+@END
+@#SCR 722
+        @IPS 39 9
+                #RUNREF ARMOR|WEAPON.REF
+                #DONE
+        @IPS 39 17
+                #GOTO 82
+                #NEWPOS 58 10
+                #DONE
+@END
+@#SCR 723
+        @IPS 39 17
+                #GOTO 82
+                #NEWPOS 43 18
+                #DONE
+        @IPS 39 9
+                #RUNREF WEAPON|WEAPON.REF
+                #DONE
+@END
+@#SCR 724
+        @IF TIME1 = 0 THEN
+                #SET TIME1 = 1;
+                #RUNREF GUY|HOTEL.REF
+        #ENDIF1
+        #DONE
+        @DONE
+
+        @IPS 45 14
+                #CLS
+                #PRINT 21
+
+
+
+
+`2A sign on the table reads:
+
+`2`C--------------------------------------------------------------
+
+`$`C*** ATTENTION ***
+
+`2`L10To all newcomers:
+
+`2`L10This is the property of Veronica Construction.  She started
+`2`L10building it some two hundred years ago, but decided not to
+`2`L10finish it.
+
+`2`L10If she ever considers finishing the job, let me know.
+
+`2`C--------------------------------------------------------------
+
+`2Press any key to continue...
+                #WAIT
+                #DONE
+        @IPS 41 17
+                #GOTO 163
+                #NEWPOS 32 18
+                #DONE
+@END
+@#SCR 725
+        @IPS 31 16
+                #GOTO 82
+                #NEWPOS 26 15           
+                #DONE
+        @IPS 23 9
+        @IPS 24 9
+                #WRITE
+                        `C`!The bed feels hard and very unconfortable...
+                #DONE
+        @IPS 33 13
+                #WRITE
+                        `C`2The sign reads:  "`%House condemmed`2"
+                #DONE
+@END

@@ -1,0 +1,45 @@
+@#WOMAN
+#CLS
+#PRINT 6
+`%A strange woman asks...  `$Hello who are you???`%  After a few seconds..
+`%She says..  `$I eat wood! Rats are nice...  `%
+
+`2It would appear this woman has some memory problems.. She then asks..
+
+`@Would you like a cup of my cocoa?
+#CHOICE 2
+Say yes`F2C that would be nice...
+Leave this putrit house...
+#IF 2
+@DONE
+#IF 1
+#CLS
+#PRINT 3
+`2You think to yourself`F2C `$Mabye this isn't such a good idea... It looks
+`$all scummy....
+
+#CHOICE 2
+Drink it anyway...
+Don't Drink it`F2C Leave.. fast...
+#IF 1
+#PRINT 1
+`Y08`!Here goes...
+#WAIT
+#CLS
+#PRINT 1
+`$You feal a warm feeling...
+#WAIT
+#PRINT 1
+`$You GAIN 25 hitpoints...
+#SET MAXENERGY + 25;
+#MAXENERGY
+#WAIT
+@DONE
+#IF 2
+#PRINT 1
+`Y08`2The woman says`F2C `@"Ok`F2C that's fine..." `2Press a key...
+#WAIT
+@DONE
+@DONECHOICE
+#SET WOMAN = 0;
+@END

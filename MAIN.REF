@@ -1,0 +1,234 @@
+@#BERRY
+        #IF BERRY > 1 THEN
+        #IF BERRY < 25 THEN
+                #WRITE
+                        `C`%You pick some more wildberries...
+                #SET BERRY + 5;
+                #ENDIF
+        #IF BERRY = 25 THEN
+                #WRITE
+                        `C`%Don't you think you have enough?
+                #ENDIF
+        #IF BERRY = 0 THEN
+                #WRITE
+                        `C`%You pick some wildberries...
+                #SET BERRY = 5;
+                #ENDIF
+@END
+
+
+@#BANKHILL
+        #IF ACCOUNT = 0 THEN
+                #CLS
+                #PRINT 1
+`2You don't have an account with us yet.  Do you wish to start one?
+#CHOICE 2
+Yes...
+No...
+#IF 2
+@DONE
+#IF 1
+        #SET ACCOUNT = 1;
+        #RETURN
+@DONE
+        #ENDIF
+        #CLS
+        #PRINT 2
+`2Welcome... You have `$$`vBANK``2 in your account.
+`2You have `$$`g`2 on hand.
+#CHOICE 4
+Deposit...
+Withdraw...
+Close Account...
+Get out of here...
+#IF 1
+        #CLS
+        #PRINT 5
+`2Your account has `$$`vBANK``2.
+`2You have `$$`g`2.
+
+`2How much do you want to deposit?
+`2Press 1 to Deposit all your gold on hand.
+#INPUT
+ 15
+ 1
+ 6
+        #IF LASTRESPONSE <= 0 THEN
+        #RETURN
+        #ENDIF
+
+        #IF LASTRESPONSE = 1 THEN
+                #SET BANK +1 GOLD;
+                #SET GOLD = 0;
+                #ENDIF
+
+        #IF GOLD >1 LASTRESPONSE THEN
+                #SET GOLD -1 LASTRESPONSE;
+                #SET BANK +1 LASTRESPONSE;
+                #ENDIF
+        #RETURN
+@DONE
+#IF 2
+        #CLS
+#PRINT 5
+`2Your account has `$$`vBANK``2.
+`2You have `$$`g`2.
+
+`2How much do you want to withdraw?
+`2Press 1 to withdraw all money in bank.
+#INPUT
+ 15
+ 1
+ 6
+        #IF LASTRESPONSE <= 0 THEN
+        #RETURN
+        #ENDIF
+
+        #IF LASTRESPONSE = 1 THEN
+                #SET GOLD +1 BANK;
+                #SET BANK = 0;
+                #ENDIF
+
+        #IF LASTRESPONSE <1 BANK THEN
+                #SET GOLD +1 LASTRESPONSE;
+                #SET BANK -1 LASTRESPONSE;
+                #ENDIF
+        #RETURN
+@DONE
+#IF 4
+@DONE
+#IF 3
+#CLS
+#PRINT 1
+`2Are you sure you want to close your account??
+#CHOICE 2
+Yes..
+No..
+#IF 1
+#SET GOLD +1 BANK;
+#SET BANK = 0;
+#SET ACCOUNT = 0;
+@DONE
+#IF 2
+#RETURN
+@DONE
+@DONECHOICE
+@END
+
+
+@#TRAVELSTONE
+#CLS
+#PRINT 4
+`C`2Stone Valley Travel Office
+`X27`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-
+
+`%"`2Welcome to the Travel office`F2C`%" says the woman behind the desk.
+#CHOICE 2
+Depart to Hill Valley...
+Leave the Office...
+#IF 2
+@DONE
+#IF 1
+#CLS
+#PRINT 2
+`2It will cost `$$20`2 to goto Hill Valley.
+`2You have `$$`g`2.
+#CHOICE 2
+Pay..
+Don't Pay..
+#IF 1
+#GOLD- 20
+#GOTO 163
+#NEWPOS 47 11
+#DONE
+#ENDIF
+@DONE
+#IF 2
+#RETURN
+@DONE
+@DONECHOICE
+@END
+
+@#TRAVELHILL
+#CLS
+#PRINT 4
+`C`2Hill Valley Travel Office
+`X27`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-`2=`0-
+
+`%"`2Welcome to the Travel office`F2C`%" says the woman behind the desk.
+#CHOICE 2
+Depart to Stone Valley...
+Leave the Office...
+#IF 2
+@DONE
+#IF 1
+#CLS
+#PRINT 2
+`2It will cost `$$30`2 to goto Stone Valley.
+`2You have `$$`g`2.
+#CHOICE 2
+Pay..
+Don't Pay..
+#IF 1
+#GOLD- 30
+#GOTO 82
+#NEWPOS 65 18
+#DONE
+#ENDIF
+@DONE
+#IF 2
+#RETURN
+@DONE
+@DONECHOICE
+@END
+
+@#ROSHI
+#CLS
+#PRINT 9
+`2Welcome to Master Roshi's training center!
+
+`2You have:
+
+`%`e`2 experience points...
+`@`h`2 hitpoints...
+`!`a`2 attack points...
+`!`d`2 defense points...
+`2You have a `#`i`2 and a `#`z`2.
+#CHOICE 2
+Train
+Leave
+#IF 2
+@DONE
+#IF 1
+#MONSTER
+Beat me if you can... Loser!!
+Master Roshi
+MAXENERGY
+1000
+100
+#CLS
+#PRINT 1
+`2Sorry... You loose.. come back next time...
+#IF LASTMONSTER = 1 THEN
+#CLS
+#MAXENERGY
+#SET MAXENERGY + 25;
+#MAXENERGY
+#SET STRENGTH + 10;
+#SET DEFENSE + 10;
+#PRINT 8
+`$You are a great man..
+
+`2You get `%100 `2more experience points for a total of `%`e`2.
+`2You get `@25 `2more hitpoints for a total of `@`h`2.
+`2You get `!10 `2extra attack points for a total of `!`a`2.
+`2You get `!10 `2extra defense points for a total of `!`d`2.
+
+Press any key...
+#ENDIF
+#WAIT
+@DONE
+@DONECHOICE
+@END
+
+

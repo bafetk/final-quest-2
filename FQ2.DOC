@@ -1,0 +1,168 @@
+                                Final Quest 2
+                                   V0.92
+
+                          Created by Akori Software
+
+Table of Contents:
+
+I. Introduction
+II. Game-play
+III. Ref File
+IV. Level Creation
+V. The Cheat Code
+VI. The Future
+VII. Troubleshooting
+VIII. Credits
+
+I. Introduction
+
+	When I started out to create a game that had a huge kick into the 
+TEXTPIC world, I thought of Final Quest.  The first episode contained a 
+world where you could walk around, and a world where you could converse 
+with different people.  I thought up of the idea for this game on 6-21-98
+while I was messing around with an idea for a previous game I had been
+working on.  I started my quest and only seven days later, on 6-28-98, I
+came out with Final Quest Version 1.0.  The only problem with that world
+was that you could not go explore any other screens in any way.  I created
+six different versions, all with the disappointment of not being able to let
+people go onto other screens.  This is why I created final quest 2.  The
+whole purpose is to let people explore the world that I, or you, had created
+for them.
+
+II. Game-play
+
+        No gameplay as of yet... But if you would like to help me with this,
+        email me at xxxx@xxxxxxxx.com... I might let you do the entire game
+        play and put your name in the Credits and on my site...
+
+III. Ref File
+
+	I wanted to create a system that could be flexible.  That is why I 
+came up with the Ref gaming system. It allows me to pick out any spot on the
+screen, and then give it a function.  This system allows me to do warps, and
+all the other goodies that this game includes. I also have the ablility for 
+variables, as shown in the REFFILE.TXT
+
+IV. Level Creation
+
+        I wanted to create a gameing engine that could be altered from the
+outside. So hence, you can basically create your own game with my engine.
+Use the LEVEL.EXE to setup the maps.. USE REFEDIT.EXE to edit the Reference
+file and your all set with your own game..  You can edit everything..
+
+NO.EXE -- Uses EDIT.COM to edit NOSCR.DAT
+VAR.EXE -- Uses EDIT.COM to edit VARIABLE.DAT
+REFEDIT.EXE -- Uses EDIT.COM to edit FQREFS.DAT
+LEVEL.EXE -- Uses FQ2LEVEL Engine to edit FQMAPS.DAT
+
+The below information is unrealiable...
+
+
+VARIABLE.DAT
+
+AkoriSoft        ;Name of Company, to appear on INFO bar...
+Akori Software   ;Name of Company, to appear on Main Menu screen and help menu.
+Final Quest 2    ;Name of Game
+V0.9             ;Version of Game without revision letter
+V0.9H            ;Version of Game with revision letter
+Rev H            ;Game Revision
+250              ;Starting hitpoints
+0                ;Starting score
+11               ;Starting x
+18               ;Starting y
+10               ;Starting strength
+10               ;Starting defense
+1                ;Starting weapon 1-4
+1                ;Starting armour 1-4
+721              ;Starting screen 1-1920
+82               ;Starting Map screen 1-1920
+Stick            ;Weapon 1
+Shotgun          ;Weapon 2
+Chaingun         ;Weapon 3
+RPG              ;Weapon 4
+Vest             ;Armour 1
+Heavy Coat       ;Armour 2
+Chain Mail       ;Armour 3
+Death Armour     ;Armour 4
+1                ;Strength of Weapon 1
+100              ;Strength of Weapon 2
+300              ;Strength of Weapon 3
+500              ;Strength of Weapon 4
+1                ;Strength of Armour 1
+100              ;Strength of Armour 1
+300              ;Strength of Armour 1
+500              ;Strength of Armour 1
+HEART           ;Variable.. Can have as many for game as you want...
+1               ;Variable Data...  Can be Number or Word.
+
+
+The below information is unrealiable...
+
+NOSCR.DAT
+
+YES             ;Monsters?, YES/NO
+91              ;Screen where no monsters attack player
+92              ;Screen where no monsters attack player
+93              ;Screen where no monsters attack player
+12              ;Screen where no monsters attack player
+16              ;Screen where no monsters attack player
+23              ;Screen where no monsters attack player
+32              ;Screen where no monsters attack player
+------  THE LINE BELOW STAYS!!!! IMPORTANT!!!  ------
+1921            ;End Screens.. This LINE MUST STAY!
+10              ;Number of Monsters...
+3               ;Determines how many calculations like the ones below are
+30              ;Chance of seeing a monster
+500             ;Score if below the next line states which monsters attack
+3               ;determines which monsters attack if Exp. above hasn't been met
+5000            ;Score if below the next line states which monsters attack
+6               ;determines which monsters attack if Exp. above hasn't been met
+10000           ;Score if below the next line states which monsters attack
+10              ;Says which monsters will be used if Exp. above hasn't been met
+10;10;10;10;Tree Frog       ;Hitpoints;strength;goldtoget;experiencewon;Name
+20;20;20;20;Woodpecker      ;Hitpoints;strength;goldtoget;experiencewon;Name
+30;30;30;30;Owl             ;Hitpoints;strength;goldtoget;experiencewon;Name
+40;40;40;40;Leopard         ;Hitpoints;strength;goldtoget;experiencewon;Name
+50;50;50;50;Wolf            ;Hitpoints;strength;goldtoget;experiencewon;Name
+60;60;60;60;Bear            ;Hitpoints;strength;goldtoget;experiencewon;Name
+70;70;70;70;Tree Elf        ;Hitpoints;strength;goldtoget;experiencewon;Name
+80;80;80;80;Cheetah         ;Hitpoints;strength;goldtoget;experiencewon;Name
+90;90;90;90;Tiger           ;Hitpoints;strength;goldtoget;experiencewon;Name
+100;100;100;100;Lion        ;Hitpoints;strength;goldtoget;experiencewon;Name
+Want some poison? Tree Frog Gasps at you!                     ;What monster 1 says...
+I need to peck something. How about you smirks Woodpecker!    ;What monster 2 says...
+Hello. And what is your name woos the Owl!                    ;What monster 3 says...
+Damn. I need a new head.  Yours looks perfect!                ;What monster 4 says...
+MMMMM. Fresh meat!!! Growls Wolf!                             ;What monster 5 says...
+I need some hair laughs Bear!                                 ;What monster 6 says...
+Heya baby... Come ere... whispers the Elf!                    ;What monster 7 says...
+Got any cheese?  I have a strange craving for cheese!         ;What monster 8 says...
+Grrr!!! Get the hell out of here yells Tiger!                 ;What monster 9 says...
+As the king I sentence you to death growls Lion!              ;What monster 10 says...
+
+
+V. The cheat code
+
+	Ever get stuck in a game?  Well, here is your chance to get out.  If
+you ever want to get out of a jam, you can type in HELPME while playing the
+game to give you 25 hit-points every time you press it.  The only thing that
+is bad is that it takes all your score away in the process.  The score
+erasion was put in to discourage people from using the HELPME code..
+
+
+VI. The Future
+
+        The future of Final Quest 2 is as follows... You will be able to
+compile your Ref files and run the game so no one can see your code!!!
+More to come..
+
+
+VII. Trouble-shooting
+
+        I have never had a problem with the game.  It should work perfectly 
+on all systems.  If it goes to slow, then maybe you should try upgrading your 
+system!  Try running readme.exe for suggestions...
+
+VIII. Credits
+
+Akori Software....................All the gaming engine, and gameplay so far..

@@ -1,0 +1,44 @@
+@#GUY
+#NEWPOS 41 15
+#PRINT P
+`X37`Y07`b5`%`F01
+#PRINT P
+`X41`Y16`b5`$`F01
+#MOVEOBJ
+.2
+41 16
+41 15
+#DONEMOVE
+#MOVEOBJ
+.2
+37 7
+37 8
+37 8
+37 9
+37 9
+37 10
+37 10
+38 11
+38 11
+39 12
+39 12
+40 13
+40 13
+40 14
+40 14
+40 15
+#DONEMOVE
+#WRITE
+`C`$He says: `%"`$Oh my god!!!  `4YOU SHOULDN'T BE IN HERE!  `!SECURITY!!!!!!`%"
+#SLEEP 3
+#MOVEOBJ
+.3
+40 15
+40 16
+40 16
+41 16
+41 16
+#DONEMOVE
+#WRITE
+`C`$You say: `%"What a dumbass..."`%
+@END
