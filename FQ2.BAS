@@ -1,3 +1,4 @@
+DECLARE FUNCTION crypt$ (tocrypt$)
 DECLARE FUNCTION inputer$ (screener)
 DECLARE FUNCTION exist! (file$)
 DECLARE FUNCTION VOB$ (dtlf$)
@@ -10,24 +11,21 @@ DIM map(1920)
 DIM map2(1920)
 DIM opt(200)
 DIM SHARED settings$(500), reffile(1920)
-COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp, refpos, fileopened
-COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, EXPER, k, x, y, monsters$
+COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp, refpos, fileopened, thescreen1
+COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, exper, k, x, y, monsters$, hitmax
 RANDOMIZE TIMER
 cl$ = COMMAND$
-IF UCASE$(cl$) = "-DEBUGMODE" THEN
-cc = 2
-END IF
-tt = 0
-dd = 0
-EXPER = 0
-helpmecode = 1
-superhuman$ = "NO"
-monsters$ = "NO"
-doposx = 1
-refpos = 1
+IF UCASE$(cl$) = "-DEBUGMODE" THEN cc = 2
+tt = 0: dd = 0: exper = 0: helpmecode = 1: superhuman$ = "NO"
+monsters$ = "YES": doposx = 1: refpos = 1
 
 IF exist("NOSCR.DAT") = 0 THEN GOTO noscrdat
 IF exist("VARIABLE.DAT") = 0 THEN GOTO novardat
+
+OPEN "NOSCR.DAT" FOR INPUT AS #42
+INPUT #42, monsters$
+CLOSE #42
+
 
 OPEN "VARIABLE.DAT" FOR INPUT AS #60
 INPUT #60, COMP1$
@@ -140,13 +138,19 @@ END IF
 PRINT "Found."
 IF cc = 2 THEN SLEEP 1
 
+
+
 PRINT "Building Reference Table..."; SPC(0);
 cursery = CSRLIN
 curserx = POS(0)
+
+refpos = 1
 OPEN "FQREFS.DAT" FOR INPUT AS #1
 totalfile = 1
 DO
 IF EOF(1) THEN GOTO finishtable
+'juc$ = inputer$(0)
+'IF juc$ = "--EOF--" THEN GOTO finishtable
 LINE INPUT #1, juc$
         IF LTRIM$(LEFT$(juc$, 5)) = "@#SCR" THEN
                 screen1 = VAL(LTRIM$(RTRIM$(RIGHT$(juc$, LEN(juc$) - 5))))
@@ -158,6 +162,7 @@ totalfile = totalfile + LEN(juc$) + 2
 LOOP
 finishtable:
 CLOSE #1
+refpos = 1
 
 LOCATE cursery, curserx
 PRINT "Done."
@@ -192,9 +197,13 @@ FOR bx = 1 TO 5
 IF file$(bx) = "1" THEN
 bx$ = LTRIM$(RTRIM$(STR$(bx - 1)))
 OPEN "FQSAVE" + bx$ + ".DAT" FOR BINARY AS #2
-save1name$ = SPACE$(15)
-GET #2, 1, save1name$
-save1name$ = LTRIM$(RTRIM$(save1name$))
+savename$ = SPACE$(15)
+GET #2, 1, savename$
+IF bx = 1 THEN save1name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+IF bx = 2 THEN save2name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+IF bx = 3 THEN save3name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+IF bx = 4 THEN save4name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+IF bx = 5 THEN save5name$ = LTRIM$(RTRIM$(crypt$(savename$)))
 CLOSE #2
 END IF
 NEXT bx
@@ -214,23 +223,16 @@ IF cc = 2 THEN i$ = INPUT$(1)
 
 
 OPEN "FQMAPS.DAT" FOR BINARY AS #1
-COLOR 7, 0
-CLS
-COLOR 15, 0
-o = 1
+COLOR 7, 0: CLS : COLOR 15, 0: o = 1
 load:
 IF cc = 2 THEN dd = 4
-COLOR 7, 0
-CLS
-CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
+COLOR 7, 0: CLS
+
 refpos = 1
 findit1:
 data$ = inputer(0)
 IF data$ = "--EOF--" THEN GOTO NOINTRO
 
-'IF EOF(36) THEN GOTO NOINTRO
-'LINE INPUT #36, data$
 IF LEFT$(data$, 7) = "@#INTRO" THEN
 k = 1
 GOTO invscr3
@@ -238,155 +240,146 @@ END IF
 GOTO findit1
 invscr3:
 
-'INPUT #36, data$
 data$ = inputer(0)
 color11 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 color12 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
-'INPUT #36, data$
 data$ = inputer(0)
 color21 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 color22 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 
 
 FOR isdf = 1 TO 6
-'INPUT #36, data$
 data$ = inputer(0)
 opy = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 opx = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 opname$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";")), LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
 IF isdf = 1 THEN
-op1y = opy
-op1x = opx
-op1name$ = opname$
+        op1y = opy
+        op1x = opx
+        op1name$ = opname$
 END IF
 IF isdf = 2 THEN
-op2y = opy
-op2x = opx
-op2name$ = opname$
+        op2y = opy
+        op2x = opx
+        op2name$ = opname$
 END IF
 IF isdf = 3 THEN
-op3y = opy
-op3x = opx
-op3name$ = opname$
+        op3y = opy
+        op3x = opx
+        op3name$ = opname$
 END IF
 IF isdf = 4 THEN
-op4y = opy
-op4x = opx
-op4name$ = opname$
+        op4y = opy
+        op4x = opx
+        op4name$ = opname$
 END IF
 IF isdf = 5 THEN
-op5y = opy
-op5x = opx
-op5name$ = opname$
+        op5y = opy
+        op5x = opx
+        op5name$ = opname$
 END IF
 IF isdf = 6 THEN
-op6y = opy
-op6x = opx
-op6name$ = opname$
+        op6y = opy
+        op6x = opx
+        op6name$ = opname$
 END IF
 NEXT
 
 
 
 invscr1:
-'LINE INPUT #36, iner$
 iner$ = inputer(0)
 
 IF iner$ = "@END" THEN GOTO waiter4
-printer 0, iner$, k
-k = k + 1
-GOTO invscr1
+        printer 0, iner$, k
+        k = k + 1
+        GOTO invscr1
 waiter4:
 load1:
-LOCATE 1, 1, 0
-N = 0
-COLOR color21, color22
-LOCATE op1y, op1x: PRINT op1name$
-LOCATE op2y, op2x: PRINT op2name$
-LOCATE op3y, op3x: PRINT op3name$
-LOCATE op4y, op4x: PRINT op4name$
-LOCATE op5y, op5x: PRINT op5name$
-LOCATE op6y, op6x: PRINT op6name$
+        LOCATE 1, 1, 0
+        N = 0
+        COLOR color21, color22
+        LOCATE op1y, op1x: PRINT op1name$
+        LOCATE op2y, op2x: PRINT op2name$
+        LOCATE op3y, op3x: PRINT op3name$
+        LOCATE op4y, op4x: PRINT op4name$
+        LOCATE op5y, op5x: PRINT op5name$
+        LOCATE op6y, op6x: PRINT op6name$
                              
-COLOR color11, color12
-LOCATE op1y, op1x: IF o = 1 THEN PRINT op1name$
-LOCATE op2y, op2x: IF o = 2 THEN PRINT op2name$
-LOCATE op3y, op3x: IF o = 3 THEN PRINT op3name$
-LOCATE op4y, op4x: IF o = 4 THEN PRINT op4name$
-LOCATE op5y, op5x: IF o = 5 THEN PRINT op5name$
-LOCATE op6y, op6x: IF o = 6 THEN PRINT op6name$
+        COLOR color11, color12
+        LOCATE op1y, op1x: IF o = 1 THEN PRINT op1name$
+        LOCATE op2y, op2x: IF o = 2 THEN PRINT op2name$
+        LOCATE op3y, op3x: IF o = 3 THEN PRINT op3name$
+        LOCATE op4y, op4x: IF o = 4 THEN PRINT op4name$
+        LOCATE op5y, op5x: IF o = 5 THEN PRINT op5name$
+        LOCATE op6y, op6x: IF o = 6 THEN PRINT op6name$
 
 IF cc = 2 THEN LOCATE 25, 1
 IF cc = 2 THEN COLOR 7, 0
 IF cc = 2 THEN PRINT "S - Set game settings"; SPC(0);
+
 DO
 check$ = INKEY$
 LOOP WHILE check$ = ""
+
 SELECT CASE check$
 CASE "S"
-IF cc = 2 THEN
-pk = 2
-GOTO setsettings
-END IF
-GOTO load1
+        IF cc = 2 THEN
+                pk = 2
+                GOTO setsettings
+        END IF
+        GOTO load1
 CASE "s"
-IF cc = 2 THEN
-pk = 2
-GOTO setsettings
-END IF
-GOTO load1
+        IF cc = 2 THEN
+                pk = 2
+                GOTO setsettings
+        END IF
+        GOTO load1
 CASE CHR$(27)
-GOTO no1
+        GOTO no1
 CASE CHR$(13)
-COLOR 7, 0
-IF o = 1 GOTO noload
-IF o = 2 GOTO savegame11
-IF o = 3 GOTO yesload
-IF o = 4 GOTO help
-IF o = 5 THEN
-towait1 = FIX(TIMER)
-COLOR 7, 0
-CLS
-GOTO loadmap
-END IF
-IF o = 6 GOTO no1
+        COLOR 7, 0
+        IF o = 1 GOTO noload
+        IF o = 2 GOTO savegame11
+        IF o = 3 GOTO yesload
+        IF o = 4 GOTO help
+        IF o = 5 THEN
+                towait1 = FIX(TIMER)
+                COLOR 7, 0
+                CLS
+                GOTO loadmap
+        END IF
+        IF o = 6 GOTO no1
 help:
 
-COLOR 7, 0
-CLS
-CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
+COLOR 7, 0: CLS
 refpos = 1
 findit13:
-'IF EOF(36) THEN GOTO NOHELP
 data$ = inputer(0)
-IF data$ = "--EOF--" THEN GOTO NOHELP
-'LINE INPUT #36, data$
-IF LEFT$(data$, 6) = "@#HELP" THEN
-k = 1
-GOTO invscr4
-END IF
+        IF data$ = "--EOF--" THEN GOTO NOHELP
+        IF LEFT$(data$, 6) = "@#HELP" THEN
+                k = 1
+                GOTO invscr4
+        END IF
 GOTO findit13
 invscr4:
-'LINE INPUT #36, iner1$
 iner1$ = inputer$(0)
-IF iner1$ = "@END" THEN GOTO waiter6
-IF iner1$ = "@NEXT" THEN GOTO nexter52
-printer 0, iner1$, k
-k = k + 1
-GOTO invscr4
+        IF iner1$ = "@END" THEN GOTO waiter6
+        IF iner1$ = "@NEXT" THEN GOTO nexter52
+                printer 0, iner1$, k
+                k = k + 1
+        GOTO invscr4
 waiter6:
-LOCATE 1, 1, 0
-i$ = INPUT$(1)
+        LOCATE 1, 1, 0
+        i$ = INPUT$(1)
 GOTO load
 nexter52:
-LOCATE 1, 1, 0
-i$ = INPUT$(1)
+        LOCATE 1, 1, 0
+        i$ = INPUT$(1)
 GOTO invscr4
-CASE Null$ + CHR$(75)
-GOTO righter
-CASE Null$ + CHR$(77)
-GOTO lefter
+
+CASE Null$ + CHR$(75): GOTO righter
+CASE Null$ + CHR$(77): GOTO lefter
 
 CASE Null$ + CHR$(72)
 righter:
@@ -401,8 +394,9 @@ o = o + 1
 GOTO load1
 
 CASE ELSE
-GOTO load1
+        GOTO load1
 END SELECT
+
 savegame11:
 CLS
 ooo = 1
@@ -533,23 +527,25 @@ OPEN "FQSAVE" + ooo$ + ".DAT" FOR BINARY AS #2
 IF monsters$ = "YES" THEN monsters5$ = "1"
 IF monsters$ = "NO" THEN monsters5$ = "0"
 
+
 'easy
-EXPER$ = MKD$(EXPER)
-i$ = MKD$(i)
-s$ = MKD$(s)
-h$ = MKD$(h)
-x$ = MKD$(x)
-y$ = MKD$(y)
-w$ = MKD$(w)
-z$ = MKD$(z)
-record$ = MKD$(record)
-rp$ = MKD$(rp)
-defs$ = MKD$(defs)
+exper$ = crypt$(MKD$(exper))
+i$ = crypt$(MKD$(i))
+s$ = crypt$(MKD$(s))
+h$ = crypt$(MKD$(h))
+x$ = crypt$(MKD$(x))
+y$ = crypt$(MKD$(y))
+w$ = crypt$(MKD$(w))
+z$ = crypt$(MKD$(z))
+record$ = crypt$(MKD$(record))
+rp$ = crypt$(MKD$(rp))
+defs$ = crypt$(MKD$(defs))
+monsters5$ = crypt$(monsters5$)
+hitmax$ = crypt$(MKD$(hitmax))
 
-
-toput$ = savename$ + STRING$(15 - LEN(savename$), " ")
+toput$ = crypt$(savename$ + STRING$(15 - LEN(savename$), " "))
 PUT #2, 1, toput$
-PUT #2, 16, EXPER$
+PUT #2, 16, exper$
 PUT #2, 24, i$
 PUT #2, 32, s$
 PUT #2, 40, h$
@@ -561,6 +557,7 @@ PUT #2, 80, record$
 PUT #2, 88, rp$
 PUT #2, 96, defs$
 PUT #2, 104, monsters5$
+PUT #2, 105, hitmax$
 
 
 records = 0
@@ -575,23 +572,23 @@ nexter5:
 
 
 nus = 1
-records$ = CHR$(records)
+records$ = crypt$(CHR$(records))
 
 
-PUT #2, 105, records$
+PUT #2, 113, records$
 
-filespace = 106
+filespace = 114
 
 nnx = 0
 continue:
 IF nnx = records THEN GOTO done
 data$ = settings$(nus): nus = nus + 1
 data1$ = settings$(nus): nus = nus + 1
-data$ = RTRIM$(LTRIM$(data$))
+data$ = crypt$(RTRIM$(LTRIM$(data$)))
 data1 = VAL(data1$)
-dat$ = MKD$(data1)
+dat$ = crypt$(MKD$(data1))
 xb = LEN(data$)
-xb$ = LTRIM$(CHR$(xb))
+xb$ = crypt$(LTRIM$(CHR$(xb)))
 PUT #2, filespace, xb$
 filespace = filespace + 1
 PUT #2, filespace, data$
@@ -667,7 +664,7 @@ OPEN "FQSAVE" + op$ + ".DAT" FOR BINARY AS #2
 
 savename$ = SPACE$(15)
 monsters5$ = SPACE$(1)
-EXPER$ = SPACE$(8)
+exper$ = SPACE$(8)
 i$ = SPACE$(8)
 s$ = SPACE$(8)
 h$ = SPACE$(8)
@@ -678,9 +675,10 @@ z$ = SPACE$(8)
 record$ = SPACE$(8)
 rp$ = SPACE$(8)
 defs$ = SPACE$(8)
+hitmax$ = SPACE$(8)
 
 GET #2, 1, savename$
-GET #2, 16, EXPER$
+GET #2, 16, exper$
 GET #2, 24, i$
 GET #2, 32, s$
 GET #2, 40, h$
@@ -692,13 +690,12 @@ GET #2, 80, record$
 GET #2, 88, rp$
 GET #2, 96, defs$
 GET #2, 104, monsters5$
+GET #2, 105, hitmax$
 
-
-
-filespace = 106
+filespace = 114
 numrecords$ = SPACE$(1)
-GET #2, 105, numrecords$
-numrecords = ASC(numrecords$)
+GET #2, 113, numrecords$
+numrecords = ASC(crypt$(numrecords$))
 
 
 
@@ -708,16 +705,16 @@ conte5:
 IF xb = numrecords THEN GOTO done1
 chra$ = SPACE$(1)
 GET #2, filespace, chra$
-abx = ASC(chra$)
+abx = ASC(crypt$(chra$))
 filespace = filespace + 1
 cbx$ = SPACE$(abx)
 GET #2, filespace, cbx$
-settings$(nus) = cbx$: nus = nus + 1
+settings$(nus) = crypt$(cbx$): nus = nus + 1
 filespace = filespace + abx
 data$ = SPACE$(8)
 GET #2, filespace, data$
 filespace = filespace + 8
-xbx = CVD(data$)
+xbx = CVD(crypt$(data$))
 xbx$ = LTRIM$(STR$(xbx))
 settings$(nus) = xbx$: nus = nus + 1
 xb = xb + 1
@@ -725,17 +722,21 @@ GOTO conte5:
 
 done1:
 settings$(nus) = "--END--": nus = nus + 1
-EXPER = CVD(EXPER$)
-i = CVD(i$)
-s = CVD(s$)
-h = CVD(h$)
-x = CVD(x$)
-y = CVD(y$)
-w = CVD(w$)
-z = CVD(z$)
-record = CVD(record$)
-rp = CVD(rp$)
-defs = CVD(defs$)
+exper = CVD(crypt$(exper$))
+i = CVD(crypt$(i$))
+s = CVD(crypt$(s$))
+h = CVD(crypt$(h$))
+x = CVD(crypt$(x$))
+y = CVD(crypt$(y$))
+w = CVD(crypt$(w$))
+z = CVD(crypt$(z$))
+record = CVD(crypt$(record$))
+rp = CVD(crypt$(rp$))
+defs = CVD(crypt$(defs$))
+monsters5$ = crypt$(monsters5$)
+hitmax = CVD(crypt$(hitmax$))
+
+
 IF monsters5$ = "1" THEN monsters$ = "YES"
 IF monsters5$ = "0" THEN monsters$ = "NO"
 
@@ -791,7 +792,7 @@ INPUT #60, armour2power
 INPUT #60, armour3power
 INPUT #60, armour4power
 
-EXPER = 0
+exper = 0
 gh3:
 IF EOF(60) THEN GOTO gh2
 INPUT #60, data$
@@ -808,7 +809,12 @@ qy = 1
 qx = 1
 mm = 1
 COLOR 14, 2
+
+begingame = 1
+GOTO getready
+begingame:
 loadmap:
+begingame = 0
 printline$ = "YES"
 gbbn = 0
 qy = 1
@@ -891,12 +897,9 @@ doneloading:
 
 begin:
 CLOSE #36, #53
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
 refpos = 1
 DO
-'IF EOF(36) THEN EXIT DO
 gotothenext:
-'INPUT #36, iner$
 iner$ = inputer$(0): IF iner$ = "--EOF--" THEN EXIT DO
 IF alwaysdo = 5 AND iner$ = "@END" THEN GOTO dones3
 IF iner$ = "@#ALWAYSDO" THEN
@@ -908,7 +911,6 @@ END IF
 LOOP
 dones3:
 alwaysdo = 0
-'CLOSE #36
 
 
 
@@ -918,20 +920,10 @@ alwaysdo = 0
 IF ghs = 5 THEN
 ghs = 0
 CLOSE #36, #53
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
-'refpos = 1
-'rp$ = STR$(rp)
-'DO
-'IF EOF(36) THEN EXIT DO
-'INPUT #36, aggggf$
-'IF aggggf$ = "@#SCR" + rp$ THEN
 thescreen$ = inputer$(rp): IF thescreen$ = "--EOF--" THEN GOTO bg1
 what = 5
 waypoint = 0
 GOTO doiter
-'END IF
-'LOOP
-'CLOSE #36
 END IF
 bg1:
 
@@ -1013,7 +1005,7 @@ RANDOMIZE TIMER
 INPUT #62, ifscore
 INPUT #62, monrand
 
-IF EXPER < ifscore THEN
+IF exper < ifscore THEN
 ra = INT(RND * monrand) + 1
 GOTO m1
 END IF
@@ -1213,7 +1205,7 @@ COLOR 4, 1
 PRINT "Dead"; SPC(0);
 END IF
 IF b < 1 THEN s = s + togetscore
-IF b < 1 THEN EXPER = EXPER + expertoget
+IF b < 1 THEN exper = exper + expertoget
 IF b < 1 THEN i$ = INPUT$(1)
 IF b < 1 THEN
 LOCATE 24, 1
@@ -1309,9 +1301,9 @@ COLOR 14, 1
 PRINT "                                                                               "; SPC(0);
 LOCATE 23, 1
 PRINT "You are deafeated... You Gold and Experience have been lowered unfortunatly.."; SPC(0);
-exper1 = FIX(EXPER / 10)
-EXPER = EXPER - exper1
-IF EXPER < 0 THEN EXPER = 0
+exper1 = FIX(exper / 10)
+exper = exper - exper1
+IF exper < 0 THEN exper = 0
 s = 0
 h = 10
 i$ = INPUT$(1)
@@ -1408,15 +1400,18 @@ check$ = INKEY$
 
 IF FIX(TIMER) >= 86396 AND ggb = 5 THEN
 ggb = 3
+printwrite = 0
 GOTO cc66
 END IF
 
 IF FIX(TIMER) >= towait1 AND ggb = 5 THEN
 ggb = 3
+printwrite = 0
 GOTO cc66
 END IF
 
-IF FIX(TIMER) < towait1 THEN LOCATE 23, doposx, 1, 6, 7
+IF FIX(TIMER) < towait1 AND printwrite <> 1 THEN LOCATE 23, doposx, 1, 6, 7
+IF FIX(TIMER) < towait1 AND ggb = 5 AND printwrite = 1 THEN LOCATE 23, doposx2, 1, 6, 7
 IF FIX(TIMER) >= towait1 THEN LOCATE y, x, 1, 6, 7
 
 LOOP WHILE check$ = ""
@@ -1647,12 +1642,15 @@ END IF
 
 
 IF xcc = thescreen THEN
-LOCATE xc, POS(0) - 1
+
+IF POS(0) <> 1 THEN LOCATE xc, POS(0) - 1
+IF POS(0) = 1 THEN LOCATE xc, 80
 
 bs = SCREEN(CSRLIN, POS(0), 1)
 b = FIX(bs / 16)
 COLOR 20, b
 PRINT CHR$(1); SPC(0);
+'LOCATE by, bx
 END IF
 
 NEXT xcc
@@ -1701,8 +1699,9 @@ PRINT
 PRINT "Screen #: ", rp
 PRINT "X: ", x
 PRINT "Y: ", y
-PRINT "Experience: ", EXPER
+PRINT "Experience: ", exper
 PRINT "Hitpoints: ", h
+PRINT "Max Hp: ", hitmax
 PRINT "Strength: ", w
 PRINT "Defense: ", defs
 PRINT "Gold: ", s
@@ -1716,6 +1715,11 @@ PRINT
 COLOR 2, 0
 
 setsettings
+settingsettings = 1
+GOTO getready
+returner:
+settingsettings = 0
+thescreen = thescreen1
 COLOR 7, 0
 CLS
 
@@ -1976,6 +1980,7 @@ doiter:
 DO
 'INPUT #36, adsg$
 adsg$ = inputer$(0)
+adsg$ = UCASE$(adsg$)
 
 IF adsg$ = "--EOF--" THEN GOTO leaver
 adsg$ = LTRIM$(adsg$)
@@ -2231,50 +2236,61 @@ LOCATE cury + (op4 - 1), doposx1, 1, 6, 7
 newcheck$ = INKEY$
 LOOP WHILE newcheck$ = ""
 SELECT CASE newcheck$
-CASE CHR$(27)
-GOTO donefunc
-CASE CHR$(13)
-GOTO enterpress
-CASE Null$ + CHR$(77)
-GOTO downer
-CASE Null$ + CHR$(75)
-GOTO uper
+
+CASE CHR$(27): GOTO donefunc
+CASE CHR$(13): GOTO enterpress
+CASE Null$ + CHR$(77): GOTO downer
+CASE Null$ + CHR$(75): GOTO uper
 CASE Null$ + CHR$(72)
 uper:
 IF op4 = 1 THEN
-op4 = howmany
-GOTO beg6
+                op4 = howmany
+                GOTO beg6
 END IF
-op4 = op4 - 1
-GOTO beg6
+        op4 = op4 - 1
+        GOTO beg6
 CASE Null$ + CHR$(80)
 downer:
 IF op4 = howmany THEN
-op4 = 1
-GOTO beg6
+                op4 = 1
+                GOTO beg6
 END IF
-op4 = op4 + 1
-GOTO beg6
+        op4 = op4 + 1
+        GOTO beg6
 CASE ELSE
-GOTO beg6
+        GOTO beg6
 END SELECT
-GOTO beg6
+        GOTO beg6
 
 enterpress:
 op4$ = STR$(op4)
-toGET$ = "#IF" + op4$
+toGET$ = "#IFCHOICE" + op4$
 
 gg:
-IF runref$ <> "YES" THEN
-'IF EOF(36) THEN GOTO nothing
-IF data$ = "--EOF--" THEN GOTO nothing
-END IF
-IF runref$ = "YES" THEN
-IF EOF(53) THEN GOTO nothing
-END IF
+IF runref$ <> "YES" AND data$ = "--EOF--" THEN GOTO nothing
+IF runref$ = "YES" AND EOF(53) THEN GOTO nothing
+
 IF runref$ <> "YES" THEN data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
+
+IF LEFT$(data$, 7) = "#CHOICE" THEN
+numofchoices = VAL(RIGHT$(data$, LEN(data$) - 7))
+gv = 0
+DO
+        IF gv = numofchoices THEN EXIT DO
+        IF runref$ <> "YES" THEN iner2$ = inputer$(0)
+        IF runref$ = "YES" THEN INPUT #53, iner2$
+        IF LEFT$(iner2$, 9) = "#IFCHOICE" THEN gv = gv + 1
+LOOP
+DO
+        IF runref$ <> "YES" THEN iner2$ = inputer$(0)
+        IF runref$ = "YES" THEN INPUT #53, iner2$
+        IF LEFT$(iner2$, 5) = "@DONE" THEN EXIT DO
+LOOP
+END IF
+
 IF data$ = toGET$ THEN GOTO dofunc
+
 GOTO gg
 dofunc:
 in:
@@ -2283,6 +2299,7 @@ IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 
 iner$ = UCASE$(iner$)
+
 IF iner$ = "@DONE" THEN GOTO donefunc
 doits = 5
 GOTO togo2
@@ -2368,12 +2385,15 @@ newgfh1:
 label$ = LTRIM$(label$)
 reffile$ = LTRIM$(reffile$)
 
-OPEN reffile$ FOR BINARY AS #53
-IF LOF(53) < 2 THEN
-CLOSE #53
-KILL reffile$
-GOTO returnit
-END IF
+
+IF exist(reffile$) = 0 THEN GOTO returnit
+'OPEN reffile$ FOR BINARY AS #53
+
+'IF LOF(53) < 2 THEN
+'CLOSE #53
+'KILL reffile$
+'GOTO returnit
+'END IF
 returnref:
 CLOSE #53
 OPEN reffile$ FOR INPUT AS #53
@@ -2381,7 +2401,7 @@ junky:
 
 IF EOF(53) THEN GOTO endrefit
 INPUT #53, iner$
-IF iner$ = "@#" + label$ THEN
+IF UCASE$(iner$) = "@#" + UCASE$(label$) THEN
 bg = 0
 GOTO ins
 END IF
@@ -2457,7 +2477,7 @@ doposy = doposy + 1
 NEXT
 g55:
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) <> "P" THEN reloadscreen = 3
-towait1 = FIX(TIMER)
+IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) <> "P" THEN towait1 = FIX(TIMER)
 END IF
 
 IF iner$ = "#MONSTER" THEN
@@ -2607,6 +2627,78 @@ GOTO itisonit
 END IF
 
 
+IF LEFT$(iner$, 8) = "#DECLARE" THEN
+gsv$ = RIGHT$(iner$, LEN(iner$) - 9)
+nus = 1
+DO
+gs$ = settings$(nus)
+
+IF gs$ = gsv$ THEN
+settings$(nus + 1) = "": nus = 1
+EXIT DO
+END IF
+
+IF gs$ = "--END--" THEN
+        settings$(nus) = gsv$
+        settings$(nus + 1) = ""
+        settings$(nus + 2) = "--END--": nus = 1
+        EXIT DO
+END IF
+
+nus = nus + 1
+LOOP
+END IF
+
+IF LEFT$(iner$, 4) = "#FIX" THEN
+data$ = RIGHT$(iner$, LEN(iner$) - 5)
+nus = 1
+DO
+ds$ = UCASE$(settings$(nus))
+IF ds$ = "--END--" THEN EXIT DO
+IF ds$ = UCASE$(data$) THEN
+        settings$(nus + 1) = LTRIM$(STR$(FIX(VAL(settings$(nus + 1))))): nus = 1
+        EXIT DO
+END IF
+
+nus = nus + 1
+LOOP
+END IF
+
+
+IF LEFT$(iner$, 8) = "#GETCHAR" THEN
+IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 9))) = "1" THEN LOCATE , , 1, 6, 7
+IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 9))) = "0" THEN LOCATE , , 0
+
+DO: getchar$ = INKEY$: LOOP WHILE getchar$ = ""
+
+FOR chars = 1 TO 32
+IF getchar$ = CHR$(chars) THEN
+        getchar$ = LTRIM$(STR$(chars))
+        EXIT FOR
+        END IF
+IF getchar$ = CHR$(0) + CHR$(chars) THEN
+        getchar$ = LTRIM$(STR$(chars))
+        EXIT FOR
+        END IF
+NEXT chars
+
+FOR chars = 127 TO 255
+IF getchar$ = CHR$(chars) THEN
+        getchar$ = LTRIM$(STR$(chars))
+        EXIT FOR
+        END IF
+IF getchar$ = CHR$(0) + CHR$(chars) THEN
+        getchar$ = LTRIM$(STR$(chars))
+        EXIT FOR
+        END IF
+NEXT chars
+
+
+toset$ = "LASTCHAR"
+tosetto$ = getchar$
+GOTO setnow
+END IF
+
 IF LEFT$(iner$, 4) = "#SET" THEN
 cb562 = 0
 
@@ -2629,22 +2721,39 @@ GOTO getready
 
 setnow:
 
+IF VAL(tosetto$) = 0 AND LEN(tosetto$) > 1 THEN
 nus = 1
+GOTO pluser
+END IF
+
+IF what$ = "*1" THEN GOTO pluser
+IF what$ = "/1" THEN GOTO pluser
 IF what$ = "+1" THEN GOTO pluser
 IF what$ = "-1" THEN GOTO pluser
 IF what$ = "=1" THEN
 pluser:
+
+
+IF settings$(nus - 1) = "--END--" THEN GOTO nuser
 IF settings$(nus) = "--END--" THEN
+nuser:
         datatouse$ = ""
         GOTO setnow2
 END IF
 
 
+
 data$ = settings$(nus): nus = nus + 1
 data1$ = settings$(nus): nus = nus + 1
 
+'PRINT data$; " "; data1$; " "; tosetto$: i$ = INPUT$(1)
+
 IF data$ = tosetto$ THEN
 datatouse$ = data1$
+tosetto$ = datatouse$
+
+'LOCATE 1, 1: PRINT datatouse$: END
+
 GOTO setnow2
 END IF
 
@@ -2656,8 +2765,8 @@ setnow2:
 
 nus = 1
 DO
-IF settings$(nus) = "--END--" THEN GOTO makeit
 data$ = settings$(nus): nus = nus + 1
+IF settings$(nus) = "--END--" THEN GOTO makeit
 IF data$ = toset$ THEN GOTO processit
 LOOP
 
@@ -2666,26 +2775,33 @@ datanow = VAL(settings$(nus))
 datanow$ = settings$(nus)
 
 
+IF what$ = "*1" THEN GOTO pluser2
+IF what$ = "/1" THEN GOTO pluser2
 IF what$ = "+1" THEN GOTO pluser2
 IF what$ = "-1" THEN GOTO pluser2
 IF what$ = "=1" THEN
 pluser2:
 
 
+IF what$ = "*1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow * VAL(datatouse$))))
+IF what$ = "/1" THEN jf$ = LTRIM$(RTRIM$(STR$(FIX((datanow / VAL(datatouse$))))))
 IF what$ = "+1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow + VAL(datatouse$))))
 IF what$ = "-1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow - VAL(datatouse$))))
 IF what$ = "=1" THEN jf$ = datatouse$
 settings$(nus) = jf$
+'CLS : PRINT datatouse$: i$ = INPUT$(50)
 
 GOTO donewithit
 END IF                                          'pluser 2
 
 
-
+IF what$ = "*" THEN jf = datanow * VAL(tosetto$)
+IF what$ = "/" THEN jf = FIX(datanow / VAL(tosetto$))
 IF what$ = "+" THEN jf = datanow + VAL(tosetto$)
 IF what$ = "-" THEN jf = datanow - VAL(tosetto$)
 IF what$ = "=" THEN jf = VAL(tosetto$)
 settings$(nus) = LTRIM$(RTRIM$(STR$(jf)))
+
 
 GOTO donewithit
 makeit:
@@ -2702,8 +2818,10 @@ IF hyes = 5 THEN
 hyes = 0
 nus = 1
 eofer62:
+IF settings$(nus - 1) = "--END--" THEN GOTO doneit2
 IF settings$(nus) = "--END--" THEN GOTO doneit2
 thes$ = settings$(nus): nus = nus + 1
+IF settings$(nus) = "--END--" THEN GOTO doneit2
 
 
 
@@ -2737,7 +2855,7 @@ END IF
 
 IF thes$ = "EXPERIENCE" THEN
 thes1$ = settings$(nus): nus = nus + 1
-EXPER = VAL(thes1$)
+exper = VAL(thes1$)
 END IF
 
 GOTO eofer62
@@ -2761,6 +2879,7 @@ iner$ = UCASE$(iner$)
 whatif$ = ""
 how$ = ""
 whatequal$ = ""
+whatequal3$ = ""
 gsb = 5
 
 data$ = RIGHT$(iner$, LEN(iner$) - 4)
@@ -2775,6 +2894,20 @@ whatequal$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, " ") + 1, data$
 GOTO getready
 getre2:
 
+IF VAL(whatequal$) = 0 AND LEN(whatequal$) > 1 THEN
+        nus = 1
+DO
+thesa$ = settings$(nus)
+IF thesa$ = "--END--" THEN EXIT DO
+        IF thesa$ = whatequal$ THEN
+        whatequal3$ = settings$(nus + 1)
+        EXIT DO
+        END IF
+nus = nus + 1
+LOOP
+
+END IF
+
 nus = 1
 EOF1:
 IF settings$(nus) = "--END--" THEN GOTO donenext
@@ -2788,6 +2921,8 @@ IF whatif$ = whatif1$ THEN
 whatequal1$ = settings$(nus): nus = nus + 1
 INR:
 
+oldequal2$ = whatequal1$
+IF whatequal3$ <> "" THEN whatequal1$ = whatequal3$
 
 IF whatequal$ = whatequal1$ AND how$ = "=" THEN GOTO runit
 IF VAL(whatequal$) >= VAL(whatequal1$) AND how$ = "<=" THEN GOTO runit
@@ -2795,6 +2930,8 @@ IF VAL(whatequal$) <= VAL(whatequal1$) AND how$ = ">=" THEN GOTO runit
 IF VAL(whatequal$) > VAL(whatequal1$) AND how$ = "<" THEN GOTO runit
 IF VAL(whatequal$) < VAL(whatequal1$) AND how$ = ">" THEN GOTO runit
 
+whatequal1$ = oldequal2$
+oldequal2$ = ""
 
 IF how$ = "=1" THEN
 whatequal3$ = VOB$(whatequal$)
@@ -2915,14 +3052,16 @@ IF runref$ <> "YES" THEN towrite$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
+printwrite = 1
 ggb = 5
+doposx2 = doposx
 END IF
 
 IF iner$ = "#RETURN" THEN
 GOTO getout
 END IF
 
-IF EXPER < 0 THEN EXPER = 0
+IF exper < 0 THEN exper = 0
 IF w < 0 THEN w = 0
 IF defs < 0 THEN defs = 0
 IF h < 0 THEN h = 0
@@ -2995,56 +3134,65 @@ END
 getready:
 nus = 1
 ghsg:
-IF settings$(nus) = "--END--" THEN GOTO startvariable
 data$ = settings$(nus): nus = nus + 1
+IF settings$(nus) = "--END--" THEN GOTO startvariable
 data1$ = settings$(nus): nus = nus + 1
+IF settings$(nus) = "--END--" THEN GOTO startvariable
 
 IF data$ = "MAXENERGY" THEN
 max1 = 1
-settings$(nus - 1) = STR$(hitmax)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(hitmax)
+IF settingsettings = 1 THEN hitmax = VAL(settings$(nus - 1))
 
 GOTO ghsg
 END IF
 
 IF data$ = "HITPOINT" THEN
 max2 = 1
-settings$(nus - 1) = STR$(h)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(h)
+IF settingsettings = 1 THEN h = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "GOLD" THEN
 max3 = 1
-settings$(nus - 1) = STR$(s)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(s)
+IF settingsettings = 1 THEN s = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "STRENGTH" THEN
 max4 = 1
-settings$(nus - 1) = STR$(w)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(w)
+IF settingsettings = 1 THEN w = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "DEFENSE" THEN
 max5 = 1
-settings$(nus - 1) = STR$(defs)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(defs)
+IF settingsettings = 1 THEN defs = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "WEAPON" THEN
 max6 = 1
-settings$(nus - 1) = STR$(i)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(i)
+IF settingsettings = 1 THEN i = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "ARMOUR" THEN
 max7 = 1
-settings$(nus - 1) = STR$(z)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(z)
+IF settingsettings = 1 THEN z = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
 IF data$ = "EXPERIENCE" THEN
 max8 = 1
-settings$(nus - 1) = STR$(EXPER)
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(exper)
+IF settingsettings = 1 THEN exper = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
@@ -3067,7 +3215,7 @@ IF max6 <> 1 THEN settings$(nus) = STR$(i): nus = nus + 1
 IF max7 <> 1 THEN settings$(nus) = "ARMOUR": nus = nus + 1
 IF max7 <> 1 THEN settings$(nus) = STR$(z): nus = nus + 1
 IF max8 <> 1 THEN settings$(nus) = "EXPERIENCE": nus = nus + 1
-IF max8 <> 1 THEN settings$(nus) = STR$(EXPER): nus = nus + 1
+IF max8 <> 1 THEN settings$(nus) = STR$(exper): nus = nus + 1
 max1 = 1
 max2 = 1
 max3 = 1
@@ -3079,6 +3227,8 @@ max8 = 1
 CLOSE #5, #66, #67, #69, #222, #234
 settings$(nus) = "--END--": nus = nus + 1
 
+IF begingame = 1 THEN GOTO begingame
+IF settingsettings = 1 THEN GOTO returner
 IF hyes = 5 THEN GOTO setnow
 
 GOTO getre2
@@ -3086,17 +3236,6 @@ GOTO getre2
 getout:
 IF runref$ = "YES" THEN GOTO returnref
 agggg$ = inputer$(rp)
-
-'CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
-'refpos = 1
-'rp$ = STR$(rp)
-'scr$ = "@#SCR" + rp$
-'DO
-'IF EOF(36) THEN EXIT DO
-'agggg$ = inputer$(0): IF agggg$ = "--EOF--" THEN EXIT DO
-'IF agggg$ = scr$ THEN EXIT DO
-'LOOP
 
 GOTO doiter
 nottt:
@@ -3231,7 +3370,7 @@ h$ = ""
 IF gh2$ = "F" THEN gh = gh + 2
 IF gh2$ = "H" THEN h$ = LTRIM$(STR$(h))
 
-IF gh2$ = "E" THEN h$ = LTRIM$(STR$(EXPER))
+IF gh2$ = "E" THEN h$ = LTRIM$(STR$(exper))
 IF gh2$ = "G" THEN h$ = LTRIM$(STR$(G))
 IF gh2$ = "A" THEN h$ = LTRIM$(STR$(w))
 IF gh2$ = "D" THEN h$ = LTRIM$(STR$(defs))
@@ -3336,7 +3475,7 @@ PRINT G$; SPC(0);
 END IF
 
 IF cole1$ = "E" THEN
-G$ = STR$(EXPER)
+G$ = STR$(exper)
 G$ = LTRIM$(RTRIM$(G$))
 PRINT G$; SPC(0);
 doposx = doposx + LEN(G$)
@@ -3415,6 +3554,23 @@ END IF
 
 END SUB
 
+FUNCTION crypt$ (tocrypt$)
+
+gs$ = ""
+FOR ggs = 1 TO LEN(tocrypt$)
+gsb$ = RIGHT$(LEFT$(tocrypt$, ggs), 1)
+
+
+asd = ASC(gsb$)
+asv = -(asd - 255)
+gs$ = gs$ + CHR$(asv)
+
+NEXT ggs
+
+crypt$ = gs$
+
+END FUNCTION
+
 SUB endscreen
 RANDOMIZE TIMER
 color$ = LTRIM$(RTRIM$(STR$(INT(RND * 7) + 1)))
@@ -3457,16 +3613,25 @@ getouts:
 END FUNCTION
 
 FUNCTION inputer$ (screener)
+
 IF fileopened = 0 THEN OPEN "fqrefs.dat" FOR BINARY AS #13
 fileopened = 1
+
 jk = 0
 data$ = ""
 IF screener <> 0 THEN refpos = reffile(screener)
+'IF screener <> 0 THEN PRINT refpos: END
 IF refpos = 0 THEN GOTO nothing323
 DO
 IF refpos + jk > LOF(13) THEN GOTO nothing323
+
 ag$ = SPACE$(80)
+IF refpos + jk + 80 > LOF(13) THEN
+ag$ = SPACE$(LOF(13) - (refpos + jk))
+END IF
+
 GET #13, refpos + jk, ag$
+
 IF INSTR(ag$, CHR$(13)) THEN
         ag1$ = LEFT$(ag$, INSTR(ag$, CHR$(13)) - 1)
         data$ = data$ + ag1$
@@ -3566,6 +3731,7 @@ IF rg$ = "" THEN GOTO chx
 IF FIX(VAL(rg$)) <= 1920 AND FIX(VAL(rg$)) >= 1 THEN GOTO nexter
 GOTO reenterrg
 nexter:
+thescreen = FIX(VAL(rg$))
 rp = FIX(VAL(rg$))
 chx:
 INPUT "INPUT X-CRT:", xg$
@@ -3593,13 +3759,17 @@ record = dkdk * 79 + x
 INPUT "INPUT Experience:", exi$
 IF exi$ = "" THEN GOTO ste1
 hi = VAL(exi$)
-EXPER = hi
+exper = hi
 ste1:
 INPUT "INPUT Hitpoints:", hi$
 IF hi$ = "" THEN GOTO ste
 hi = VAL(hi$)
 h = hi
 ste:
+INPUT "INPUT Max Hitpoints:", gs$
+IF gs$ = "" THEN GOTO svs
+hitmax = VAL(gs$)
+svs:
 INPUT "INPUT Strength:", wi$
 IF wi$ = "" THEN GOTO defsg
 wi = VAL(wi$)
@@ -3634,6 +3804,50 @@ monster$ = INPUT$(1)
 monster$ = UCASE$(monster$)
 IF monster$ = "Y" THEN monsters$ = "YES"
 IF monster$ = "N" THEN monsters$ = "NO"
+thescreen1 = rp
+
+nus = 1
+DO
+bx$ = settings$(nus): nus = nus + 1
+IF bx$ = "--END--" THEN EXIT DO
+
+IF bx$ = "MAXENERGY" THEN settings$(nus) = STR$(hitmax)
+IF bx$ = "EXPERIENCE" THEN settings$(nus) = STR$(exper)
+IF bx$ = "STRENGTH" THEN settings$(nus) = STR$(w)
+IF bx$ = "DEFENSE" THEN settings$(nus) = STR$(defs)
+IF bx$ = "HITPOINT" THEN settings$(nus) = STR$(h)
+IF bx$ = "GOLD" THEN settings$(nus) = STR$(s)
+IF bx$ = "WEAPON" THEN settings$(nus) = STR$(i)
+IF bx$ = "ARMOUR" THEN settings$(nus) = STR$(z)
+
+nus = nus + 1
+LOOP
+
+
+
+PRINT "Edit dynamic SETTINGS$ array? Y/(N)"
+array$ = INPUT$(1)
+
+
+IF UCASE$(array$) = "Y" THEN
+PRINT
+gust = 1
+DO
+gs$ = settings$(gust): gust = gust + 1
+IF gs$ = "--END--" THEN GOTO dones
+gs1$ = settings$(gust):
+PRINT "Variable :  "; gs$
+PRINT "Value    :  "; gs1$
+INPUT "New Value:  ", newvalue$
+        IF newvalue$ <> "" THEN
+        settings$(gust) = newvalue$
+        END IF
+PRINT
+gust = gust + 1
+LOOP
+dones:
+END IF
+
 
 END SUB
 

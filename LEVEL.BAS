@@ -1,15 +1,17 @@
+DECLARE SUB background ()
+DECLARE SUB foreground ()
 DECLARE SUB clump (CLUMP1$, posx!, posy!, size!, collor!)
 DECLARE SUB button (pressed!, boxx!, boxy!, boxl!, boxh!)
 DECLARE SUB letters (which$, px!, py!, sz!, col!)
 DECLARE SUB level ()
-DIM SHARED bbbb, dddd$, rp, f, b, h$, gg$, ii$, x, y, filename$
+DIM SHARED bbbb, dddd$, rp, F, b, h$, gg$, ii$, x, y, filename$, reload
 DIM map(5000)
-c$ = UCASE$(COMMAND$)
-IF c$ = "" THEN filename$ = "fqmaps.dat"
-IF c$ <> "" THEN filename$ = c$
+C$ = UCASE$(COMMAND$)
+IF C$ = "" THEN filename$ = "fqmaps.dat"
+IF C$ <> "" THEN filename$ = C$
 
 
-IF c$ <> "" THEN GOTO continue3
+IF C$ <> "" THEN GOTO continue3
 
 OPEN "fqmaps.dat" FOR BINARY AS #1
 IF LOF(1) < 2 THEN
@@ -71,10 +73,10 @@ END IF
 
 
 IF im >= LOF(98) THEN GOTO nx
-a$ = SPACE$(5)
-GET #98, im, a$
-type$ = LEFT$(a$, 1)
-number = VAL(RIGHT$(a$, 4))
+A$ = SPACE$(5)
+GET #98, im, A$
+type$ = LEFT$(A$, 1)
+number = VAL(RIGHT$(A$, 4))
 IF type$ = "1" THEN map(number) = 1
 IF type$ = "2" THEN map(number) = 2
 IF type$ = "3" THEN map(number) = 3
@@ -319,8 +321,8 @@ LOCATE 1, 1
 bk = dd * 5219 - 5213
 kb = dd * 5219
 FOR l = bk TO kb STEP 3
-a$ = SPACE$(3)
-GET #1, l, a$
+A$ = SPACE$(3)
+GET #1, l, A$
 
 IF POS(0) = 80 THEN
 LOCATE CSRLIN + 1, 1
@@ -328,7 +330,7 @@ END IF
 
 
 
-D$ = LEFT$(a$, 1)
+D$ = LEFT$(A$, 1)
 D = ASC(D$)
 bg = FIX(D / 16)
 fg = D - (bg * 16)
@@ -348,7 +350,7 @@ PRINT " "; SPC(0);
 GOTO redo
 END IF
 
-PRINT RIGHT$(a$, 1); SPC(0);
+PRINT RIGHT$(A$, 1); SPC(0);
 
 
 redo:
@@ -357,6 +359,14 @@ doneloading:
 CLOSE #1
 LOCATE 1, 1, 0
 level
+
+IF reload = 1 THEN
+reload = 0
+CLOSE #1
+OPEN dddd$ FOR BINARY AS #1
+GOTO bbeeggiinn
+END IF
+
 GOTO loader1
 DEL:
 LOCATE 25, 1
@@ -378,7 +388,7 @@ OPEN "TEMP.DAT" FOR BINARY AS #2
 
 rp$ = STR$(rp)
 rp$ = RTRIM$(LTRIM$(rp$))
-c = 1
+C = 1
 FOR i = 1 TO LOF(1) STEP 5219
 ab$ = SPACE$(5219)
 abc$ = SPACE$(4)
@@ -388,8 +398,8 @@ abc$ = LTRIM$(RTRIM$(abc$))
 IF abc$ = rp$ THEN
 GOTO nope
 END IF
-PUT #2, c, ab$
-c = c + 5219
+PUT #2, C, ab$
+C = C + 5219
 nope:
 NEXT i
 CLOSE #1, #2
@@ -528,6 +538,21 @@ PRINT "All rights reserved..."
 PRINT
 CLOSE
 
+SUB background
+PRINT "BACKGROUND: "; SPC(0);
+'0,1,2,3,4,5,6,7: "; SPC(0);
+COLOR 15, 0: PRINT "0"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 1: PRINT "1"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 2: PRINT "2"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 3: PRINT "3"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 4: PRINT "4"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 5: PRINT "5"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 6: PRINT "6"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 7: PRINT "7"; SPC(0);
+COLOR 7, 0: PRINT ": "; SPC(0);
+
+END SUB
+
 SUB button (pressed, boxx, boxy, boxl, boxh)
 IF pressed = 0 THEN GOTO unpressed
 IF pressed = 1 THEN GOTO pressed
@@ -585,6 +610,28 @@ END IF
 posx = posx + size / 3
 posx = FIX(posx)
 NEXT i
+END SUB
+
+SUB foreground
+PRINT "FORGROUND: 0,"; SPC(0); : COLOR 1, 0:
+PRINT "1"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 2, 0: PRINT "2"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 3, 0: PRINT "3"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 4, 0: PRINT "4"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 5, 0: PRINT "5"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 6, 0: PRINT "6"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 7, 0: PRINT "7"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 8, 0: PRINT "8"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 9, 0: PRINT "9"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 10, 0: PRINT "A"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 11, 0: PRINT "B"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 12, 0: PRINT "C"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 13, 0: PRINT "D"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 14, 0: PRINT "E"; SPC(0);
+COLOR 7, 0: PRINT ","; SPC(0); : COLOR 15, 0: PRINT "F"; SPC(0);
+COLOR 7, 0: PRINT ": "; SPC(0);
+
+',1,2,3,4,5,6,7,8,9,A,B,C,D,E,F: "; SPC(0);
 END SUB
 
 SUB letters (which$, px, py, sz, col)
@@ -1116,8 +1163,8 @@ OPEN dddd$ FOR BINARY AS #1
 IF b <> 0 THEN GOTO skiper
 b = 0
 skiper:
-IF f <> 0 THEN GOTO skiper1
-f = 0
+IF F <> 0 THEN GOTO skiper1
+F = 0
 skiper1:
 IF x <> 1 THEN GOTO skiper6
 x = 1
@@ -1162,6 +1209,7 @@ COLOR 7, 0
 PRINT STRING$(55, " "); SPC(0);
 LOCATE 23, 1
 PRINT "Press "; CHR$(34); "o"; CHR$(34); " for options. ESC quits, C-COPY, S-STAMP."
+PRINT "Press B to input HEX CHR. Press T for ASCII Chart. Press A to input ASCII CHR."; SPC(0);
 LOCATE 23, 56
 PRINT "OFF R:"; r; "X:"; x; "Y:"; y
 DO
@@ -1169,12 +1217,112 @@ COLOR 15
 LOCATE y, x, 1, 0, 7
 check$ = INKEY$
 LOOP WHILE check$ = ""
+LOCATE 24, 1
+PRINT "                                                                              "; SPC(0);
 SELECT CASE check$
-CASE "B"
-CASE "b"
+
+CASE "A"
+GOTO casea
+CASE "a"
+casea:
+thecode$ = ""
 LOCATE 23, 1
 COLOR 7, 0
-PRINT STRING$(60, " ")
+PRINT STRING$(50, " ")
+LOCATE 23, 1
+PRINT "INPUT ASCII CHR #:"; SPC(0);
+
+cints:
+gs$ = INPUT$(1)
+
+IF gs$ = CHR$(8) THEN
+IF LEN(thecode$) > 0 THEN
+thecode$ = LEFT$(thecode$, LEN(thecode$) - 1)
+LOCATE , POS(0) - 1: PRINT " "; SPC(0); : LOCATE , POS(0) - 1
+END IF
+GOTO cints
+END IF
+
+IF gs$ = CHR$(13) THEN GOTO dos
+IF gs$ = CHR$(27) THEN GOTO begin
+IF LEN(thecode$) = 3 THEN GOTO cints
+IF VAL(gs$) <> 0 THEN
+PRINT gs$; SPC(0);
+thecode$ = thecode$ + gs$
+END IF
+
+
+GOTO cints
+dos:
+
+gs = VAL(thecode$)
+doagain:
+IF gs > 255 THEN
+gs = gs - 255
+IF gs > 255 THEN GOTO doagain
+END IF
+
+
+gg$ = CHR$(gs)
+
+GOTO begin
+
+
+CASE "T"
+GOTO caset
+CASE "t"
+caset:
+COLOR 7, 0: CLS
+PRINT "                       Basic ASCII Chart"
+PRINT "000   (nul)  016  (dle)  032 sp  048 0  064 @  080 P  096 `  112 p"
+PRINT "001  (soh)  017  (dc1)  033 !   049 1  065 A  081 Q  097 a  113 q"
+PRINT "002  (stx)  018  (dc2)  034 "; CHR$(34); "   050 2  066 B  082 R  098 b  114 r"
+PRINT "003  (etx)  019  (dc3)  035 #   051 3  067 C  083 S  099 c  115 s"
+PRINT "004  (eot)  020  (dc4)  036 $   052 4  068 D  084 T  100 d  116 t"
+PRINT "005  (enq)  021  (nak)  037 %   053 5  069 E  085 U  101 e  117 u"
+PRINT "006  (ack)  022  (syn)  038 &   054 6  070 F  086 V  102 f  118 v"
+PRINT "007   (bel)  023  (etb)  039 '   055 7  071 G  087 W  103 g  119 w"
+PRINT "008  (bs)   024  (can)  040 (   056 8  072 H  088 X  104 h  120 x"
+PRINT "009   (tab)  025  (em)   041 )   057 9  073 I  089 Y  105 i  121 y"
+PRINT "010   (lf)   026   (eof)  042 *   058 :  074 J  090 Z  106 j  122 z"
+PRINT "011   (vt)   027  (esc)  043 +   059 ;  075 K  091 [  107 k  123 {"
+PRINT "012   (np)   028  (fs)   044 ,   060 <  076 L  092    108 l  124 |"
+PRINT "013   (cr)   029   (gs)   045 -   061 =  077 M  093 ]  109 m  125 }"
+PRINT "014  (so)   030   (rs)   046 .   062 >  078 N  094 ^  110 n  126 ~"
+PRINT "015  (si)   031   (us)   047 /   063 ?  079 O  095 _  111 o  127 "
+PRINT
+PRINT "Press any key for extended chart..."
+gfi$ = INPUT$(1)
+COLOR 7, 0: CLS
+PRINT "            Extended ASCII Chart (character codes 128 - 255)"
+PRINT "128 Ä      144 ê      160 †    176 ∞    192 ¿    208 –    224 ‡   240 "
+PRINT "129 Å      145 ë      161 °    177 ±    193 ¡    209 —    225 ·   241 Ò"
+PRINT "130 Ç      146 í      162 ¢    178 ≤    194 ¬    210 “    226 ‚   242 Ú"
+PRINT "131 É      147 ì      163 £    179 ≥    195 √    211 ”    227 „   243 Û"
+PRINT "132 Ñ      148 î      164 §    180 ¥    196 ƒ    212 ‘    228 ‰   244 Ù"
+PRINT "133 Ö      149 ï      165 •    181 µ    197 ≈    213 ’    229 Â   245 ı"
+PRINT "134 Ü      150 ñ      166 ¶    182 ∂    198 ∆    214 ÷    230 Ê   246 ˆ"
+PRINT "135 á      151 ó      167 ß    183 ∑    199 «    215 ◊    231 Á   247 ˜"
+PRINT "136 à      152 ò      168 ®    184 ∏    200 »    216 ÿ    232 Ë   248 ¯"
+PRINT "137 â      153 ô      169 ©    185 π    201 …    217 Ÿ    233 È   249 ˘"
+PRINT "138 ä      154 ö      170 ™    186 ∫    202      218 ⁄    234 Í   250 ˙"
+PRINT "139 ã      155 õ      171 ´    187 ª    203 À    219 €    235 Î   251 ˚"
+PRINT "140 å      156 ú      172 ¨    188 º    204 Ã    220 ‹    236 Ï   252 ¸"
+PRINT "141 ç      157 ù      173 ≠    189 Ω    205 Õ    221 ›    237 Ì   253 ˝"
+PRINT "142 é      158 û      174 Æ    190 æ    206 Œ    222 ﬁ    238 Ó   254 ˛"
+PRINT "143 è      159 ü      175 Ø    191 ø    207 œ    223 ﬂ    239 Ô   255"
+PRINT ""
+PRINT "Press any key..."
+gfi$ = INPUT$(1)
+
+GOTO geet
+CASE "B"
+GOTO caseb
+CASE "b"
+caseb:
+LOCATE 23, 1
+COLOR 7, 0
+PRINT STRING$(50, " ")
 LOCATE 23, 1
 PRINT "INPUT HEX CHR:"; SPC(0);
 newchr:
@@ -1212,9 +1360,6 @@ gv$ = ""
 iv$ = ""
 GOTO newchr1
 END IF
-
-
-
 i$ = UCASE$(LEFT$(i$, 1))
 IF i$ = "A" THEN i$ = "10"
 IF i$ = "B" THEN i$ = "11"
@@ -1236,7 +1381,9 @@ b1 = g1 + last
 gg$ = CHR$(b1)
 GOTO begin
 CASE "S"
+GOTO cases
 CASE "s"
+cases:
 buffernow$ = "YES"
 GOTO enter
 CASE "C"
@@ -1247,12 +1394,12 @@ cc = 50
 GOTO doer
 cc1:
 cc = 0
-D$ = LEFT$(a$, 1)
+D$ = LEFT$(A$, 1)
 dhg = ASC(D$)
 b = FIX(dhg / 16)
-f = dhg - (b * 16)
-gg$ = RIGHT$(a$, 1)
-h$ = LEFT$(RIGHT$(a$, 2), 1)
+F = dhg - (b * 16)
+gg$ = RIGHT$(A$, 1)
+h$ = LEFT$(RIGHT$(A$, 2), 1)
 GOTO begin
 
 CASE CHR$(13)
@@ -1262,22 +1409,22 @@ dfdf = r * 3 - 3
 M = lk + dfdf
 
 
-a$ = SPACE$(3)
-GET #1, M, a$
-D$ = LEFT$(a$, 1)
+A$ = SPACE$(3)
+GET #1, M, A$
+D$ = LEFT$(A$, 1)
 dhg = ASC(D$)
 D = FIX(dhg / 16)
 k = dhg - (D * 16)
 
-IF gg$ = CHR$(0) THEN f = 15
-IF gg$ = CHR$(32) THEN f = 15
+IF gg$ = CHR$(0) THEN F = 15
+IF gg$ = CHR$(32) THEN F = 15
 
 
-IF b = f THEN f = 15
-IF b = 0 AND f = 0 THEN f = 15
+IF b = F THEN F = 15
+IF b = 0 AND F = 0 THEN F = 15
 
 s = b * 16
-xg = f + s
+xg = F + s
 b$ = CHR$(xg)
 
 
@@ -1434,18 +1581,18 @@ LOCATE y, x
 lk = rp * 5219 - 5213
 dfdf = r * 3 - 3
 M = lk + dfdf
-a$ = SPACE$(3)
-GET #1, M, a$
+A$ = SPACE$(3)
+GET #1, M, A$
 
 IF cc = 50 THEN GOTO cc1
 
-D$ = LEFT$(a$, 1)
+D$ = LEFT$(A$, 1)
 dhg = ASC(D$)
 bg = FIX(dhg / 16)
 fg = dhg - (bg * 16)
 COLOR fg, bg
 IF fg = 0 AND bg = 0 THEN COLOR 15
-E$ = RIGHT$(a$, 1)
+E$ = RIGHT$(A$, 1)
 IF E$ = CHR$(32) THEN
 COLOR 15
 PRINT " "; SPC(0);
@@ -1500,7 +1647,7 @@ LOCATE 23, 1
 COLOR 7, 0
 PRINT STRING$(55, " "); SPC(0);
 LOCATE 23, 1
-PRINT "BACKGROUND: 0,1,2,3,4,5,6,7: "; SPC(0);
+background
 i$ = INPUT$(1)
 id = VAL(i$)
 
@@ -1515,27 +1662,27 @@ LOCATE 23, 1
 COLOR 7, 0
 PRINT STRING$(55, " "); SPC(0);
 LOCATE 23, 1
-PRINT "FORGROUND: 0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F: "; SPC(0);
+foreground
 i$ = UCASE$(INPUT$(1))
-f = -1
+F = -1
 
-IF i$ = "0" THEN f = 0
-IF i$ = "1" THEN f = 1
-IF i$ = "2" THEN f = 2
-IF i$ = "3" THEN f = 3
-IF i$ = "4" THEN f = 4
-IF i$ = "5" THEN f = 5
-IF i$ = "6" THEN f = 6
-IF i$ = "7" THEN f = 7
-IF i$ = "8" THEN f = 8
-IF i$ = "9" THEN f = 9
-IF i$ = "A" THEN f = 10
-IF i$ = "B" THEN f = 11
-IF i$ = "C" THEN f = 12
-IF i$ = "D" THEN f = 13
-IF i$ = "E" THEN f = 14
-IF i$ = "F" THEN f = 15
-IF f <> -1 THEN GOTO next1111
+IF i$ = "0" THEN F = 0
+IF i$ = "1" THEN F = 1
+IF i$ = "2" THEN F = 2
+IF i$ = "3" THEN F = 3
+IF i$ = "4" THEN F = 4
+IF i$ = "5" THEN F = 5
+IF i$ = "6" THEN F = 6
+IF i$ = "7" THEN F = 7
+IF i$ = "8" THEN F = 8
+IF i$ = "9" THEN F = 9
+IF i$ = "A" THEN F = 10
+IF i$ = "B" THEN F = 11
+IF i$ = "C" THEN F = 12
+IF i$ = "D" THEN F = 13
+IF i$ = "E" THEN F = 14
+IF i$ = "F" THEN F = 15
+IF F <> -1 THEN GOTO next1111
 
 GOTO next111
 
@@ -1588,18 +1735,18 @@ kb1 = rp * 5219
 
 
 
-IF b = 0 AND f = 0 THEN f = 15
+IF b = 0 AND F = 0 THEN F = 15
 
 IF gg$ = CHR$(0) THEN
-f = 15
+F = 15
 END IF
 
 IF gg$ = CHR$(32) THEN
-f = 15
+F = 15
 END IF
 
 df = b * 16
-df1 = df + f
+df1 = df + F
 df1$ = CHR$(df1)
 
 flyer$ = df1$ + h$ + gg$
@@ -1612,7 +1759,7 @@ IF gg$ = CHR$(0) THEN gg$ = " "
 belto:
 IF mn = 23 THEN GOTO ender
 LOCATE mn, nm
-COLOR f, b
+COLOR F, b
 IF gg$ = " " THEN COLOR 15
 PRINT gg$
 IF nm >= 79 THEN mn = mn + 1
@@ -1637,15 +1784,15 @@ pkl = bk1 + r1
 inputer$ = INPUT$(1)
 IF inputer$ = CHR$(13) THEN GOTO begin
 LOCATE 23, kj
-COLOR f, b
+COLOR F, b
 PRINT inputer$
-COLOR f, b
+COLOR F, b
 IF inputer$ = " " THEN COLOR 15
 LOCATE y, x
 PRINT inputer$
 
 df = b * 16
-df1 = df + f
+df1 = df + F
 df1$ = CHR$(df1)
 
 fileeer$ = df1$ + h$ + inputer$
@@ -1668,6 +1815,8 @@ END IF
 kj = kj + 1
 LOCATE y, x
 GOTO textentry1
+geet:
+reload = 1
 quit:
 rp = sf
 CLOSE #1

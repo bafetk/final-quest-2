@@ -1,3 +1,8 @@
+Version Changes (02/25/01) 093 Rev C
+
+I tried to get the code to be more organized.  Also, I added the FIX,
+DECLARE, and GETCHAR functions.
+
 Version Changes (02/19/01) 093 Rev B
 
 I changed the input routine for the primary Reference file.  It increases

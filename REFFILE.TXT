@@ -40,6 +40,11 @@ Section 2
        25. #CLEAR
        26. @GOTO
        27. #SLEEP
+       28. #DECLARE
+       29. #INPUT
+       30. #FIX
+       31. #GETCHAR
+               
 
     B. @#INTRO, @#INVSCR, @#HELP, @#MAP
 
@@ -98,7 +103,7 @@ screen numbers are from 1-100.  When you use this function, it will reload
 the screen to that screen, and then you will be running under those functions
 from that screen.
 
-
+UPDATE:  As of v.91A, there are now 1920 screens.... Have fun..
 
 3. #NEWPOS
 
@@ -214,10 +219,10 @@ Syntax:
  #
 ######...
 ...
-#IF number
+#IFCHOICE number
 PROGRAMMING
 @DONE
-#IF number
+#IFCHOICE number
 PROGRAMMING
 @DONE
 @DONECHOICE
@@ -235,7 +240,7 @@ Leave
         then, you use if to do what your option says...  It searches the file
 for the next "IF 1", or "IF 2" and so on...
 
-#IF 1
+#IFCHOICE 1
 #CLS
 #PRINT
  3
@@ -245,7 +250,7 @@ Now wheres that 20000
 #WAIT
 #GOLD- 20000
 @DONE
-#IF 2
+#IFCHOICE 2
 @DONE
 @DONECHOICE
 
@@ -263,6 +268,8 @@ thing, and also when you go onto something.  Whether you "knock-up" against
 them or go "onto" them depends in the space is hard or not specified in the
 level editor.  Enter the text you want in the "SOMETEXT" position.  You must
 not use a comma ",".
+
+UPDATE: As of v.92c, you can now use a comma in your statements....
 
 
 
@@ -314,7 +321,7 @@ PROGRAMMING
 
     Programming function to add animating in the program.  This function was
 added late in the development stage and has not been tested.  It may most
-likely not work correctly, but if it does...
+likely not work correctly, so I suggest using #MOVEOBJ, but if it does...
 
     The first # under "#animate" is used to tell the program whether to sleep
 1 second while before a function is run. If it is "1" then the program will
@@ -524,6 +531,53 @@ Eg.  #SLEEP .5    ...  will halt the computer for .5 seconds.   This has the
                        same effect when using #MOVEOBJ as of Ver .92C
 
 
+28. #DECLARE
+
+Syntax:
+
+#DECLARE ###
+
+        Where ### is the variable to declare.  This is useful for declaring
+variables in your program and not putting them in you Variable.DAT
+
+
+29. #INPUT
+
+Syntax:
+
+#INPUT
+length
+x
+y
+
+        where length is the length of the input box, x is the x coordinate
+and y is the y coordinate of the box.  The value of #INPUT is returned as
+the variable LASTRESPONSE
+
+
+30. #FIX
+
+Syntax:
+
+#FIX #VARIABLE#
+
+where #VARIABLE# is some variable.  This command is useful in getting rid
+of fractions that users may enter during an Input command. It always rounds
+down.
+
+
+31. #GETCHAR
+
+Syntax:
+
+#GETCHAR #
+
+where the # is 1 standing for a cursor to be blinking while the user makes
+his decision, and a 0 is for a cursor not to be blinking.  The character
+returned by the user is returned as the variable LASTCHAR.
+
+
+
 ------------------------------------------------------------------------------
 B. @#INTRO, @#INVSCR, @#HELP, @#MAP
 
@@ -573,6 +627,8 @@ C. Instructions
 
     You must be very persistant and very careful when you are programming in 
 REF, because if you aren't, the program is likely to really "SCREW..."
+However, if you type in a word the ref system does not understand, it will
+simply skip over it.  This is so you can put comments in your ref file.
 
 Here is a sample REF procedure for if you were to move to x3,y20...
 
@@ -585,9 +641,9 @@ Here is a sample REF procedure for if you were to move to x3,y20...
  2
 Respond "Fine"
 Leave...
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
 #CLS
 #PRINT 4
 `2Me too.
@@ -598,7 +654,7 @@ Leave...
  2
 YES
 NO
-#IF 2
+#IFCHOICE 2
 #PRINT
  4
 
@@ -607,7 +663,7 @@ NO
 `@Ok.. that's fine... Press a key...
 #WAIT
 @DONE
-#IF 1
+#IFCHOICE 1
 #PRINT
  4
 
@@ -638,7 +694,7 @@ want..
 4 = Dark Red
 5 = Violet
 6 = Brown
-7 = White Grey
+7 = Light Grey
 8 = Dark Grey
 9 = Light Blue
 0 = Light Green
@@ -672,7 +728,7 @@ Z = Show's Armor Name
 
 The "`v" function...
 
-You use this to show the what a user set variable in your program is...
+You use this to show the user what a set variable in your program is...
 For instance...
 
 if WOMAN = 5, then you would put in `vWOMAN`  .. and you would get 5 in
@@ -684,6 +740,8 @@ You can use variables for your `X and `Y coordinates... For instance..
 
 @#SLEEPER
 #CLS
+#DECLARE X
+#DECLARE Y
 #SET X = 1;
 #SET Y = 2;
 @#SLEEPER1
@@ -691,7 +749,7 @@ You can use variables for your `X and `Y coordinates... For instance..
 #PRINT 1
 `X:X;`Y:Y;`$.
 #SET X + 1;
-#IF X = 10 THEN
+#IF X = 11 THEN
 @GOTO DONE
 #ENDIF
 @GOTO SLEEPER1
@@ -700,4 +758,3 @@ You can use variables for your `X and `Y coordinates... For instance..
 
 
 End of Documentation
-
