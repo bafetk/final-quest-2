@@ -1,3 +1,16 @@
+Version Changes (05/19/01) 094 Rev C
+
+(Writing on 7/01/01)
+Ok... I had some trouble with my motherboard, and this is the second time 
+since the 04/26/01 that I have been able to get on my computer.  So, I have
+finally gotten my mb back, now I can update FQ2!!!  On 5/19/01, I updated
+the statusbar line so it wouldn't update so much, and I put a block in the
+Refs.dat file where you can customize the bar.  I don't remember what else
+I fixed, but my mb broke again a day later, so I couldn't update this.
+Anyway... I bought a new mb and a new processor.  Same speed, but at least
+this one works.  Back to normal I guess.  Oh yea, Final Quest celebrated its
+third birthday on the 21st of last month... Too bad I couldn't see it. :-(
+
 Version Changes (04/01/01) 094 Rev B
 
 Hey!! I put all the Save Game and Load Game routines in a function in
@@ -100,3 +113,4 @@ originally, and now I am at 1920.  It sure has come a long way.  I started
 Final Quest 1 on 6-21-98.
 
 END FILE
+

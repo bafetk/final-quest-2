@@ -1,4 +1,8 @@
-DECLARE FUNCTION MonsterFunction! ()
+DECLARE SUB Help ()
+DECLARE FUNCTION SaveGame$ ()
+DECLARE FUNCTION LoadGame$ ()
+DECLARE FUNCTION SecretCode$ (code$)
+DECLARE FUNCTION MonsterFunction! (monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
 DECLARE FUNCTION crypt$ (tocrypt$)
 DECLARE FUNCTION inputer$ (screener)
 DECLARE FUNCTION exist! (file$)
@@ -8,98 +12,74 @@ DECLARE SUB cole (pressed, toprint$, cole1$, fground, bground)
 DECLARE SUB endscreen ()
 DECLARE SUB printer (da, towrite$, jack)
 DECLARE SUB writer (towrite$)
-DIM ReferenceArray$(1000)
+DIM ReferenceArray$(1200)
 DIM realsavename$(75)
 DIM map(1920)
 DIM map2(1920)
-DIM opt(350)
-DIM SHARED settings$(500), reffile(1920)
-COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile()
-COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp, refpos, fileopened, thescreen1, cb562
-COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, exper, k, x, y, monsters$, hitmax, Ber, jdcolor, theg
+DIM opt(100)
+DIM SHARED settings$(500), reffile(1920), file$(5)
+COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile(), file$()
+COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, s, w, defs, I, z, gdi
+COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg
+
 RANDOMIZE TIMER
 cl$ = COMMAND$
-IF UCASE$(cl$) = "-DEBUGMODE" THEN cc = 2
+        IF UCASE$(cl$) = "-DEBUGMODE" THEN cc = 2
+
+statusline$ = "`b1`Y23`X01`L77`X01`1`b0`X01`Y23`FB0`FB1`C`%`b1`Y23Final Quest 2 -- By AkoriSoft -- HP (`vHITPOINT`/`vMAXENERGY`) -- Gold: `vGOLD`!`1`b0`Y23`X78`FB1`FB0"
 tt = 0: dd = 0: exper = 0: helpmecode = 1: superhuman$ = "NO"
 monsters$ = "YES": doposx = 1: refpos = 1
-'settingscode$ = ""
-'settingscode$ = crypt$(settingscode$)
 
 IF exist("NOSCR.DAT") = 0 THEN noscrdat = 1
-IF exist("VARIABLE.DAT") = 0 THEN novardat = 1
+IF exist("VARS.DAT") = 0 THEN novardat = 1
 
 IF noscrdat <> 1 THEN
-OPEN "NOSCR.DAT" FOR INPUT AS #42
-INPUT #42, monsters$
-CLOSE #42
+        OPEN "NOSCR.DAT" FOR INPUT AS #42
+        INPUT #42, monsters$
+        CLOSE #42
 END IF
 
 IF novardat <> 1 THEN
-OPEN "VARIABLE.DAT" FOR INPUT AS #60
-INPUT #60, COMP1$
-INPUT #60, COMP2$
-INPUT #60, gamename$
- 
-IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
-IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
-IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
-IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
+        OPEN "VARS.DAT" FOR INPUT AS #60
+        INPUT #60, COMP1$
+        INPUT #60, COMP2$
+        INPUT #60, gamename$
+                IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
+                IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
+                IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
+                IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
+        INPUT #60, Version1$
+        INPUT #60, Version2$
+        INPUT #60, Revision$
+        INPUT #60, superhuman$
+        INPUT #60, superminus
+        INPUT #60, h
+        INPUT #60, hitmax
+        INPUT #60, s
+        INPUT #60, x
+        INPUT #60, y: record = (y - 1) * 79 + x
+        INPUT #60, w
+        INPUT #60, defs
+        INPUT #60, rp
+        INPUT #60, thescreen
 
-
-INPUT #60, version1$
-INPUT #60, version2$
-INPUT #60, revision$
-INPUT #60, superhuman$
-INPUT #60, superminus
-INPUT #60, h
-INPUT #60, hitmax
-INPUT #60, s
-INPUT #60, x
-INPUT #60, y
-dkdk = y - 1
-record = dkdk * 79 + x
-INPUT #60, w
-INPUT #60, defs
-'INPUT #60, I
-'INPUT #60, z
-INPUT #60, rp
-INPUT #60, thescreen
-'INPUT #60, weapon1name$
-'INPUT #60, weapon2name$
-'INPUT #60, weapon3name$
-'INPUT #60, weapon4name$
-'INPUT #60, armour1name$
-'INPUT #60, armour2name$
-'INPUT #60, armour3name$
-'INPUT #60, armour4name$
-'INPUT #60, weapon1power
-'INPUT #60, weapon2power
-'INPUT #60, weapon3power
-'INPUT #60, weapon4power
-'INPUT #60, armour1power
-'INPUT #60, armour2power
-'INPUT #60, armour3power
-'INPUT #60, armour4power
 nus = 1
 gh:
-IF EOF(60) THEN GOTO gh1
-INPUT #60, data$
-settings$(nus) = data$
-nus = nus + 1
-GOTO gh:
+        IF EOF(60) THEN GOTO gh1
+                INPUT #60, data$
+                settings$(nus) = data$: nus = nus + 1
+        GOTO gh
 gh1:
-settings$(nus) = "--END--"
-CLOSE #60
+        settings$(nus) = "--END--"
+        CLOSE #60
 END IF
 
+
 Null$ = CHR$(0)
-CLS
-COLOR , 1
-LOCATE 1, 1
-PRINT STRING$(80, " "); SPC(0);
-LOCATE 1, 24
-beginline$ = "`C`b1`$" + gamename$ + " " + version1$ + " " + revision$ + " Startup..."
-printer 1, beginline$, 1
+IF gamename$ = "" THEN gamename$ = "Unknown"
+        CLS : COLOR , 1: LOCATE 1, 1: PRINT STRING$(80, " "); SPC(0);
+        LOCATE 1, 24: beginline$ = "`C`b1`$" + gamename$ + " " + Version1$ + " " + Revision$ + " Startup..."
+        printer 1, beginline$, 1
 
 COLOR 7, 0
 IF cc = 2 THEN PRINT "Debug Mode on..."
@@ -107,9 +87,9 @@ IF cc = 2 THEN SLEEP 1
 
 
 PRINT "Looking for Level Map File..."; SPC(0);
-IF exist("FQMAPS.DAT") = 0 THEN
-PRINT "Not Found."
-nolevelmap = 1
+IF exist("MAPS.DAT") = 0 THEN
+        PRINT "Not Found."
+        nolevelmap = 1
 END IF
 IF nolevelmap <> 1 THEN PRINT "Found."
 IF cc = 2 THEN SLEEP 1
@@ -117,24 +97,24 @@ IF cc = 2 THEN SLEEP 1
 
 PRINT "Building Map Dimension, Please wait..."; SPC(0);
 IF nolevelmap <> 1 THEN
-OPEN "fqmaps.dat" FOR BINARY AS #98
-im = 1
+        OPEN "maps.dat" FOR BINARY AS #98
+        im = 1
 csg:
-IF im >= LOF(98) THEN GOTO nx
-a$ = SPACE$(5)
-GET #98, im, a$
-type$ = LEFT$(a$, 1)
-number = VAL(RIGHT$(a$, 4))
-IF type$ = "1" THEN map(number) = 1
-IF type$ = "2" THEN map(number) = 2
-IF type$ = "3" THEN map(number) = 3
-IF type$ = "4" THEN map(number) = 4
-map2(number) = im
-im = im + 3481
+        IF im >= LOF(98) THEN GOTO nx
+        a$ = SPACE$(5)
+        GET #98, im, a$
+        type$ = LEFT$(a$, 1)
+        number = VAL(RIGHT$(a$, 4))
+        IF type$ = "1" THEN map(number) = 1
+        IF type$ = "2" THEN map(number) = 2
+        IF type$ = "3" THEN map(number) = 3
+        IF type$ = "4" THEN map(number) = 4
+        map2(number) = im
+        im = im + 3481
 GOTO csg
 
 nx:
-PRINT "Done."
+        PRINT "Done."
 END IF
 IF nolevelmap = 1 THEN PRINT "Not done."
 IF cc = 2 THEN SLEEP 1
@@ -142,9 +122,9 @@ IF cc = 2 THEN SLEEP 1
 
 
 PRINT "Looking for Level Ref File..."; SPC(0);
-IF exist("FQREFS.DAT") = 0 THEN
-PRINT "Not Found."
-norefdat = 1
+IF exist("REFS.DAT") = 0 THEN
+        PRINT "Not Found."
+        norefdat = 1
 END IF
 IF norefdat <> 1 THEN PRINT "Found."
 IF cc = 2 THEN SLEEP 1
@@ -157,12 +137,10 @@ curserx = POS(0)
 
 IF norefdat <> 1 THEN
 refpos = 1
-OPEN "FQREFS.DAT" FOR INPUT AS #1
+OPEN "REFS.DAT" FOR INPUT AS #1
 totalfile = 1
 DO
 IF EOF(1) THEN GOTO finishtable
-'juc$ = inputer$(0)
-'IF juc$ = "--EOF--" THEN GOTO finishtable
 LINE INPUT #1, juc$
         IF LTRIM$(LEFT$(juc$, 5)) = "@#SCR" THEN
                 screen1 = VAL(LTRIM$(RTRIM$(RIGHT$(juc$, LEN(juc$) - 5))))
@@ -174,6 +152,19 @@ totalfile = totalfile + LEN(juc$) + 2
 LOOP
 finishtable:
 CLOSE #1
+refpos = 1
+
+
+'Loading StatusLine
+getnextda:
+da$ = inputer$(0): IF da$ = "--EOF--" THEN GOTO continues
+        IF da$ = "@#STATUSLINE" THEN
+        statusline$ = inputer$(0)
+        GOTO continues
+        END IF
+GOTO getnextda
+
+continues:
 refpos = 1
 
 LOCATE cursery, curserx
@@ -188,39 +179,27 @@ PRINT "Looking for saved games..."; SPC(0);
 
 
 FOR xv = 1 TO 5
-LOCATE , 27
-PRINT "Saved Game"; xv; SPC(0);
-IF cc = 2 THEN SLEEP 1
-xv$ = LTRIM$(RTRIM$(STR$(xv - 1)))
-file$(xv) = "1"
-IF exist("FQSAVE" + xv$ + ".DAT") = 0 THEN
-file$(xv) = "0"
-END IF
+        LOCATE , 27
+        PRINT "Saved Game"; xv; SPC(0);
+        IF cc = 2 THEN SLEEP 1
+        xv$ = LTRIM$(RTRIM$(STR$(xv - 1)))
+        file$(xv) = "1"
+        IF exist("SAVE" + xv$ + ".DAT") = 0 THEN
+                file$(xv) = "0"
+        END IF
 NEXT xv
 
 
-'save1name$ = "Empty"
-'save2name$ = "Empty"
-'save3name$ = "Empty"
-'save4name$ = "Empty"
-'save5name$ = "Empty"
-
-
 FOR bx = 1 TO 5
-realsavename$(bx) = "Empty"
-IF file$(bx) = "1" THEN
-bx$ = LTRIM$(RTRIM$(STR$(bx - 1)))
-OPEN "FQSAVE" + bx$ + ".DAT" FOR BINARY AS #2
-savename$ = SPACE$(15)
-GET #2, 1, savename$
-realsavename$(bx) = LTRIM$(RTRIM$(crypt$(savename$)))
-'IF bx = 1 THEN save1name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-'IF bx = 2 THEN save2name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-'IF bx = 3 THEN save3name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-'IF bx = 4 THEN save4name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-'IF bx = 5 THEN save5name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-CLOSE #2
-END IF
+        realsavename$(bx) = "Empty"
+        IF file$(bx) = "1" THEN
+                bx$ = LTRIM$(RTRIM$(STR$(bx - 1)))
+                OPEN "SAVE" + bx$ + ".DAT" FOR BINARY AS #2
+                        savename$ = SPACE$(15)
+                        GET #2, 1, savename$
+                        realsavename$(bx) = LTRIM$(RTRIM$(crypt$(savename$)))
+                CLOSE #2
+        END IF
 NEXT bx
 
 
@@ -233,16 +212,16 @@ IF nolevelmap = 1 THEN GOTO errorhandle
 IF norefdat = 1 THEN GOTO errorhandle
 
 IF cc = 2 THEN SLEEP 1
-PRINT COMP2$ + " Development " + version2$ + " " + revision$ + "..."
+PRINT COMP2$ + " Development " + Version2$ + " " + Revision$ + "..."
 PRINT "Loading main title screen..."
 
 
 IF cc = 2 THEN PRINT
 IF cc = 2 THEN PRINT "Press any key to continue..."
-IF cc = 2 THEN i$ = INPUT$(1)
+IF cc = 2 THEN I$ = INPUT$(1)
 
 
-OPEN "FQMAPS.DAT" FOR BINARY AS #1
+OPEN "MAPS.DAT" FOR BINARY AS #1
 COLOR 7, 0: CLS : COLOR 15, 0: o = 1
 load:
 IF cc = 2 THEN dd = 4
@@ -254,7 +233,7 @@ data$ = inputer(0)
 IF data$ = "--EOF--" THEN GOTO NOINTRO
 
 IF LEFT$(data$, 7) = "@#INTRO" THEN
-k = 1
+        k = 1
 GOTO invscr3
 END IF
 GOTO findit1
@@ -273,7 +252,6 @@ data$ = inputer(0)
 opy = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 opx = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 opname$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";")), LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
-
 
 IF isdf = 1 THEN
         op1y = opy
@@ -344,28 +322,26 @@ IF cc = 2 THEN PRINT "S - Set game settings"; SPC(0);
 DO
 check$ = INKEY$
 LOOP WHILE check$ = ""
+        check$ = UCASE$(check$)
 
 SELECT CASE check$
+
 CASE "S"
         IF cc = 2 THEN
                 pk = 2
                 GOTO setsettings
-        END IF
+                END IF
         GOTO load1
-CASE "s"
-        IF cc = 2 THEN
-                pk = 2
-                GOTO setsettings
-        END IF
-        GOTO load1
+
 CASE CHR$(27)
         GOTO no1
+
 CASE CHR$(13)
         COLOR 7, 0
         IF o = 1 GOTO noload
         IF o = 2 GOTO savegame11
         IF o = 3 GOTO yesload
-        IF o = 4 GOTO help
+        IF o = 4 GOTO Help
         IF o = 5 THEN
                 towait1 = FIX(TIMER)
                 COLOR 7, 0
@@ -373,496 +349,87 @@ CASE CHR$(13)
                 GOTO loadmap
         END IF
         IF o = 6 GOTO no1
-help:
 
-COLOR 7, 0: CLS
-refpos = 1
-findit13:
-data$ = inputer(0)
-        IF data$ = "--EOF--" THEN GOTO NOHELP
-        IF LEFT$(data$, 6) = "@#HELP" THEN
-                k = 1
-                GOTO invscr4
-        END IF
-GOTO findit13
-invscr4:
-iner1$ = inputer$(0)
-        IF iner1$ = "@END" THEN GOTO waiter6
-        IF iner1$ = "@NEXT" THEN GOTO nexter52
-                printer 0, iner1$, k
-                k = k + 1
-        GOTO invscr4
-waiter6:
-        LOCATE 1, 1, 0
-        i$ = INPUT$(1)
+Help:
+Help
 GOTO load
-nexter52:
-        LOCATE 1, 1, 0
-        i$ = INPUT$(1)
-GOTO invscr4
 
 CASE Null$ + CHR$(75): GOTO righter
 CASE Null$ + CHR$(77): GOTO lefter
 
 CASE Null$ + CHR$(72)
 righter:
-IF o = 1 THEN o = 7
-o = o - 1
-GOTO load1
+        IF o = 1 THEN o = 7
+        o = o - 1
+        GOTO load1
 
 CASE Null$ + CHR$(80)
 lefter:
-IF o = 6 THEN o = 0
-o = o + 1
-GOTO load1
+        IF o = 6 THEN o = 0
+        o = o + 1
+        GOTO load1
 
 CASE ELSE
         GOTO load1
 END SELECT
 
 savegame11:
-CLS
-ooo = 1
-COLOR 10, 0
-LOCATE 9, 30: PRINT "Save a Game..."
-COLOR 4, 0
-LOCATE 17, 30: PRINT "Enter a Choice."
-savegame1:
-COLOR 15, 0
-
-FOR gsx = 11 TO 15
-LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
-'LOCATE 12, 30: PRINT savename$ + "..."
-'LOCATE 13, 30: PRINT savename$ + "..."
-'LOCATE 14, 30: PRINT savename$ + "..."
-'LOCATE 15, 30: PRINT savename$ + "..."
-NEXT gsx
-
-COLOR 12, 0
-
-LOCATE ooo + 10, 30: PRINT realsavename$(ooo) + "..."
-
-'FOR gsx = 11 TO 15
-'LOCATE gsx, 30: IF ooo = (gsx - 10) THEN PRINT realsavename$(ooo) + "..."
-'LOCATE 12, 30: IF ooo = 2 THEN PRINT save2name$ + "..."
-'LOCATE 13, 30: IF ooo = 3 THEN PRINT save3name$ + "..."
-'LOCATE 14, 30: IF ooo = 4 THEN PRINT save4name$ + "..."
-'LOCATE 15, 30: IF ooo = 5 THEN PRINT save5name$ + "..."
-'NEXT gsx
-
-
-DO
-check$ = INKEY$
-LOOP WHILE check$ = ""
-SELECT CASE check$
-CASE CHR$(27)
-CLS
-GOTO load
-CASE CHR$(13)
-IF ooo >= 1 AND ooo <= 5 THEN GOTO overwrite1
-GOTO load
-overwrite1:
-IF file$(ooo) = "1" THEN GOTO zz
-
-GOTO saveover1
-zz:
-LOCATE 1, 1
-COLOR 2, 0
-PRINT "Overwrite Existing Saved Game? Y/N"
-i$ = INPUT$(1)
-i$ = UCASE$(i$)
-IF i$ = "Y" THEN pkd = 6
-IF i$ = "Y" THEN GOTO saveover1
-GOTO savegame11
-
-CASE Null$ + CHR$(72)
-IF ooo = 1 THEN ooo = 6
-ooo = ooo - 1
-GOTO savegame1
-
-
-CASE Null$ + CHR$(80)
-IF ooo = 5 THEN ooo = 0
-ooo = ooo + 1
-GOTO savegame1
-
-CASE ELSE
-GOTO savegame1
-END SELECT
-saveover1:
-IF file$(ooo) <> "1" THEN GOTO saveover1notexist
-saveover = 1
-GOTO saveover1go
-saveover1notexist:
-saveover1go:
-CLS
-COLOR 10, 0
-LOCATE 9, 30: PRINT "Save a Game..."
-COLOR 4, 0
-LOCATE 17, 30: PRINT "Enter a Choice."
-COLOR 15, 0
-
-FOR gsx = 11 TO 15
-IF ooo <> gsx - 10 THEN
-        LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
-        END IF
-NEXT gsx
-
-
-'LOCATE 11, 30: IF ooo <> 1 THEN PRINT save1name$ + "..."
-'LOCATE 12, 30: IF ooo <> 2 THEN PRINT save2name$ + "..."
-'LOCATE 13, 30: IF ooo <> 3 THEN PRINT save3name$ + "..."
-'LOCATE 14, 30: IF ooo <> 4 THEN PRINT save4name$ + "..."
-'LOCATE 15, 30: IF ooo <> 5 THEN PRINT save5name$ + "..."
-
-LOCATE ooo + 10, 30
-
-
-savename$ = ""
-IF saveover = 1 THEN
-        saveover = 0
-        savename$ = realsavename$(ooo)
-        END IF
-
-COLOR 15, 0: LOCATE ooo + 10, 30: PRINT savename$; SPC(0);
-
-wordenter:
-
-DO
-COLOR 15, 0
-LOCATE , , 1, 6, 7           ': PRINT savename$; SPC(0);
-id$ = INKEY$
-LOOP WHILE id$ = ""
-
-
-IF id$ = CHR$(8) THEN
-IF POS(0) = 30 THEN GOTO wordenter
-LOCATE , POS(0) - 1, 1, 6, 7
-PRINT " "; SPC(0);
-LOCATE , POS(0) - 1, 1, 6, 7
-asdf = LEN(savename$)
-savename$ = LEFT$(savename$, asdf - 1)
-GOTO wordenter
-END IF
-
-IF id$ = CHR$(13) THEN GOTO pressenter
-
-IF LEN(savename$) >= 15 THEN GOTO wordenter
-
-savename$ = savename$ + id$
-LOCATE , , 1, 6, 7
-PRINT id$; SPC(0);
-GOTO wordenter
-
-pressenter:
-IF savename$ = "" THEN savename$ = "NoName"
-IF savename$ = "Empty" THEN savename$ = "NoName"
-realsavename$(ooo) = savename$
-
-
-'IF ooo = 1 THEN save1name$ = savename$
-'IF ooo = 2 THEN save2name$ = savename$
-'IF ooo = 3 THEN save3name$ = savename$
-'IF ooo = 4 THEN save4name$ = savename$
-'IF ooo = 5 THEN save5name$ = savename$
-SHELL "IF EXIST FQSAVE" + LTRIM$(STR$(ooo)) + ".DAT DEL FQSAVE" + LTRIM$(STR$(ooo)) + ".DAT"
-
-'IF ooo = 1 THEN SHELL "IF EXIST FQSAVE0.DAT DEL FQSAVE0.DAT"
-'IF ooo = 2 THEN SHELL "IF EXIST FQSAVE1.DAT DEL FQSAVE1.DAT"
-'IF ooo = 3 THEN SHELL "IF EXIST FQSAVE2.DAT DEL FQSAVE2.DAT"
-'IF ooo = 4 THEN SHELL "IF EXIST FQSAVE3.DAT DEL FQSAVE3.DAT"
-'IF ooo = 5 THEN SHELL "IF EXIST FQSAVE4.DAT DEL FQSAVE4.DAT"
-
-ooo$ = LTRIM$(RTRIM$(STR$(ooo - 1)))
-OPEN "FQSAVE" + ooo$ + ".DAT" FOR BINARY AS #2
-IF monsters$ = "YES" THEN monsters5$ = "1"
-IF monsters$ = "NO" THEN monsters5$ = "0"
-
-
-'easy
-exper$ = crypt$(MKD$(exper))
-s$ = crypt$(MKD$(s))
-h$ = crypt$(MKD$(h))
-x$ = crypt$(MKD$(x))
-y$ = crypt$(MKD$(y))
-w$ = crypt$(MKD$(w))
-record$ = crypt$(MKD$(record))
-rp$ = crypt$(MKD$(rp))
-defs$ = crypt$(MKD$(defs))
-monsters5$ = crypt$(monsters5$)
-hitmax$ = crypt$(MKD$(hitmax))
-
-toput$ = crypt$(savename$ + STRING$(15 - LEN(savename$), " "))
-PUT #2, 1, toput$
-PUT #2, 16, exper$
-'PUT #2, 24, I$
-PUT #2, 24, s$
-PUT #2, 32, h$
-PUT #2, 40, x$
-PUT #2, 48, y$
-PUT #2, 56, w$
-'PUT #2, 72, z$
-PUT #2, 64, record$
-PUT #2, 72, rp$
-PUT #2, 80, defs$
-PUT #2, 88, monsters5$
-PUT #2, 89, hitmax$
-
-'64'72'80'88'96'104'105
-records = 0
-nus = 1
-nexter4:
-IF settings$(nus) = "--END--" THEN GOTO nexter5
-nus = nus + 1
-records = records + 1
-GOTO nexter4
-
-nexter5:
-
-
-nus = 1
-records$ = crypt$(CHR$(records))
-
-
-PUT #2, 97, records$
-
-filespace = 98
-
-nnx = 0
-continue:
-IF nnx = records THEN GOTO done
-data$ = crypt$(RTRIM$(LTRIM$(settings$(nus)))): nus = nus + 1
-data1$ = crypt$(settings$(nus)): nus = nus + 1
-''''''''''''data1 = VAL(data1$)
-''''''''''''dat$ = crypt$(MKD$(data1))
-xb$ = crypt$(LTRIM$(CHR$(LEN(data$))))
-xb1$ = crypt$(LTRIM$(CHR$(LEN(data1$))))
-PUT #2, filespace, xb$
-filespace = filespace + 1
-PUT #2, filespace, data$
-filespace = filespace + ASC(crypt$(xb$))
-PUT #2, filespace, xb1$
-filespace = filespace + 1
-PUT #2, filespace, data1$
-filespace = filespace + ASC(crypt$(xb1$))
-'filespace = filespace + 8
-nnx = nnx + 1
-GOTO continue
-
-done:
-
-
-
-CLOSE #2
-
-file$(ooo) = "1"
+result$ = SaveGame$
+IF result$ = "3" THEN GOTO savegame11
+IF result$ = "2" THEN GOTO load
+IF result$ = "1" THEN GOTO load
 GOTO load
 
 yesload:
 loadgame11:
-CLS
-op = 1
-COLOR 10, 0
-LOCATE 9, 30: PRINT "Load a Game..."
-COLOR 4, 0
-LOCATE 17, 30: PRINT "Enter a Choice."
-loadgame1:
-COLOR 15, 0
-
-FOR gsx = 11 TO 15
-LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
-NEXT gsx
-
-COLOR 12, 0
-
-LOCATE op + 10, 30: PRINT realsavename$(op) + "..."
-
-'COLOR 12, 0
-'LOCATE 11, 30: IF op = 1 THEN PRINT save1name$ + "..."
-'LOCATE 12, 30: IF op = 2 THEN PRINT save2name$ + "..."
-'LOCATE 13, 30: IF op = 3 THEN PRINT save3name$ + "..."
-'LOCATE 14, 30: IF op = 4 THEN PRINT save4name$ + "..."
-'LOCATE 15, 30: IF op = 5 THEN PRINT save5name$ + "..."
-
-
-DO
-docheck$ = INKEY$
-LOOP WHILE docheck$ = ""
-SELECT CASE docheck$
-CASE CHR$(27)
+result$ = LoadGame$
+IF result$ = "2" THEN GOTO load
+IF result$ = "1" THEN
+        towait1 = FIX(TIMER)
+        GOTO loadmap
+        END IF
 GOTO load
-CASE CHR$(13)
-IF op >= 1 AND op <= 5 THEN GOTO gameload1
-GOTO load
-CASE Null$ + CHR$(72)
-IF op = 1 THEN op = 6
-op = op - 1
-GOTO loadgame1
-
-CASE Null$ + CHR$(80)
-
-IF op = 5 THEN op = 0
-op = op + 1
-GOTO loadgame1
 
 
-CASE ELSE
-GOTO loadgame1
-END SELECT
-gameload1:
-
-IF file$(op) <> "1" THEN GOTO loadgame1
-op$ = LTRIM$(RTRIM$(STR$(op - 1)))
-OPEN "FQSAVE" + op$ + ".DAT" FOR BINARY AS #2
-
-savename$ = SPACE$(15)
-monsters5$ = SPACE$(1)
-exper$ = SPACE$(8)
-'I$ = SPACE$(8)
-s$ = SPACE$(8)
-h$ = SPACE$(8)
-x$ = SPACE$(8)
-y$ = SPACE$(8)
-w$ = SPACE$(8)
-'z$ = SPACE$(8)
-record$ = SPACE$(8)
-rp$ = SPACE$(8)
-defs$ = SPACE$(8)
-hitmax$ = SPACE$(8)
-
-'1'16'24'32'40'48'56'64'72'80'88'89'97'98
-GET #2, 1, savename$
-GET #2, 16, exper$
-GET #2, 24, s$
-GET #2, 32, h$
-GET #2, 40, x$
-GET #2, 48, y$
-GET #2, 56, w$
-GET #2, 64, record$
-GET #2, 72, rp$
-GET #2, 80, defs$
-GET #2, 88, monsters5$
-GET #2, 89, hitmax$
-
-filespace = 98
-numrecords$ = SPACE$(1)
-GET #2, 97, numrecords$
-numrecords = ASC(crypt$(numrecords$))
-
-
-
-xb = 0
-nus = 1
-conte5:
-IF xb = numrecords THEN GOTO done1
-chra$ = SPACE$(1)
-GET #2, filespace, chra$
-abx = ASC(crypt$(chra$))
-filespace = filespace + 1
-cbx$ = SPACE$(abx)
-GET #2, filespace, cbx$
-settings$(nus) = crypt$(cbx$): nus = nus + 1
-filespace = filespace + abx
-data$ = SPACE$(1)
-GET #2, filespace, data$
-filespace = filespace + 1
-data3$ = SPACE$(ASC(crypt$(data$)))
-GET #2, filespace, data3$
-filespace = filespace + LEN(data3$)
-'xbx = CVD(crypt$(data$))
-'xbx$ = LTRIM$(STR$(xbx))
-settings$(nus) = crypt$(data3$): nus = nus + 1
-xb = xb + 1
-GOTO conte5:
-
-done1:
-settings$(nus) = "--END--": nus = nus + 1
-exper = CVD(crypt$(exper$))
-'I = CVD(crypt$(I$))
-s = CVD(crypt$(s$))
-h = CVD(crypt$(h$))
-x = CVD(crypt$(x$))
-y = CVD(crypt$(y$))
-w = CVD(crypt$(w$))
-'z = CVD(crypt$(z$))
-record = CVD(crypt$(record$))
-rp = CVD(crypt$(rp$))
-defs = CVD(crypt$(defs$))
-monsters5$ = crypt$(monsters5$)
-hitmax = CVD(crypt$(hitmax$))
-
-
-IF monsters5$ = "1" THEN monsters$ = "YES"
-IF monsters5$ = "0" THEN monsters$ = "NO"
-
-CLOSE #2
-towait1 = FIX(TIMER)
-GOTO loadmap
 noload:
-COLOR 7, 0
-CLS
+COLOR 7, 0: CLS
+
 nus = 1
-OPEN "VARIABLE.DAT" FOR INPUT AS #60
-INPUT #60, COMP1$
-INPUT #60, COMP2$
-INPUT #60, gamename$
-
-IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
-IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
-IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
-IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
-
-INPUT #60, version1$
-INPUT #60, version2$
-INPUT #60, revision$
-INPUT #60, superhuman$
-INPUT #60, superminus
-INPUT #60, h
-INPUT #60, hitmax
-INPUT #60, s
-INPUT #60, x
-INPUT #60, y
-dkdk = y - 1
-record = dkdk * 79 + x
-INPUT #60, w
-INPUT #60, defs
-'INPUT #60, I
-'INPUT #60, z
-INPUT #60, rp
-INPUT #60, thescreen
-'INPUT #60, weapon1name$
-'INPUT #60, weapon2name$
-'INPUT #60, weapon3name$
-'INPUT #60, weapon4name$
-'INPUT #60, armour1name$
-'INPUT #60, armour2name$
-'INPUT #60, armour3name$
-'INPUT #60, armour4name$
-'INPUT #60, weapon1power
-'INPUT #60, weapon2power
-'INPUT #60, weapon3power
-'INPUT #60, weapon4power
-'INPUT #60, armour1power
-'INPUT #60, armour2power
-'INPUT #60, armour3power
-'INPUT #60, armour4power
+OPEN "VARS.DAT" FOR INPUT AS #60
+        INPUT #60, COMP1$
+        INPUT #60, COMP2$
+        INPUT #60, gamename$
+                IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
+                IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
+                IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
+                IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP1$ = "AkoriSoft"
+        INPUT #60, Version1$
+        INPUT #60, Version2$
+        INPUT #60, Revision$
+        INPUT #60, superhuman$
+        INPUT #60, superminus
+        INPUT #60, h
+        INPUT #60, hitmax
+        INPUT #60, s
+        INPUT #60, x
+        INPUT #60, y: record = (y - 1) * 79 + x
+        INPUT #60, w
+        INPUT #60, defs
+        INPUT #60, rp
+        INPUT #60, thescreen
 
 exper = 0
 gh3:
-IF EOF(60) THEN GOTO gh2
-INPUT #60, data$
-settings$(nus) = data$: nus = nus + 1
+        IF EOF(60) THEN GOTO gh2
+        INPUT #60, data$
+                settings$(nus) = data$: nus = nus + 1
 GOTO gh3:
 gh2:
-settings$(nus) = "--END--": nus = nus + 1
+        settings$(nus) = "--END--": nus = nus + 1
 CLOSE #60
-tt = 0
-towait1 = FIX(TIMER)
-dd1 = 0
-d = 2
-qy = 1
-qx = 1
-mm = 1
+
+tt = 0: towait1 = FIX(TIMER): dd1 = 0: d = 2
+qy = 1: qx = 1: mm = 1
 COLOR 14, 2
 
 
@@ -886,6 +453,7 @@ beginninggame = 0
 
 begingame = 1
 GOTO getready
+
 begingame:
 
 loadmap:
@@ -929,12 +497,12 @@ LOCATE 1, 1
         kb = dd + 3481
 FOR L = bk TO kb STEP 2
 a$ = SPACE$(2)
-GET #1, L, a$
-IF POS(0) = 80 THEN
-LOCATE CSRLIN + 1, 1
-END IF
-d$ = LEFT$(a$, 1)
-d = ASC(d$)
+        GET #1, L, a$
+                IF POS(0) = 80 THEN
+                        LOCATE CSRLIN + 1, 1
+                END IF
+        d$ = LEFT$(a$, 1)
+        d = ASC(d$)
 
 'MARK1
 fg = FIX(d / 16)
@@ -942,28 +510,19 @@ bg = d - (fg * 16)
 IF bg > 7 THEN bg = bg - 8
 COLOR fg, bg
 
-'648 on scr 82
-'PRINT ((l - dd) - 5) / 2 + 1: END
-'IF ((l - dd) - 5) / 2 + 1 = 648 THEN
-'        PRINT fg; bg; SPC(0);
-'        i$ = INPUT$(1)
-'        END IF
-
-'bg = FIX(d / 16)
-'fg = d - (bg * 16)
 IF fg = 0 AND bg = 0 THEN COLOR 15
 
 IF RIGHT$(a$, 1) = CHR$(32) THEN
-COLOR 15
-PRINT " "; SPC(0);
-GOTO redo
+        COLOR 15
+        PRINT " "; SPC(0);
+        GOTO redo
 END IF
 
 
 IF RIGHT$(a$, 1) = CHR$(0) THEN
-COLOR 15
-PRINT " "; SPC(0);
-GOTO redo
+        COLOR 15
+        PRINT " "; SPC(0);
+        GOTO redo
 END IF
 
 PRINT RIGHT$(a$, 1); SPC(0);
@@ -979,33 +538,18 @@ dl1:
 
 IF printline$ = "NO" THEN GOTO doneloading
 
-'IF oldhitpoints <> h THEN GOTO printtheline
-'IF oldmaxhitpoints <> hitmax THEN GOTO printtheline
-'IF oldgold <> s THEN GOTO printtheline
+'LOCATE 23, 2: COLOR 15, 1
+'PRINT STRING$(77, 32); SPC(0);
+'COLOR 1, 0: LOCATE 23, 1: PRINT CHR$(176) + CHR$(177); SPC(0);
+'LOCATE 23, 78: PRINT CHR$(177) + CHR$(176); SPC(0);
+'COLOR 15, 1: LOCATE 23, 2
+'        'bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
+'    
+'LOCATE , 40 - FIX((LEN(bottomline$)) \ 2)
+'PRINT bottomline$; SPC(0);
 
-'GOTO doneloading
+printer 2, statusline$, 23
 
-'printtheline:
-LOCATE 23, 2: COLOR 15, 1
-PRINT STRING$(77, 32); SPC(0);
-COLOR 1, 0
-LOCATE 23, 1
-PRINT CHR$(176) + CHR$(177); SPC(0);
-LOCATE 23, 78
-PRINT CHR$(177) + CHR$(176); SPC(0);
-COLOR 15, 1
-LOCATE 23, 2
-bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
-stg = LEN(bottomline$)
-stxy = stg \ 2
-stxy = FIX(stxy)
-startx = 40 - stxy
-LOCATE , startx
-
-PRINT bottomline$; SPC(0);
-'oldhitpoints = h
-'oldmaxhitpoints = hitmax
-'oldgold = s
 
 doneloading:
 
@@ -1097,16 +641,23 @@ PRINT CHR$(1)
 'don't do these screens with monsters
 IF monsters$ = "NO" THEN GOTO doer1
 Monster:
-result = MonsterFunction
+IF doamonster <> 1 THEN GOTO doer1
+doamonster = 0
+monsb$ = ""
+monsmn$ = ""
+tosay$ = ""
+m$ = ""
+togetscore$ = ""
+expertoget$ = ""
+result = MonsterFunction(monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
 IF result = 1 THEN GOTO doer1
-IF result = 2 THEN GOTO monster1
 IF result = 3 THEN GOTO dl1
 
 
 
 IF theg = 50 THEN
-theg = 0
-GOTO loadmap
+        theg = 0
+        GOTO loadmap
 END IF
 
 GOTO dl1
@@ -1133,6 +684,7 @@ FOR ixv = 1 TO 79
                 LOCATE ydf, xdf
                 PRINT b$ + " "; SPC(0);
                 xdf = xdf - 1
+
 NEXT ixv
         vdf = LEN(a$) - 1
 FOR ixv = 1 TO LEN(a$)
@@ -1147,12 +699,15 @@ FOR ixv = 1 TO LEN(a$)
 NEXT ixv
 GOTO begin5
 NOT2:
+COLOR 7, 0
+CLS
 GOTO loadmap
 doer1:
 
                   IF printcheater = 1 THEN
                   printcheater = 0
                   writer "`CCheater!!! You got 25 more hitpoints for a total of `h."
+                  doupdate = 0
                   ggb = 5
                   towait1 = FIX(TIMER) + 4
                   END IF
@@ -1174,6 +729,7 @@ END IF
 IF FIX(TIMER) >= towait1 AND ggb = 5 THEN
 ggb = 3
 printwrite = 0
+doupdate = 0
 GOTO cc66
 END IF
 
@@ -1187,100 +743,54 @@ check$ = UCASE$(check$)
 IF FIX(TIMER) <= towait1 THEN GOTO cc56
 cc66:
 IF gbbn = 5 THEN
-LOCATE 23, 1
-COLOR 7, 0
-PRINT STRING$(80, " "); SPC(0);
+        LOCATE 23, 1
+        COLOR 7, 0
+        PRINT STRING$(80, " "); SPC(0);
 END IF
 
 IF printline$ = "NO" THEN GOTO noline
 
-'IF oldhitpoints <> h THEN GOTO printtheline1
-'IF oldmaxhitpoints <> hitmax THEN GOTO printtheline1
-'IF oldgold <> s THEN GOTO printtheline1
-     
+'LOCATE 23, 2: COLOR 15, 1
+'PRINT STRING$(77, 32); SPC(0);
+'LOCATE 23, 1: COLOR 1, 0: PRINT CHR$(176) + CHR$(177); SPC(0);
+'LOCATE 23, 78: PRINT CHR$(177) + CHR$(176); SPC(0);
+'COLOR 15, 1: LOCATE 23, 2
+'        bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
+'LOCATE , 40 - FIX((LEN(bottomline$)) \ 2)
+'PRINT bottomline$; SPC(0);
 
-'GOTO noline
-
-'printtheline1:
-LOCATE 23, 2: COLOR 15, 1
-PRINT STRING$(77, 32); SPC(0);
-LOCATE 23, 1
-COLOR 1, 0
-PRINT CHR$(176) + CHR$(177); SPC(0);
-LOCATE 23, 78
-PRINT CHR$(177) + CHR$(176); SPC(0);
-COLOR 15, 1
-LOCATE 23, 2
-bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
-stg = LEN(bottomline$)
-stxy = stg \ 2
-stxy = FIX(stxy)
-startx = 40 - stxy
-LOCATE , startx
-PRINT bottomline$; SPC(0);
-'oldhitpoints = h
-'oldmaxhitpoints = hitmax
-'oldgold = s
-
+IF doupdate = 0 THEN
+printer 2, statusline$, 23
+END IF
+doupdate = 0
 
 noline:
 IF ggb = 3 THEN
-ggb = 0
-GOTO doer1
+        ggb = 0
+        GOTO doer1
 END IF
 cc56:
 SELECT CASE check$
 
-
-'CASE LEFT$(crypt$(settingscode$), 1)
-'placeincode = 2
-'repeatcode:
-' LOCATE y, x
-'  next$ = UCASE$(INPUT$(1))
-'   IF next$ = RIGHT$(crypt$(settingscode$), 1) AND placeincode = LEN(settingscode$) THEN ccp = 2: GOTO setsettings
-'   IF next$ = MID$(crypt$(settingscode$), placeincode, 1) THEN
-'    placeincode = placeincode + 1: GOTO repeatcode
-'   END IF
-'check$ = next$
-'GOTO cc56
-
-
-
-
 CASE "Q"
- LOCATE y, x
- next$ = UCASE$(INPUT$(1))
-  IF next$ = "U" THEN
-   next$ = UCASE$(INPUT$(1))
-    IF next$ = "A" THEN
-     next$ = UCASE$(INPUT$(1))
-      IF next$ = "K" THEN
-       next$ = UCASE$(INPUT$(1))
-        IF next$ = "E" THEN ccp = 2: GOTO setsettings
-      END IF
-    END IF
-  END IF
-check$ = next$
-GOTO cc56
+        LOCATE y, x
+        result$ = SecretCode$("UAKE")
+        IF result$ = "!!" THEN
+                ccp = 2: GOTO setsettings
+                  doupdate = 0
+        END IF
+        check$ = result$
+        GOTO cc56
 
 CASE "T"
- LOCATE y, x
- next$ = UCASE$(INPUT$(1))
-  IF next$ = "I" THEN
-   next$ = UCASE$(INPUT$(1))
-    IF next$ = "T" THEN
-     next$ = UCASE$(INPUT$(1))
-      IF next$ = "A" THEN
-       next$ = UCASE$(INPUT$(1))
-        IF next$ = "N" THEN
-         next$ = UCASE$(INPUT$(1))
-          IF next$ = "I" THEN
-           next$ = UCASE$(INPUT$(1))
-            IF next$ = "C" THEN
+        LOCATE y, x
+        result$ = SecretCode$("ITANIC")
+        IF result$ = "!!" THEN
              IF hh = 1 THEN hh = -1
              hh = hh + 1
                IF hh = 1 THEN
                  writer "`C`%No Cliping Mode on..."
+                  doupdate = 0
                  ggb = 5
                  towait1 = FIX(TIMER) + 4
                END IF
@@ -1288,16 +798,11 @@ CASE "T"
                  writer "`C`%No Cliping Mode off..."
                  ggb = 5
                  towait1 = FIX(TIMER) + 4
-               GOTO begin
+                 GOTO begin
                END IF
-            END IF
-          END IF
         END IF
-      END IF
-    END IF
-  END IF
-check$ = next$
-GOTO cc56
+        check$ = result$
+        GOTO cc56
 
 
 CASE "I"
@@ -1309,77 +814,65 @@ GOTO map
 
 CASE "H"
  LOCATE y, x
- next$ = UCASE$(INPUT$(1))
-  IF next$ = "E" THEN
-   next$ = UCASE$(INPUT$(1))
-    IF next$ = "L" THEN
-     next$ = UCASE$(INPUT$(1))
-      IF next$ = "P" THEN
-       next$ = UCASE$(INPUT$(1))
-        IF next$ = "M" THEN
-         next$ = UCASE$(INPUT$(1))
-          IF next$ = "E" THEN
+        result$ = SecretCode$("ELPME")
+        IF result$ = "!!" THEN
              ggb = 3
              printcheater = 1
+                  doupdate = 0
              s = 0
              h = h + 25
              hitmax = hitmax + 25
              GOTO cc66
-          END IF
         END IF
-      END IF
-    END IF
-  END IF
-check$ = next$
-GOTO cc56
+        check$ = result$
+        GOTO cc56
+
+
 
 CASE "S"
-
-IF cc = 2 THEN
-ccc = 1: GOTO setsettings
-END IF
-
-LOCATE y, x
- next$ = UCASE$(INPUT$(1))
-  IF next$ = "D" THEN
-   next$ = UCASE$(INPUT$(1))
-    IF next$ = "E" THEN
-     next$ = UCASE$(INPUT$(1))
-      IF next$ = "B" THEN
-        IF dd1 = 1 THEN dd1 = -1
-        dd1 = dd1 + 1
-                IF dd1 = 1 THEN
-                  writer "`C`%Debug Details On..."
-                  ggb = 5
-                  towait1 = FIX(TIMER) + 4: GOTO begin
-                END IF
-                IF dd1 = 0 THEN
-                  writer "`C`%Debug Details Off..."
-                  ggb = 5
-                  towait1 = FIX(TIMER) + 4: GOTO begin
-                END IF
-     
-      END IF
-    END IF
-  END IF
-check$ = next$
-GOTO cc56
-
+        IF cc = 2 THEN
+                ccc = 1: GOTO setsettings
+        END IF
+       
+        LOCATE y, x
+        result$ = SecretCode$("DEB")
+        IF result$ = "!!" THEN
+                IF dd1 = 1 THEN dd1 = -1
+                dd1 = dd1 + 1
+                        IF dd1 = 1 THEN
+                                writer "`C`%Debug Details On..."
+                                doupdate = 0
+                                ggb = 5
+                                towait1 = FIX(TIMER) + 4: GOTO begin
+                        END IF
+                        IF dd1 = 0 THEN
+                                writer "`C`%Debug Details Off..."
+                                doupdate = 0
+                                ggb = 5
+                                towait1 = FIX(TIMER) + 4: GOTO begin
+                        END IF
+        END IF
+        check$ = result$
+        GOTO cc56
 
 
 CASE "4"
+        doamonster = 1
         direction$ = "L"
 GOTO hardhs
 
 CASE "6"
+        doamonster = 1
         direction$ = "R"
 GOTO hardhs
 
 CASE "8"
+        doamonster = 1
         direction$ = "U"
 GOTO hardhs
 
 CASE "2"
+        doamonster = 1
         direction$ = "D"
 GOTO hardhs
 
@@ -1388,15 +881,19 @@ GOTO Quit
 CASE CHR$(27)
 GOTO Quit
 CASE Null$ + CHR$(75)
+        doamonster = 1
         direction$ = "L"
 GOTO hardhs
 CASE Null$ + CHR$(72)
+        doamonster = 1
         direction$ = "U"
 GOTO hardhs
 CASE Null$ + CHR$(80)
+        doamonster = 1
         direction$ = "D"
 GOTO hardhs
 CASE Null$ + CHR$(77)
+        doamonster = 1
         direction$ = "R"
 GOTO hardhs
 
@@ -1405,36 +902,33 @@ GOTO begin
 
 END SELECT
 GOTO begin
+
 map:
 VIEW PRINT 1 TO 25
-COLOR 7, 0
-CLS
-LOCATE 25, 1, 0
-COLOR 7, 0
+COLOR 7, 0: CLS : LOCATE 25, 1, 0: COLOR 7, 0
 PRINT STRING$(80, " "); SPC(0);
+
 LOCATE 1, 1
-'printer 0, "`2" + gamename$ + " - Map`7`X25`FDB `%- `Y10represents a village or town`X65Press any key...", 25
-dd = 1
-ig = 1
+dd = 1: ig = 1
 
 LOCATE 1, 1
 FOR xcc = 1 TO 1920
-xc = CSRLIN
-IF map(xcc) = 0 THEN
-COLOR 15, 1: PRINT " "; SPC(0);
-END IF
-IF map(xcc) = 1 THEN
-COLOR 15, 2: PRINT " "; SPC(0);
-END IF
-IF map(xcc) = 2 THEN
-COLOR 15, 1: PRINT " "; SPC(0);
-END IF
-IF map(xcc) = 3 THEN
-COLOR 15, 7: PRINT " "; SPC(0);
-END IF
-IF map(xcc) = 4 THEN
-COLOR 7, 2: PRINT CHR$(254); SPC(0);
-END IF
+        xc = CSRLIN
+                IF map(xcc) = 0 THEN
+                        COLOR 15, 1: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 1 THEN
+                        COLOR 15, 2: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 2 THEN
+                        COLOR 15, 1: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 3 THEN
+                        COLOR 15, 7: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 4 THEN
+                        COLOR 7, 2: PRINT CHR$(254); SPC(0);
+                END IF
 
 
 IF xcc = thescreen THEN
@@ -1446,11 +940,8 @@ IF POS(0) = 1 THEN
 IF POS(0) <> 1 THEN LOCATE xc, POS(0) - 1
 
 getoutSc:
-bs = SCREEN(CSRLIN, POS(0), 1)
-b = FIX(bs / 16)
-COLOR 20, b
-PRINT CHR$(1); SPC(0);
-'LOCATE by, bx
+        COLOR 20, FIX((SCREEN(CSRLIN, POS(0), 1)) / 16)
+        PRINT CHR$(1); SPC(0);
 END IF
 
 NEXT xcc
@@ -1459,35 +950,27 @@ NEXT xcc
 LOCATE 1, 1
 
 CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
 refpos = 1
 
 gs:
-'IF EOF(36) THEN GOTO nomaperror
 da$ = inputer$(0): IF da$ = "--EOF--" THEN GOTO nomaperror
-'INPUT #36, da$
-IF da$ = "@#MAP" THEN GOTO mapsx
+        IF da$ = "@#MAP" THEN GOTO mapsx
 GOTO gs:
 
 mapsx:
 k = 1
 invscr63:
-'LINE INPUT #36, iner$
-iner$ = inputer$(0)
-IF LTRIM$(RTRIM$(iner$)) = "@END" THEN GOTO waiter62
-printer 0, iner$, k
-k = k + 1
+        iner$ = inputer$(0)
+                IF LTRIM$(RTRIM$(iner$)) = "@END" THEN GOTO waiter62
+        printer 0, iner$, k
+        k = k + 1
 GOTO invscr63
 
 
 waiter62:
-
-CLOSE #36
-LOCATE 1, 1
-i$ = INPUT$(1)
+LOCATE 1, 1: I$ = INPUT$(1)
 towait1 = FIX(TIMER)
-COLOR 7, 0
-CLS
+COLOR 7, 0: CLS
 GOTO loadmap
 
 setsettings:
@@ -1505,8 +988,6 @@ PRINT "Max Hp: ", hitmax
 PRINT "Strength: ", w
 PRINT "Defense: ", defs
 PRINT "Gold: ", s
-'PRINT "Weapon: ", i
-'PRINT "Armour: ", z
 PRINT "Monsters: ", monsters$
 PRINT
 COLOR 7
@@ -1514,57 +995,47 @@ PRINT "New Settings:"
 PRINT
 COLOR 2, 0
 
-
 settingsettings = 2
 GOTO getready
 returner2:
-setsettings
-settingsettings = 1
-GOTO getready
+        setsettings
+        settingsettings = 1
+        GOTO getready
 returner:
-settingsettings = 0
-thescreen = thescreen1
-COLOR 7, 0
-CLS
+        settingsettings = 0
+        thescreen = thescreen1
+COLOR 7, 0: CLS
 
 IF ccp = 1 THEN
-ccp = 0
-GOTO loadmap
+        ccp = 0
+        GOTO loadmap
 END IF
 IF ccc = 1 THEN
-ccc = 0: GOTO loadmap
+        ccc = 0: GOTO loadmap
 END IF
 IF cc = 2 THEN GOTO load
 tt = 0
+
 IF pk = 2 THEN
-pk = 0
-GOTO load
+        pk = 0
+        GOTO load
 END IF
 GOTO loadmap
 
 
 hardhs:
 IF x = 1 AND direction$ = "L" THEN
-ghs = 5: thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
+        ghs = 5: thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
 END IF
 IF x = 79 AND direction$ = "R" THEN
-ghs = 5: thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
+        ghs = 5: thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
 END IF
 IF y = 1 AND direction$ = "U" THEN
-ghs = 5: rp = rp - 80: thescreen = thescreen - 80: y = 22: record = 21 * 79 + x: GOTO loadmap
+        ghs = 5: rp = rp - 80: thescreen = thescreen - 80: y = 22: record = 21 * 79 + x: GOTO loadmap
 END IF
 IF y = 22 AND direction$ = "D" THEN
-ghs = 5: thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
+        ghs = 5: thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
 END IF
-
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
-'refpos = 1
-'rp$ = STR$(rp)
-'DO
-'aggggf$ = inputer$(rp): IF aggggf$ = "--EOF--" THEN EXIT DO
-''IF EOF(36) THEN EXIT DO
-''INPUT #36, aggggf$
-'IF aggggf$ = "@#SCR" + rp$ THEN
         IF direction$ = "L" THEN
         way = 1: what = 1
         END IF
@@ -1578,16 +1049,12 @@ END IF
         way = 4: what = 4
         END IF
 GOTO dofunction
-'END IF
-'LOOP
 CLOSE #36
 GOTO hard
 
 
 
 'LRUD  1234, what and way
-
-
 
 
 hard:
@@ -1617,6 +1084,7 @@ IF hard = 1 THEN
         IF direction$ = "R" THEN record = record - 1
         IF direction$ = "U" THEN record = record + 79
         IF direction$ = "D" THEN record = record - 79
+       doupdate = 1
        GOTO doer1
 END IF
 
@@ -1634,32 +1102,25 @@ GOTO begin
 
 
 inventory:
-COLOR 7, 0
-CLS
-CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
+COLOR 7, 0: CLS
+
 refpos = 1
 findit:
-'IF EOF(36) THEN GOTO SUCKIT
-data$ = inputer$(0): IF data$ = "--EOF--" THEN GOTO suckit
-'LINE INPUT #36, data$
-IF LEFT$(data$, 8) = "@#INVSCR" THEN
-k = 1
-GOTO invscr
-END IF
+        data$ = inputer$(0): IF data$ = "--EOF--" THEN GOTO suckit
+                IF LEFT$(data$, 8) = "@#INVSCR" THEN
+                        k = 1
+                        GOTO invscr
+                END IF
 GOTO findit
 invscr:
-iner$ = inputer$(0)
-'LINE INPUT #36, iner$
-IF iner$ = "@END" THEN GOTO waiter
-printer 1, iner$, k
-k = k + 1
+        iner$ = inputer$(0)
+                IF iner$ = "@END" THEN GOTO waiter
+        printer 1, iner$, k
+        k = k + 1
 GOTO invscr
 waiter:
-LOCATE , , 0, 6, 7
-i$ = INPUT$(1)
+LOCATE , , 0, 6, 7: I$ = INPUT$(1)
 towait1 = FIX(TIMER)
-CLOSE #36
 GOTO loadmap
 
 
@@ -1671,18 +1132,19 @@ IF direction$ = "D" THEN kk = 4
 GOTO doer
 l56b:
 IF kk = 1 THEN
-x = x - 1: record = record - 1
+        x = x - 1: record = record - 1
 END IF
 IF kk = 2 THEN
-x = x + 1: record = record + 1
+        x = x + 1: record = record + 1
 END IF
 IF kk = 3 THEN
-y = y - 1: record = record - 79
+        y = y - 1: record = record - 79
 END IF
 IF kk = 4 THEN
-y = y + 1: record = record + 79
+        y = y + 1: record = record + 79
 END IF
 
+doupdate = 1
 GOTO begin
 
 
@@ -1693,12 +1155,12 @@ yes2:
 
 
 IF doer = 5 THEN
-dkdk = cury - 1
-record1 = dkdk * 79 + curx
-lk = dd + 5
-dfdf = record1 * 2 - 2
-m = lk + dfdf
-GOTO getstuff
+        dkdk = cury - 1
+        record1 = dkdk * 79 + curx
+        lk = dd + 5
+        dfdf = record1 * 2 - 2
+        m = lk + dfdf
+        GOTO getstuff
 END IF
 
 
@@ -1712,28 +1174,27 @@ m = lk + dfdf
 getstuff:
 LOCATE y, x
 a$ = SPACE$(2)
-GET #1, m, a$
-d$ = LEFT$(a$, 1)
-dhg = ASC(d$)
+        GET #1, m, a$
 
-fg1 = FIX(dhg / 16)
-bg1 = dhg - (fg1 * 16)
+fg1 = FIX(ASC(LEFT$(a$, 1)) / 16)
+bg1 = ASC(LEFT$(a$, 1)) - (fg1 * 16)
 IF bg1 > 7 THEN bg1 = bg1 - 8
 COLOR fg1, bg1
 
 IF doer = 5 THEN GOTO gotcolor
 e$ = RIGHT$(a$, 1)
-IF e$ = CHR$(0) THEN
-PRINT " "; SPC(0);
-GOTO doner
-END IF
+        IF e$ = CHR$(0) THEN
+                PRINT " "; SPC(0);
+                GOTO doner
+        END IF
 PRINT e$; SPC(0);
 
 doner:
-IF kk = 1 THEN GOTO l56b  'eft1
-IF kk = 2 THEN GOTO l56b  'right1
-IF kk = 3 THEN GOTO l56b  'up1
-IF kk = 4 THEN GOTO l56b  'down1
+IF kk > 0 AND kk < 5 THEN GOTO l56b
+'IF kk = 1 THEN GOTO l56b  'eft1
+'IF kk = 2 THEN GOTO l56b  'right1
+'IF kk = 3 THEN GOTO l56b  'up1
+'IF kk = 4 THEN GOTO l56b  'down1
 GOTO begin
 Quit:
 GOTO load
@@ -1741,52 +1202,45 @@ errorhandle:
 PRINT
 PRINT "The following errors were detected:"
 PRINT
-IF novardat = 1 THEN PRINT "Cannot find VARIABLE.DAT"
+IF novardat = 1 THEN PRINT "Cannot find VARS.DAT"
 IF noscrdat = 1 THEN PRINT "Cannot find NOSCR.DAT"
-IF nolevelmap = 1 THEN PRINT "Cannot find FQMAPS.DAT"
-IF norefdat = 1 THEN PRINT "Cannot find FQREFS.DAT"
+IF nolevelmap = 1 THEN PRINT "Cannot find MAPS.DAT"
+IF norefdat = 1 THEN PRINT "Cannot find REFS.DAT"
 PRINT
 GOTO ender5
 suckit:
-PRINT
-PRINT "The following error was detected... Cannot find @#INVSCR in REF file."
-PRINT
-GOTO ender5
+        PRINT
+        PRINT "The following error was detected... Cannot find @#INVSCR in REF file."
+        PRINT
+        GOTO ender5
 nomaperror:
-PRINT
-PRINT "The following error was detected... Cannot find @#MAP in REF file."
-PRINT
-GOTO ender5
-NOHELP:
-PRINT
-PRINT "The following error was detected... Cannot find @#HELP in REF file."
-PRINT
-GOTO ender5
+        PRINT
+        PRINT "The following error was detected... Cannot find @#MAP in REF file."
+        PRINT
+        GOTO ender5
 NOINTRO:
-PRINT
-PRINT "The following error was detected... Cannot find @#INTRO in REF file."
-PRINT
-GOTO ender5
+        PRINT
+        PRINT "The following error was detected... Cannot find @#INTRO in REF file."
+        PRINT
+        GOTO ender5
 leaver1:
 dofunction:
 IF way = 1 THEN
-x = x - 1: waypoint = 1: looker = 1
+        x = x - 1: waypoint = 1: looker = 1
 END IF
 IF way = 2 THEN
-x = x + 1: waypoint = 2: looker = 1
+        x = x + 1: waypoint = 2: looker = 1
 END IF
 IF way = 3 THEN
-y = y - 1: waypoint = 3: looker = 1
+        y = y - 1: waypoint = 3: looker = 1
 END IF
 IF way = 4 THEN
-y = y + 1: waypoint = 4: looker = 1
+        y = y + 1: waypoint = 4: looker = 1
 END IF
 
 doiter:
 DO
-'INPUT #36, adsg$
 adsg$ = ReferenceArray$(looker): looker = looker + 1
-'adsg$ = inputer$(0)
 adsg$ = UCASE$(adsg$)
 
 IF adsg$ = "--EOF--" THEN
@@ -1811,19 +1265,15 @@ IF adsg$ = "--EOF--" THEN
         END IF
 END IF
 IF runref$ = "YES" THEN
-IF adsg$ = "--EOF--" THEN GOTO ins
-'IF EOF(53) THEN GOTO ins
+        IF adsg$ = "--EOF--" THEN GOTO ins
 END IF
 LOOP
 dothe:
-'INPUT #36, iner$
 iner$ = ReferenceArray$(looker): looker = looker + 1
                 beforecaps$ = LTRIM$(iner$)
 IF iner$ = "--EOF--" THEN looker = 1: GOTO dothe
-'iner$ = inputer$(0)
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
-'PRINT iner$: i$ = INPUT$(1)
 IF iner$ = "@ENDDO" THEN GOTO donewith
 dothe = 5
 GOTO togo2
@@ -1940,11 +1390,26 @@ returnhere:
 IF runref$ <> "YES" THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1'dfdf$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
+
+
+
+continue:
 IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
+'olddfdf$ = dfdf$
+'returnsemicolon:
+'IF INSTR(dfdf$, ";") <> 0 THEN
+' 
+'        semicolon = 1
+' 
+'        END IF
+'IF INSTR(dfdf$, ";") = 0 AND semicolon = 1 THEN
+'        semicolon = 0
+'        GOTO returnhere
+'        END IF
+'
 
 curx = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
 cury = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
-
 
 xb = SCREEN(cury, curx)
 toprint$ = CHR$(xb)
@@ -1975,10 +1440,12 @@ IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
 curx = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
 cury = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
 
+
 LOCATE cury, curx
 COLOR xb1, d
 PRINT toprint$; SPC(0);
-GOTO returnhere:
+
+GOTO returnhere
 
 donemove:
 END IF
@@ -2140,6 +1607,7 @@ IF iner$ = "@DONE" THEN GOTO donefunc
 doits = 5
 GOTO togo2
 donefunc:
+doits = 0
 IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 data$ = UCASE$(data$)
@@ -2342,48 +1810,61 @@ IF runref$ = "YES" THEN INPUT #53, m$
 IF runref$ = "YES" THEN INPUT #53, b$
 IF runref$ = "YES" THEN INPUT #53, togetscore
 IF runref$ = "YES" THEN INPUT #53, expertoget
+IF runref$ = "YES" THEN INPUT #53, mons$
+IF runref$ = "YES" THEN INPUT #53, mond$
 
 IF runref$ <> "YES" THEN tosay$ = ReferenceArray$(looker): looker = looker + 1'tosay$ = inputer$(0)
 IF runref$ <> "YES" THEN m$ = ReferenceArray$(looker): looker = looker + 1'm$ = inputer$(0)
 IF runref$ <> "YES" THEN b$ = ReferenceArray$(looker): looker = looker + 1'b$ = inputer$(0)
 IF runref$ <> "YES" THEN togetscore = VAL(ReferenceArray$(looker)): looker = looker + 1'(inputer$(0))
 IF runref$ <> "YES" THEN expertoget = VAL(ReferenceArray$(looker)): looker = looker + 1'(inputer$(0))
+IF runref$ <> "YES" THEN mons$ = ReferenceArray$(looker): looker = looker + 1'(inputer$(0))
+IF runref$ <> "YES" THEN mond$ = ReferenceArray$(looker): looker = looker + 1'(inputer$(0))
 
+weapon = 0
+armour = 0
+wep = VAL(mons$)
+mon = VAL(mond$)
+
+IF mons$ = "MAXENERGY" THEN
 nus = 1
 DO
-i$ = settings$(nus): nus = nus + 1
-IF i$ = "--END--" THEN
+I$ = settings$(nus): nus = nus + 1
+IF I$ = "--END--" THEN
         weapon = 0
         EXIT DO
         END IF
-IF i$ = "WEAPONPOWER" THEN
-        i$ = settings$(nus): nus = nus + 1
-        weaponpower = VAL(i$)
+IF I$ = "WEAPONPOWER" THEN
+        I$ = settings$(nus): nus = nus + 1
+        weaponpower = VAL(I$)
         weapon = 1
         EXIT DO
         END IF
-i$ = settings$(nus): nus = nus + 1
+I$ = settings$(nus): nus = nus + 1
 LOOP
+END IF
 
+IF mond$ = "MAXENERGY" THEN
 DO
-i$ = settings$(nus): nus = nus + 1
-IF i$ = "--END--" THEN
+I$ = settings$(nus): nus = nus + 1
+IF I$ = "--END--" THEN
         armour = 0
         EXIT DO
         END IF
-IF i$ = "ARMOURPOWER" THEN
-        i$ = settings$(nus): nus = nus + 1
-        armourpower = VAL(i$)
+IF I$ = "ARMOURPOWER" THEN
+        I$ = settings$(nus): nus = nus + 1
+        armourpower = VAL(I$)
         armour = 1
         EXIT DO
         END IF
-i$ = settings$(nus): nus = nus + 1
+I$ = settings$(nus): nus = nus + 1
 LOOP
+END IF
 
 IF weapon = 1 THEN wep = weaponpower
 IF armour = 1 THEN arm = armourpower
-IF weapon <> 1 THEN wep = 1
-IF armour <> 1 THEN arm = 1
+'IF weapon <> 1 THEN wep = 1
+'IF armour <> 1 THEN arm = 1
 
 
 'IF I = 1 THEN weapon = weapon1power
@@ -2396,18 +1877,24 @@ IF armour <> 1 THEN arm = 1
 'IF z = 3 THEN armour = armour3power
 'IF z = 4 THEN armour = armour4power
 
+b = VAL(b$)
+mn = wep
+
+
 IF b$ = "MAXENERGY" THEN
 b = hitmax
-mn = w * 2 + wep + arm
+mn = w * 2 + wep
 GOTO deg1
 END IF
-b = VAL(b$)
-mn = VAL(b$)
+
 deg1:
-deg = 5
-GOTO Monster
-monster1:
-deg = 0
+monsb$ = STR$(b)
+monsmn$ = STR$(mn)
+togetscore$ = STR$(togetscore)
+expertoget$ = STR$(expertoget)
+
+result = MonsterFunction(monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
+
 END IF
 
 
@@ -2482,6 +1969,7 @@ IF theprint$ = "" THEN theprint$ = "0"
 what$ = "="
 toset$ = "LASTRESPONSE"
 tosetto$ = theprint$
+beforetosetto$ = theprint$
 GOTO setnow
 END IF
 
@@ -2618,8 +2106,6 @@ tosetto$ = ""
 gsb = 6
 
 data$ = RIGHT$(iner$, LEN(iner$) - 5)
-'COLOR 7, 0: CLS : COLOR 15, 1
-'PRINT beforecaps$, iner$
 data1$ = RIGHT$(beforecaps$, LEN(beforecaps$) - 5)
 
 
@@ -2660,14 +2146,11 @@ END IF
 data$ = settings$(nus): nus = nus + 1
 data1$ = settings$(nus): nus = nus + 1
 
-'PRINT data$; " "; data1$; " "; tosetto$: i$ = INPUT$(1)
-
 IF data$ = tosetto$ THEN
 datatouse$ = data1$
+        'PRINT data$
+        'PRINT data1$: i$ = INPUT$(1)
 tosetto$ = datatouse$
-
-'LOCATE 1, 1: PRINT datatouse$: END
-
 GOTO setnow2
 END IF
 
@@ -2679,9 +2162,13 @@ setnow2:
 
 nus = 1
 DO
-data$ = settings$(nus): nus = nus + 1
-IF settings$(nus) = "--END--" THEN GOTO makeit
-IF data$ = toset$ THEN GOTO processit
+data$ = settings$(nus)
+IF data$ = "--END--" THEN GOTO makeit
+IF data$ = toset$ THEN
+        nus = nus + 1
+        GOTO processit
+        END IF
+nus = nus + 1
 LOOP
 
 processit:
@@ -2710,6 +2197,9 @@ pluser2:
 IF what$ = "*1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow * VAL(datatouse$))))
 IF what$ = "/1" THEN jf$ = LTRIM$(RTRIM$(STR$(FIX((datanow / VAL(datatouse$))))))
 IF what$ = "+1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow + VAL(datatouse$))))
+'IF what$ = "+1" THEN
+'PRINT " "; jf$; " "; datanow; " "; datatouse$: END
+'        END IF
 IF what$ = "-1" THEN jf$ = LTRIM$(RTRIM$(STR$(datanow - VAL(datatouse$))))
 IF what$ = "=1" THEN jf$ = datatouse$
 settings$(nus) = jf$
@@ -3108,6 +2598,7 @@ kkkk = y - 1
 kkk = kkkk * 79
 record = kkk + x
 reloadscreen = 0
+doits = 0
 GOTO loadmap
 END IF
 
@@ -3204,8 +2695,8 @@ END IF
 
 IF data$ = "WEAPON" THEN
 max6 = 1
-IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(i)
-IF settingsettings = 1 THEN i = VAL(settings$(nus - 1))
+IF settingsettings <> 1 THEN settings$(nus - 1) = STR$(I)
+IF settingsettings = 1 THEN I = VAL(settings$(nus - 1))
 GOTO ghsg
 END IF
 
@@ -3249,7 +2740,7 @@ IF max4 <> 1 THEN settings$(nus) = STR$(w): nus = nus + 1
 IF max5 <> 1 THEN settings$(nus) = "DEFENSE": nus = nus + 1
 IF max5 <> 1 THEN settings$(nus) = STR$(defs): nus = nus + 1
 IF max6 <> 1 THEN settings$(nus) = "WEAPON": nus = nus + 1
-IF max6 <> 1 THEN settings$(nus) = STR$(i): nus = nus + 1
+IF max6 <> 1 THEN settings$(nus) = STR$(I): nus = nus + 1
 IF max7 <> 1 THEN settings$(nus) = "ARMOUR": nus = nus + 1
 IF max7 <> 1 THEN settings$(nus) = STR$(z): nus = nus + 1
 IF max8 <> 1 THEN settings$(nus) = "EXPERIENCE": nus = nus + 1
@@ -3296,5 +2787,4 @@ nottt:
 COLOR 7, 0
 CLEAR
 END
-
 

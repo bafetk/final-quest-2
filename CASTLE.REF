@@ -7,10 +7,20 @@
 `!GUESS WHAT!!!!  `2This castle has never been discovered, until now!!!
 
 `2You are the lucky guy who gets to make it his home!
-`0<`2Continue`0>
-#SLEEP 2
+`0<`2Continue`0>  `2(2 second delay)`X11
+#SLEEP 1
+#PRINT 1
+`Y05`X14`21`X11
+#SLEEP 1
+#PRINT 1
+`Y05`X13`b0`L16`X11
 #WAIT
 #ENDIF
+#IF EXITCASTLE = 41 THEN
+        #NEWPOS 41 21
+#ENDIF
+#IF EXITCASTLE = 42 THEN
+        #NEWPOS 42 21
+#ENDIF
 #GOTO 726
-#NEWPOS 41 21
 @END

@@ -3,7 +3,7 @@ Akori Software
 Final Quest 2
 V0.94
 V0.94
-Rev B
+Rev C
 NO
 3
 250
@@ -37,5 +37,8 @@ PASSWORD
 0
 OLDMAN
 0
-WEAPONNAME
-Stick
+ENTERHOUSE
+0
+EXITCASTLE
+41
+

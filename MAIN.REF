@@ -211,6 +211,8 @@ Master Roshi
 MAXENERGY
 1000
 100
+MAXENERGY
+MAXENERGY
 #CLS
 #PRINT 1
 `2Sorry... You loose.. come back next time...
@@ -261,10 +263,12 @@ Leave the hut...
 #DECLARE NEWGOLD
 #SET NEWGOLD =1 GOLD;
 #SET NEWGOLD / 2;
+#FIX NEWGOLD
 
 #IF NEWGOLD >2 HEAL THEN
 #SET NEWGOLD =1 HEAL;
 #ENDIF
+
 
 #PRINT 4
 `2You have `%`vHITPOINT` `2hitpoint(s).  It costs `$$2`2 For every hitpoint
@@ -277,6 +281,8 @@ Leave the hut...
 5
 
 #FIX LASTRESPONSE
+
+
 
 #IF HITPOINT =1 MAXENERGY THEN
 #CLS
@@ -307,7 +313,7 @@ Leave the hut...
 #RETURN
 #ENDIF
 
-#IF LASTRESPONSE = 1 THEN
+#IF LASTRESPONSE < 2 THEN
 #SET HITPOINT +1 NEWGOLD;
 #SET NEWGOLD * 2;
 #SET GOLD -1 NEWGOLD;

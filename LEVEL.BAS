@@ -16,7 +16,7 @@ Mouse 0
 Mouse 4
 
 C$ = UCASE$(COMMAND$)
-IF C$ = "" THEN filename$ = "fqmaps.dat"
+IF C$ = "" THEN filename$ = "maps.dat"
 IF C$ <> "" THEN filename$ = C$
 
 
@@ -25,7 +25,7 @@ IF C$ <> "" THEN
         GOTO continue3
         END IF
 
-IF exist("fqmaps.dat") = 0 THEN
+IF exist("maps.dat") = 0 THEN
         INPUT "Please enter map name to edit eg. MAPS.DAT:"; filename$
 
 
@@ -112,7 +112,7 @@ loader1:
                                         COLOR 15, 2: PRINT " "; SPC(0);
                                 END IF
                                 IF map(xcc) = 2 THEN
-                                        COLOR 15, 3: PRINT " "; SPC(0);
+                                        COLOR 15, 4: PRINT " "; SPC(0);
                                 END IF
                                 IF map(xcc) = 3 THEN
                                         COLOR 15, 7: PRINT " "; SPC(0);
@@ -1136,7 +1136,8 @@ GOTO begin
 CASE CHR$(13)
 enter:
 
-IF y > 22 THEN y = 22: IF x > 79 THEN x = 79
+IF y > 22 THEN y = 22
+IF x > 79 THEN x = 79
 r = (((y - 1) * 79) + x)
 IF r > 1738 THEN r = 1738
 
@@ -1222,10 +1223,10 @@ IF mousecontrol = 1 THEN
 xpos = mousexpos
 ypos = mouseypos
 IF (mousexpos / 8) + 1 > 79 THEN
-        xpos = (79 * 8) - 1: Mouse 2
+        xpos = (79 * 8) - 1: Mouse 2: Mouse 3
         END IF
 IF (mouseypos / 8) + 1 > 22 THEN
-        ypos = (22 * 8) - 1: Mouse 2
+        ypos = (22 * 8) - 1: Mouse 2: Mouse 3
         END IF
 Mouse 3
         x = (mousexpos / 8) + 1
@@ -1432,7 +1433,7 @@ IF cc = 9 THEN GOTO left1
 GOTO begin
 
 refedit:
-SHELL "EDIT FQREFS.DAT"
+SHELL "EDIT REFS.DAT"
 GOTO begin
 
 caseo:

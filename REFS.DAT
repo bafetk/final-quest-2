@@ -32,6 +32,8 @@
 `X10\\\\`X21\\\\`X31`b7 `b1`L18`b7 `b0`X58////`X69////
 `X13\\`X24\\`X31`b7`L20`b0`X57//`X68//
 @END
+@#STATUSLINE
+`b1`Y23`X01`L77`X01`1`b0`X01`Y23`FB0`FB1`C`%`b1`Y23Final Quest 2 -- By AkoriSoft -- HP (`vHITPOINT`/`vMAXENERGY`) -- Gold: `vGOLD`!`1`b0`Y23`X78`FB1`FB0
 @#MAP
 `X30`Y03`%`b1Welcome to `$F`4inal `$Q`4uest `$2`%.
 `X28`Y05`%`b1A `b7 `b1 represents a large town,
@@ -39,49 +41,47 @@
 `X28`Y07`%`b1and a `b2 `b1 represents land.
 @END
 @#INVSCR
-`Y08`X21`b4              `!I`#n`!v`#e`!n`#t`!o`#r`!y               `b0
-`X21`b4 `b0`2Experience: `%`e`X58`b4 `b0
-`X21`b4 `b0`2Hitpoints: `@`h`X58`b4 `b0
-`X21`b4 `b0`2Gold: `$$`g`X58`b4 `b0
-`X21`b4 `b0`2Gold in Bank: `$$`vBANK``x58`b4 `b0
-`X21`b4 `b0`2Strength: `!`a`X58`b4 `b0
-`X21`b4 `b0`2Defense: `!`d`X58`b4 `b0
-`X21`b4 `b0`2Weapon: `#`i`X58`b4 `b0
-`X21`b4 `b0`2Armour: `#`z`X58`b4 `b0
-`X21`b4 `b0`2Wildberries: `4`vBERRY``X58`b4 `b0
-`X21`b4                                      `b0
-`X21`b4 `b0 `%`X31Press any key...`X58`b4 `b0 
-`X21`b4                                      `b0
+`%`b0`%`b0`K`Y02`X01`Y03`X01`X07`%`b0ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y04`X01  `%`b1    `%`b0³`X13Inventory`X27³`%`b1    `Y05`X01`X07`%`b0ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y06`X01`Y07`X01`X14`%`b1ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y08`X01`X14³                    `%`b0`Y09`X14
+`Y08`X35`%`b1                                 ³`Y09`X01`X14³                                                     ³`Y10`X01`X14³                                                     ³`Y11`X01`X14³                                                     ³`%`b0`Y12`X14
+`%`b1`Y12`X01`X14³                                                     ³`Y13`X01`X14³                                                     ³`Y14`X01`X14³                                                     ³`Y15`X01`X14³                            `%`b0`Y16`X14
+`Y15`X43`%`b1                         ³`Y16`X01`X14³                                                     ³`Y17`X01`X14³                                                     ³`Y18`X01`X14³                                                     ³`Y19`X01`X14`%`b0`Y20`X14
+`Y19`X14`%`b1ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y20`X01`Y21`X01`X54`%`b0ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y22`X01`X50`%`b1    `%`b0³   Press a Key..   ³`%`b1    `Y23`X01`X54`%`b0ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y01`X01
+`Y09`X17`%Experience: `%`e`X58
+`X17`%Hitpoints: `@`h`X58
+`X17`%Gold: `$$`g`X58
+`X17`%Gold in Bank: `$$`vBANK``x58
+`X17`%Strength: `!`a`X58
+`X17`%Defense: `!`d`X58
+`X17`%Weapon: `#`i`X58
+`X17`%Armour: `#`z`X58
+`X17`%Wildberries: `4`vBERRY``X58
 @END
 @#HELP
 `$`CWelcome to Final Quest 2 V0.94 by Akori Software.
 
 `$`X37KEYS:
-`0`C = Moves you Left
+`0`C= Moves you Left
 `0`C = Moves you Right
-`0`C = Moves you Down
+`0`C= Moves you Down
 `0`X32 = Moves you Up 
 `0`CI = Inventory -- M = Map
 `0`CESC = Quit to Menu
-`0`CQ = Quit to Menu
-
-
-`X05`@Long ago a `%witch`@ the most `$lethal`@ attacked an old `9city`@. There she built
-`@herself a `!castle`@ and appointed herself `#ruler`@.  Along came a `%hero`@. This `%hero
-`@worked hard and long on perserving his country.  He eventually became `$strong
-`@enough to confront the `%witch`@.  From there he `!defeated`@ the `%witch`@ and was declared
-`@a `%hero`@. This game tells the story of that `%witch's`@ `0daughter`@. The `6secret and
-`6spoiled `@descendent of that `%witch`@.  She has taken over the `$entire`@ country now
-`@instead and there are more areas to `%explore`@ and `%conquer`@.
-
-
-`%Good Luck Adventurer.
-
-`$Press any key...
 `Y04`X31`0`F1B
 `Y05`X31`0`F1A
 `Y06`X31`0`F19
 `Y07`X31`0`F18
+`Y12`X03`!So, here we are.  Not much to report on this revision because I haven't done
+`!much with it.  I am attempting to make as many screens as I can, and impliment
+`!as much gameplay into them as possible.  You know, I'm not that creative of a
+`!guy!  I don't know what I am going to do!  Anyway, today is 4/17/01, and this
+`!is Rev 094B02, So I guess I will keep working on it.  The only reason that this
+`!game never made 1.0 is because of that darned gameplay... Hey, I'll get it
+`!eventually.  I've been working on it for two years and eight months now, so
+`!three more years won't be any different.  `$:`8-`0)
+
+`%Good Luck Adventurer.
+
+`$Press any key...
 @END
 @#ALWAYSDO
 @END
@@ -108,79 +108,6 @@
 `0<`2Continue`0>
 #WAIT 1
 @END
-@#SCR 243
-        @IPS 36 16
-#RUNREF CASTLE|CASTLE.REF
-                #DONE
-@END
-@#SCR 802
-        @IPS 41 20
-                #NEWPOS 41 18
-                #GOTO 726
-                #DONE
-        @IPS 42 20
-                #NEWPOS 42 18
-                #GOTO 726
-                #DONE
-@END
-@#SCR 803
-        @IPS 39 19
-                #GOTO 726
-                #NEWPOS 67 19
-                #DONE
-@END
-@#SCR 726
-        @IPS 41 22
-        @IPS 42 22
-                #GOTO 243
-                #NEWPOS 36 17
-                #DONE
-        @IPS 17 18
-                #GOTO 801
-                #NEWPOS 39 18
-                #DONE
-        @IPS 41 17
-                #NEWPOS 41 19
-                #GOTO 802
-                #DONE
-        @IPS 42 17
-                #NEWPOS 42 19
-                #GOTO 802
-                #DONE
-        @IPS 67 18
-                #NEWPOS 39 18
-                #GOTO 803
-                #DONE
-@END
-@#SCR 801
-        @IPS 39 19
-                #GOTO 726
-                #NEWPOS 17 19
-                #DONE
-        @IPS 55 9
-                #GOTO 881
-                #NEWPOS 54 10
-                #DONE
-@END
-@#SCR 321
-        @IPS 71 9
-                #WRITE
-                        `C`%Moorish Village -->
-                #DONE
-
-        @IPS 60 17
-                #NEWPOS 75 12
-                #WRITE
-                        `!`CWhat appears to be a warp...
-                #DONE
-
-        @IPS 74 12
-                #NEWPOS 61 17
-                #WRITE
-                        `!`CWhat appears to be a warp`F2C again...
-                #DONE
-@END
-
 
 @#SCR 2
 
@@ -211,8 +138,6 @@
                         `C`$"A warm and cozy barn..."
                 #DONE
 @END
-
-
 @#SCR 81
 
         @IPS 26 11
@@ -247,11 +172,11 @@
                 #DONE
 
         @IPS 32 7
-'                #WRITE
-'                        `C`2The Sign Reads:  Village of Stone Valley...
-'                #DONE
-        #RUNREF MOVE|MOVE.REF
+                #WRITE
+                        `C`2The Sign Reads:  Village of Stone Valley...
                 #DONE
+'        #RUNREF MOVE|MOVE.REF
+'                #DONE
          @IPS 65 17
                 #RUNREF TRAVELSTONE|MAIN.REF
                 #DONE
@@ -307,6 +232,12 @@
 @END
 
 @#SCR 163
+@IF TIME1 = 1 THEN
+#SET TIME1 = 2;
+#RUNREF RUNNING|HOTEL.REF
+#ENDIF1
+#DONE
+
         @IPS 44 10
                 #WRITE
                         `C`2<-- Hill Valley Bank    Hill Valley Travel Office -->
@@ -380,6 +311,60 @@
                         `C`$What looks like an old hospital is locked.. In the window you see nothing..
                 #DONE
 @END
+@#SCR 243
+        @IPS 36 16
+#RUNREF CASTLE|CASTLE.REF
+                 #DONE
+@END
+@#SCR 321
+        @IPS 71 9
+                #WRITE
+                        `C`%Moorish Village -->
+                #DONE
+
+        @IPS 60 17
+                #NEWPOS 75 12
+                #WRITE
+                        `!`CWhat appears to be a warp...
+                #DONE
+
+        @IPS 74 12
+                #NEWPOS 61 17
+                #WRITE
+                        `!`CWhat appears to be a warp`F2C again...
+                #DONE
+@END
+@#SCR 322
+        @IPS 33 13
+        @IPS 32 14
+        @IPS 33 14
+        @IPS 32 13
+                #WRITE
+                        `C`!What a wonderful place for a camp fire.
+                #DONE
+        @IPS 43 7
+                #WRITE
+                        `C`%The man`F2C although interested at your presence`F2C ignores you.
+                #DONE
+        @IPS 42 6
+        @IPS 45 6
+                #WRITE
+                        `C`%Mooooooooooooo!!!
+                #DONE
+        @IPS 25 13
+                #NEWPOS 40 15
+                #GOTO 804
+                #DONE
+        @IPS 42 12
+                #NEWPOS 40 15
+                #SET ENTERHOUSE = 1;
+                #GOTO 805
+                #DONE
+        @IPS 32 10
+                #NEWPOS 40 15
+                #GOTO 806
+                #DONE
+@END
 @#SCR 721
         @IPS 28 8
                 #IF ROOM = 1 THEN
@@ -414,7 +399,7 @@
                 #DONE
         @IPS 52 9
                 #WRITE
-                        `C`$"To many beds in this room..."
+                        `C`$"Too many beds in this room..."
                 #DONE
         @IPS 41 19
                 #GOTO 82
@@ -505,12 +490,114 @@
                 #DONE
         @IPS 33 13
                 #WRITE
-                        `C`2The sign reads:  "`%House condemmed`2"
+                        `C`!You find a Minigun on the table!
+                #SET WEAPONNAME =2 Minigun;
+                #SET WEAPONPOWER = 10000;
+                #SET WEAPONVALUE = 100000;
+'                #WRITE
+'                        `C`2The sign reads:  "`%House condemmed`2"
+                #DONE
+@END
+@#SCR 726
+        @IPS 41 22
+                #DECLARE EXITCASTLE
+                #SET EXITCASTLE = 41;
+                #GOTO 243
+                #NEWPOS 36 17
+                #DONE
+        @IPS 42 22
+                #DECLARE EXITCASTLE
+                #SET EXITCASTLE = 42;
+                #GOTO 243
+                #NEWPOS 36 17
+                #DONE
+        @IPS 17 18
+                #GOTO 801
+                #NEWPOS 39 18
+                #DONE
+        @IPS 41 17
+                #NEWPOS 41 19
+                #GOTO 802
+                #DONE
+        @IPS 42 17
+                #NEWPOS 42 19
+                #GOTO 802
+                #DONE
+        @IPS 67 18
+                #NEWPOS 39 18
+                #GOTO 803
+                #DONE
+@END
+@#SCR 801
+        @IPS 39 19
+                #GOTO 726
+                #NEWPOS 17 19
+                #DONE
+        @IPS 55 9
+                #GOTO 881
+                #NEWPOS 55 9
+                #DONE
+@END
+@#SCR 802
+        @IPS 41 20
+                #NEWPOS 41 18
+                #GOTO 726
+                #DONE
+        @IPS 42 20
+                #NEWPOS 42 18
+                #GOTO 726
+                #DONE
+@END
+@#SCR 803
+        @IPS 39 19
+                #GOTO 726
+                #NEWPOS 67 19
+                #DONE
+@END
+@#SCR 804
+        @IPS 48 9
+                #WRITE
+                        `C`!The bed seems to be broken. Darn.
+                #DONE
+        @IPS 36 12
+                #WRITE
+                        `C`!"I am a moor.  You are not.  Get out of my house, NOW!"
+                #DONE
+        @IPS 40 16
+                #NEWPOS 25 14
+                #GOTO 322
+                #DONE
+@END
+@#SCR 805
+@DO
+   #IF ENTERHOUSE = 1 THEN
+        #SET ENTERHOUSE = 0;
+        #WRITE
+                `C`!An old deserted hut.
+   #ENDIF
+@ENDDO
+        @IPS 40 16
+                #NEWPOS 42 13
+                #GOTO 322
+                #DONE
+@END
+@#SCR 806
+        @IPS 43 11
+                #WRITE
+                        `C`%The moor looks at you, strangely...
+                #DONE
+        @IPS 32 9
+                #WRITE
+                        `C`!The bed feels very comfortable...
+                #DONE
+        @IPS 40 16
+                #NEWPOS 32 11
+                #GOTO 322
                 #DONE
 @END
 @#SCR 881
-        @IPS 54 11
+        @IPS 55 11
                 #GOTO 801
-                #NEWPOS 55 10
+                #NEWPOS 55 11
                 #DONE
 @END

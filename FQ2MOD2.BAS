@@ -1,4 +1,7 @@
-DECLARE FUNCTION MonsterFunction! ()
+DECLARE FUNCTION LoadGame$ ()
+DECLARE FUNCTION SaveGame$ ()
+DECLARE FUNCTION SecretCode$ (code$)
+DECLARE FUNCTION MonsterFunction! (monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
 DECLARE FUNCTION crypt$ (tocrypt$)
 DECLARE FUNCTION inputer$ (screener)
 DECLARE FUNCTION exist! (file$)
@@ -10,15 +13,15 @@ DECLARE SUB printer (da, towrite$, jack)
 DECLARE SUB writer (towrite$)
 
 
-DIM ReferenceArray$(1000)
+DIM ReferenceArray$(1200)
 DIM realsavename$(75)
 DIM map(1920)
 DIM map2(1920)
-DIM opt(350)
-DIM SHARED settings$(500), reffile(1920)
-COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile()
-COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, s, w, defs, I, z, gdi, cgd, bg, rp, refpos, fileopened, thescreen1, theg
-COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562
+DIM opt(100)
+DIM SHARED settings$(500), reffile(1920), file$(5)
+COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile(), file$()
+COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, S, w, defs, I, z, gdi
+COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg
 
 SUB cole (pressed, toprint$, cole1$, fground, bground)
 
@@ -275,7 +278,7 @@ PRINT h$; SPC(0);
 END IF
 
 IF cole1$ = "G" THEN
-g$ = STR$(s)
+g$ = STR$(S)
 g$ = LTRIM$(RTRIM$(g$))
 PRINT g$; SPC(0);
  doposx = doposx + LEN(g$)
@@ -399,8 +402,7 @@ END FUNCTION
 
 SUB endscreen
 RANDOMIZE TIMER
-color$ = LTRIM$(RTRIM$(STR$(INT(RND * 7) + 1)))
-color$ = "`" + color$
+color$ = "`" + LTRIM$(RTRIM$(STR$(INT(RND * 7) + 1)))
 printer 1, color$ + "°°°°±±±²²²²`@`b" + RIGHT$(color$, 1) + "                                                          `b0" + color$ + "²²²²±±±°°°°", 1
 printer 1, color$ + "°°°°±±`8`b7ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»`b0" + color$ + "±±°°°°", 2
 printer 1, color$ + "°°°°±±`8`b7º                                                                  º`b0" + color$ + "±±°°°°", 3
@@ -438,9 +440,43 @@ END IF
 getouts:
 END FUNCTION
 
+SUB Help
+COLOR 7, 0: CLS
+refpos = 1
+findit13:
+data$ = inputer(0)
+        IF data$ = "--EOF--" THEN
+                        PRINT
+                        PRINT "The following error was detected... Cannot find @#HELP in REF file."
+                        PRINT
+                        CLOSE #8: COLOR 7, 0: END
+                        END IF
+        IF LEFT$(data$, 6) = "@#HELP" THEN
+                k = 1
+                GOTO invscr4
+        END IF
+GOTO findit13
+invscr4:
+iner1$ = inputer$(0)
+        IF iner1$ = "@END" THEN GOTO waiter6
+        IF iner1$ = "@NEXT" THEN GOTO nexter52
+                printer 0, iner1$, k
+                k = k + 1
+        GOTO invscr4
+waiter6:
+        LOCATE 1, 1, 0
+        I$ = INPUT$(1)
+        GOTO done65
+nexter52:
+        LOCATE 1, 1, 0
+        I$ = INPUT$(1)
+GOTO invscr4
+done65:
+END SUB
+
 FUNCTION inputer$ (screener)
 
-IF fileopened = 0 THEN OPEN "fqrefs.dat" FOR BINARY AS #13
+IF fileopened = 0 THEN OPEN "refs.dat" FOR BINARY AS #13
 fileopened = 1
 
 'IF monsters$ = "YES" THEN END
@@ -478,9 +514,169 @@ refpos = refpos + jk + 2
 inputer$ = LTRIM$(RTRIM$(data$))
 END FUNCTION
 
-FUNCTION MonsterFunction
+FUNCTION LoadGame$
+Null$ = CHR$(0)
+CLS : op = 1
+COLOR 10, 0: LOCATE 9, 30: PRINT "Load a Game..."
+COLOR 4, 0: LOCATE 17, 30: PRINT "Enter a Choice."
+loadgame1:
+COLOR 2, 0
+
+FOR gsx = 11 TO 15
+        LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+NEXT gsx
+
+COLOR 15, 0
+
+LOCATE op + 10, 30: PRINT realsavename$(op) + "..."
+
+DO
+        docheck$ = INKEY$
+LOOP WHILE docheck$ = ""
+
+SELECT CASE docheck$
+
+        CASE CHR$(27)
+                LoadGame$ = "2"
+                EXIT FUNCTION
+               'GOTO load
+ 
+        CASE CHR$(13)
+                IF op >= 1 AND op <= 5 THEN GOTO gameload1
+                LoadGame$ = "2"
+                EXIT FUNCTION
+                'GOTO load
+
+        CASE Null$ + CHR$(72)
+                IF op = 1 THEN op = 6
+                op = op - 1
+                GOTO loadgame1
+
+        CASE Null$ + CHR$(80)
+                IF op = 5 THEN op = 0
+                op = op + 1
+                GOTO loadgame1
+
+        CASE ELSE
+                GOTO loadgame1
+
+END SELECT
+gameload1:
+
+IF file$(op) <> "1" THEN GOTO loadgame1
+op$ = LTRIM$(RTRIM$(STR$(op - 1)))
+OPEN "SAVE" + op$ + ".DAT" FOR BINARY AS #2
+
+savename$ = SPACE$(15)
+monsters5$ = SPACE$(1)
+exper$ = SPACE$(8)
+S$ = SPACE$(8)
+h$ = SPACE$(8)
+x$ = SPACE$(8)
+y$ = SPACE$(8)
+w$ = SPACE$(8)
+record$ = SPACE$(8)
+rp$ = SPACE$(8)
+defs$ = SPACE$(8)
+hitmax$ = SPACE$(8)
+
+GET #2, 1, savename$
+GET #2, 16, exper$
+GET #2, 24, S$
+GET #2, 32, h$
+GET #2, 40, x$
+GET #2, 48, y$
+GET #2, 56, w$
+GET #2, 64, record$
+GET #2, 72, rp$
+GET #2, 80, defs$
+GET #2, 88, monsters5$
+GET #2, 89, hitmax$
+
+filespace = 98
+numrecords$ = SPACE$(1)
+GET #2, 97, numrecords$
+numrecords = ASC(crypt$(numrecords$))
+
+
+
+xb = 0
+nus = 1
+conte5:
+        IF xb = numrecords THEN GOTO done1
+        chra$ = SPACE$(1)
+                GET #2, filespace, chra$
+                        abx = ASC(crypt$(chra$))
+                        filespace = filespace + 1
+        cbx$ = SPACE$(abx)
+                GET #2, filespace, cbx$
+                        settings$(nus) = crypt$(cbx$): nus = nus + 1
+                        filespace = filespace + abx
+        data$ = SPACE$(1)
+                GET #2, filespace, data$
+                        filespace = filespace + 1
+        data3$ = SPACE$(ASC(crypt$(data$)))
+                GET #2, filespace, data3$
+                filespace = filespace + LEN(data3$)
+                settings$(nus) = crypt$(data3$): nus = nus + 1
+        xb = xb + 1
+GOTO conte5
+
+done1:
+settings$(nus) = "--END--": nus = nus + 1
+exper = CVD(crypt$(exper$))
+S = CVD(crypt$(S$))
+h = CVD(crypt$(h$))
+x = CVD(crypt$(x$))
+y = CVD(crypt$(y$))
+w = CVD(crypt$(w$))
+record = CVD(crypt$(record$))
+rp = CVD(crypt$(rp$))
+defs = CVD(crypt$(defs$))
+monsters5$ = crypt$(monsters5$)
+hitmax = CVD(crypt$(hitmax$))
+
+
+IF monsters5$ = "1" THEN monsters$ = "YES"
+IF monsters5$ = "0" THEN monsters$ = "NO"
+
+CLOSE #2
+LoadGame$ = "1"
+
+END FUNCTION
+
+FUNCTION MonsterFunction (monsb$, monsmn$, tosay1$, m1$, togetscore$, expertoget$)
 Null$ = CHR$(0)
 MonsterFunction = 0
+monster76 = 0
+IF monsb$ <> "" THEN
+        b = VAL(monsb$)
+        monster76 = 1
+        END IF
+IF monsmn$ <> "" THEN
+mn = VAL(monsmn$)
+monster76 = 1
+        END IF
+IF tosay1$ <> "" THEN
+tosay$ = tosay1$
+monster76 = 1
+        END IF
+IF m1$ <> "" THEN
+m$ = m1$
+monster76 = 1
+        END IF
+IF togetscore$ <> "" THEN
+togetscore = VAL(togetscore$)
+monster76 = 1
+        END IF
+IF expertoget$ <> "" THEN
+expertoget = VAL(expertoget$)
+monster76 = 1
+        END IF
+IF monster76 = 1 THEN GOTO monster
+
+
+
 OPEN "NOSCR.DAT" FOR INPUT AS #62
 INPUT #62, firstanswer$
         IF monsters$ = "YES" THEN GOTO ghb
@@ -658,7 +854,7 @@ COLOR 7, 0
 LOCATE 25, 1: PRINT STRING$(80, " "); SPC(0);
 LOCATE 24, 1: PRINT STRING$(80, " "); SPC(0);
 
-IF deg = 5 THEN
+IF monster76 = 1 THEN
         toset$ = "LASTMONSTER"
         tosetto$ = "0"
         cb562 = 0
@@ -760,7 +956,7 @@ consL:
                 COLOR 4, 1
                 PRINT "Dead"; SPC(0);
         END IF
-        IF b < 1 THEN s = s + togetscore
+        IF b < 1 THEN S = S + togetscore
         IF b < 1 THEN exper = exper + expertoget
         IF b < 1 THEN I$ = INPUT$(1)
         IF b < 1 THEN
@@ -779,7 +975,7 @@ IF b < 1 THEN
         LOCATE 25, 1: PRINT STRING$(80, " "); SPC(0);
 END IF
 
-IF b < 1 AND deg = 5 THEN
+IF b < 1 AND monster76 = 1 THEN
 toset$ = "LASTMONSTER"
 tosetto$ = "1"
 cb562 = 0
@@ -792,6 +988,8 @@ eofer131:
                 IF junk$ = toset$ THEN
                 settings$(nus) = tosetto$: nus = nus + 1
                 cb562 = 5
+                GOTO endnext131
+       
         END IF
         GOTO eofer131
 endnext131:
@@ -814,7 +1012,6 @@ GOTO m1hitf
 
 m1hitf:
 COLOR 14, 0
-a = INT(RND * 5) + 1
 
 nus = 1
 DO
@@ -832,9 +1029,12 @@ IF I$ = "ARMOURPOWER" THEN
 I$ = settings$(nus): nus = nus + 1
 LOOP
 
+'IF armour = 1 THEN a = INT(RND * FIX(armourpower / 10)) + 1
+'IF armour = 0 THEN
+a = INT(RND * 5) + 1
+
 t = mn
 
-'IF armour = 1 THEN t = mn' - armourpower
 IF armour = 1 THEN
         gx = INT(RND * FIX(armourpower / 6)) + 1
         bx = INT(RND * 2) + 1
@@ -844,14 +1044,6 @@ IF armour = 1 THEN
         END IF
 
 
-
-
-'IF armour = 0 THEN t = mn
-
-'IF z = 1 THEN t = mn - armour1power
-'IF z = 2 THEN t = mn - armour2power
-'IF z = 3 THEN t = mn - armour3power
-'IF z = 4 THEN t = mn - armour4power
 t = t - defs
 IF t < 0 THEN t = 0
 IF t = 0 THEN a = 0
@@ -895,7 +1087,7 @@ PRINT "You are deafeated... You Gold and Experience have been lowered unfortunat
 exper1 = FIX(exper / 10)
 exper = exper - exper1
 IF exper < 0 THEN exper = 0
-s = 0
+S = 0
 h = 10
 I$ = INPUT$(1)
 
@@ -903,7 +1095,7 @@ I$ = INPUT$(1)
         LOCATE 25, 1: PRINT STRING$(80, " "); SPC(0);
         LOCATE 24, 1: PRINT STRING$(80, " "); SPC(0);
 
-IF deg = 5 THEN
+IF monster76 = 1 THEN
 toset$ = "LASTMONSTER"
 tosetto$ = "0"
 cb562 = 0
@@ -939,6 +1131,7 @@ bg = 0
 screenmode = 0
 collor = 15
 IF da = 3 THEN bg = 1
+IF doposy > 25 THEN doposy = 1
 doposx = 1
 FOR gdi = 1 TO LEN(toprint$)
 d$ = LEFT$(toprint$, gdi)
@@ -983,6 +1176,7 @@ collor = bb
 END IF
 
 COLOR collor, bg
+IF doposy > 25 THEN doposy = 1
 
 bg1 = bg
 
@@ -1017,6 +1211,226 @@ IF da = 3 THEN PRINT
 'PRINT
 Ber = 0
 END SUB
+
+FUNCTION SaveGame$
+Null$ = CHR$(0)
+CLS
+ooo = 1
+COLOR 10, 0: LOCATE 9, 30: PRINT "Save a Game..."
+COLOR 4, 0: LOCATE 17, 30: PRINT "Enter a Choice."
+savegame1:
+COLOR 2, 0
+
+FOR gsx = 11 TO 15
+        LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+NEXT gsx
+COLOR 15, 0
+LOCATE ooo + 10, 30: PRINT realsavename$(ooo) + "..."
+
+DO
+        check$ = INKEY$
+LOOP WHILE check$ = ""
+
+        SELECT CASE check$
+      
+        CASE CHR$(27)
+                CLS
+                SaveGame$ = "2"
+                EXIT FUNCTION
+                'GOTO load
+      
+        CASE CHR$(13)
+                IF ooo >= 1 AND ooo <= 5 THEN GOTO overwrite1
+                SaveGame$ = "2"
+                EXIT FUNCTION
+                'GOTO load
+      
+        CASE Null$ + CHR$(72)
+                IF ooo = 1 THEN ooo = 6
+                ooo = ooo - 1
+                GOTO savegame1
+
+        CASE Null$ + CHR$(80)
+                IF ooo = 5 THEN ooo = 0
+                ooo = ooo + 1
+                GOTO savegame1
+
+        CASE ELSE
+                GOTO savegame1
+END SELECT
+
+saveover1:
+IF file$(ooo) <> "1" THEN GOTO saveover1notexist
+saveover = 1
+GOTO saveover1go
+
+overwrite1:
+IF file$(ooo) = "1" THEN GOTO zz
+
+GOTO saveover1
+zz:
+LOCATE 1, 1: COLOR 2, 0
+
+PRINT "Overwrite Existing Saved Game? Y/N"
+        I$ = INPUT$(1)
+        I$ = UCASE$(I$)
+                IF I$ = "Y" THEN pkd = 6
+                IF I$ = "Y" THEN GOTO saveover1
+SaveGame$ = "3"
+EXIT FUNCTION
+'GOTO savegame11
+
+saveover1notexist:
+saveover1go:
+CLS : COLOR 10, 0: LOCATE 9, 30: PRINT "Save a Game..."
+COLOR 4, 0: LOCATE 17, 30: PRINT "Enter a Choice."
+COLOR 2, 0
+
+FOR gsx = 11 TO 15
+IF ooo <> gsx - 10 THEN
+        LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+        END IF
+NEXT gsx
+
+LOCATE ooo + 10, 30
+
+savename$ = ""
+IF saveover = 1 THEN
+        saveover = 0
+        savename$ = realsavename$(ooo)
+        END IF
+
+COLOR 15, 0: LOCATE ooo + 10, 30: PRINT savename$; SPC(0);
+
+wordenter:
+
+DO
+        COLOR 15, 0: LOCATE , , 1, 6, 7
+        id$ = INKEY$
+LOOP WHILE id$ = ""
+
+
+IF id$ = CHR$(8) THEN
+        IF POS(0) = 30 THEN GOTO wordenter
+        LOCATE , POS(0) - 1, 1, 6, 7
+        PRINT " "; SPC(0);
+        LOCATE , POS(0) - 1, 1, 6, 7
+        asdf = LEN(savename$)
+        savename$ = LEFT$(savename$, asdf - 1)
+        GOTO wordenter
+END IF
+
+IF id$ = CHR$(13) THEN GOTO pressenter
+
+IF LEN(savename$) >= 15 THEN GOTO wordenter
+
+savename$ = savename$ + id$
+LOCATE , , 1, 6, 7
+PRINT id$; SPC(0);
+GOTO wordenter
+
+pressenter:
+IF savename$ = "" THEN savename$ = "NoName"
+IF savename$ = "Empty" THEN savename$ = "NoName"
+realsavename$(ooo) = savename$
+
+SHELL "IF EXIST SAVE" + LTRIM$(STR$(ooo)) + ".DAT DEL SAVE" + LTRIM$(STR$(ooo)) + ".DAT"
+
+ooo$ = LTRIM$(RTRIM$(STR$(ooo - 1)))
+OPEN "SAVE" + ooo$ + ".DAT" FOR BINARY AS #2
+IF monsters$ = "YES" THEN monsters5$ = "1"
+IF monsters$ = "NO" THEN monsters5$ = "0"
+
+exper$ = crypt$(MKD$(exper))
+S$ = crypt$(MKD$(S))
+h$ = crypt$(MKD$(h))
+x$ = crypt$(MKD$(x))
+y$ = crypt$(MKD$(y))
+w$ = crypt$(MKD$(w))
+record$ = crypt$(MKD$(record))
+rp$ = crypt$(MKD$(rp))
+defs$ = crypt$(MKD$(defs))
+monsters5$ = crypt$(monsters5$)
+hitmax$ = crypt$(MKD$(hitmax))
+
+toput$ = crypt$(savename$ + STRING$(15 - LEN(savename$), " "))
+PUT #2, 1, toput$
+PUT #2, 16, exper$
+PUT #2, 24, S$
+PUT #2, 32, h$
+PUT #2, 40, x$
+PUT #2, 48, y$
+PUT #2, 56, w$
+PUT #2, 64, record$
+PUT #2, 72, rp$
+PUT #2, 80, defs$
+PUT #2, 88, monsters5$
+PUT #2, 89, hitmax$
+
+records = 0
+nus = 1
+nexter4:
+IF settings$(nus) = "--END--" THEN GOTO nexter5
+nus = nus + 1
+records = records + 1
+GOTO nexter4
+
+nexter5:
+
+
+nus = 1
+records$ = crypt$(CHR$(records))
+
+
+PUT #2, 97, records$
+
+filespace = 98
+
+nnx = 0
+continue:
+IF nnx = records THEN GOTO done
+data$ = crypt$(RTRIM$(LTRIM$(settings$(nus)))): nus = nus + 1
+data1$ = crypt$(settings$(nus)): nus = nus + 1
+xb$ = crypt$(LTRIM$(CHR$(LEN(data$))))
+xb1$ = crypt$(LTRIM$(CHR$(LEN(data1$))))
+PUT #2, filespace, xb$
+filespace = filespace + 1
+PUT #2, filespace, data$
+filespace = filespace + ASC(crypt$(xb$))
+PUT #2, filespace, xb1$
+filespace = filespace + 1
+PUT #2, filespace, data1$
+filespace = filespace + ASC(crypt$(xb1$))
+nnx = nnx + 1
+GOTO continue
+
+done:
+
+CLOSE #2
+
+file$(ooo) = "1"
+
+SaveGame$ = "1"
+
+END FUNCTION
+
+FUNCTION SecretCode$ (code$)
+thecodenow$ = ""
+LOCATE y, x
+code$ = UCASE$(code$)
+FOR code = 1 TO LEN(code$)
+        letternow$ = MID$(code$, code, 1)
+                userinput$ = UCASE$(INPUT$(1))
+                        IF userinput$ <> letternow$ THEN
+                                SecretCode$ = userinput$
+                                EXIT FUNCTION
+                        END IF
+                        IF code = LEN(code$) AND userinput$ = letternow$ THEN
+                                SecretCode$ = "!!"
+                                EXIT FUNCTION
+                        END IF
+NEXT code
+END FUNCTION
 
 SUB setsettings
 reenterrg:
@@ -1077,7 +1491,7 @@ sgg:
 INPUT "INPUT Gold:", si$
 IF si$ = "" THEN GOTO cha
 si = VAL(si$)
-s = si
+S = si
 cha:
 'INPUT "INPUT Armour(1-4):", zi$
 'IF zi$ = "" THEN GOTO chw
@@ -1110,7 +1524,7 @@ IF bx$ = "EXPERIENCE" THEN settings$(nus) = STR$(exper)
 IF bx$ = "STRENGTH" THEN settings$(nus) = STR$(w)
 IF bx$ = "DEFENSE" THEN settings$(nus) = STR$(defs)
 IF bx$ = "HITPOINT" THEN settings$(nus) = STR$(h)
-IF bx$ = "GOLD" THEN settings$(nus) = STR$(s)
+IF bx$ = "GOLD" THEN settings$(nus) = STR$(S)
 IF bx$ = "WEAPON" THEN settings$(nus) = STR$(I)
 IF bx$ = "ARMOUR" THEN settings$(nus) = STR$(z)
 
