@@ -87,6 +87,7 @@ IF im >= LOF(98) THEN GOTO nx
         IF type$ = "1" THEN map(number) = 1
         IF type$ = "2" THEN map(number) = 2
         IF type$ = "3" THEN map(number) = 3
+        IF type$ = "4" THEN map(number) = 4
         im = im + 3481
                 LOCATE , 39: PRINT number; SPC(0);
         dicks = dicks + 1
@@ -115,6 +116,9 @@ loader1:
                                 END IF
                                 IF map(xcc) = 3 THEN
                                         COLOR 15, 7: PRINT " "; SPC(0);
+                                END IF
+                                IF map(xcc) = 4 THEN
+                                        COLOR 7, 2: PRINT CHR$(254); SPC(0);
                                 END IF
                         NEXT xcc
 
@@ -154,8 +158,19 @@ IF (mouseypos / 8) + 1 > 24 THEN
         END IF
 
 IF mousecontrol = 1 THEN
-        x23 = (mousexpos / 8) + 1
-        y23 = (mouseypos / 8) + 1
+        IF restarting = 0 THEN
+                x23 = (mousexpos / 8) + 1
+                y23 = (mouseypos / 8) + 1
+                END IF
+        IF restarting = 1 THEN
+                xpos = (x23 * 8) - 1
+                ypos = (y23 * 8) - 1: Mouse 2: Mouse 4
+                restarting = 0
+                END IF
+        IF y23 > 24 THEN y23 = 24
+        IF x23 > 80 THEN x23 = 80
+        IF y23 < 1 THEN y23 = 1
+        IF x23 < 1 THEN x23 = 1
         rp = ((y23 - 1) * 80) + x23
 IF rp <> oldrp THEN LOCATE 25, 74, 0: PRINT rp; SPC(0); STRING$(5 - LEN(LTRIM$(STR$(rp))), " "); SPC(0);
 
@@ -417,9 +432,12 @@ OPEN dddd$ FOR BINARY AS #1
 GOTO bbeeggiinn
 END IF
 
-y23 = FIX(rp / 80) + 1
-x23 = rp - ((y23 - 1) * 80)
-LOCATE y23, x23: mousecontrol = 0
+'y23 = FIX(rp / 80) + 1
+'x23 = rp - ((y23 - 1) * 80)
+'PRINT y23, x23: END
+'IF x23 = 0 THEN x23 = 80
+LOCATE y23, x23: 'mousecontrol = 0
+restarting = 1
 
 GOTO loader1
 DEL:
@@ -574,6 +592,13 @@ GOTO loader1
 END IF
 
 IF type$ = "3" THEN
+type$ = "4"
+map(rp) = 4
+PUT #1, lk, type$
+GOTO loader1
+END IF
+
+IF type$ = "4" THEN
 type$ = "1"
 map(rp) = 1
 PUT #1, lk, type$
@@ -824,6 +849,9 @@ COLOR 15, 1
 IF h$ = CHR$(1) THEN LOCATE 25, 30: PRINT "HARD"; SPC(0);
 IF h$ = CHR$(0) THEN LOCATE 25, 35: PRINT "SOFT"; SPC(0);
 harder = ASC(h$)
+COLOR f, b
+LOCATE 25, 43: PRINT gg$; SPC(0);
+oldf = f: oldb = b
 COLOR 7, 0
 
         DO
@@ -835,7 +863,19 @@ IF a$ = CHR$(27) THEN EXIT DO
         IF mouseleftbutton = -1 AND (mousexpos / 8) + 1 > 17 AND (mousexpos / 8) + 1 < 26 THEN b = processcolor((mousexpos / 8) + 1)
         IF mouseleftbutton = -1 AND (mousexpos / 8) + 1 > 29 AND (mousexpos / 8) + 1 < 34 THEN h$ = CHR$(1)
         IF mouseleftbutton = -1 AND (mousexpos / 8) + 1 > 34 AND (mousexpos / 8) + 1 < 39 THEN h$ = CHR$(0)
-       
+      
+
+IF f <> oldf THEN
+        COLOR f, b
+        LOCATE 25, 43: PRINT gg$; SPC(0);
+        oldf = f
+END IF
+
+IF b <> oldb THEN
+        COLOR f, b: LOCATE 25, 43: PRINT gg$; SPC(0);
+        oldb = b
+END IF
+
 IF ASC(h$) <> harder THEN
         COLOR 7, 0
         LOCATE 25, 30: PRINT "HARD"; SPC(0);
@@ -849,7 +889,7 @@ END IF
         LOCATE (mouseypos / 8) + 1, (mousexpos / 8) + 1, 1
 
         LOOP WHILE (mouseypos / 8) + 1 = 25
-        LOCATE 25, 1: COLOR 7, 0: PRINT STRING$(50, " "); SPC(0);
+        LOCATE 25, 1: COLOR 7, 0: PRINT STRING$(55, " "); SPC(0);
         ypos = (22 * 8) - 1
         xpos = mousexpos: Mouse 2
         END IF
@@ -921,7 +961,7 @@ cints:
 gs$ = INPUT$(1)
 
 IF gs$ = CHR$(8) THEN
-IF LEN(thecode$) > 0 THEN
+IF LEN(thecode$) >= 0 THEN
 thecode$ = LEFT$(thecode$, LEN(thecode$) - 1)
 LOCATE , POS(0) - 1: PRINT " "; SPC(0); : LOCATE , POS(0) - 1
 END IF
@@ -931,7 +971,7 @@ END IF
 IF gs$ = CHR$(13) THEN GOTO dos
 IF gs$ = CHR$(27) THEN GOTO begin
 IF LEN(thecode$) = 3 THEN GOTO cints
-IF VAL(gs$) <> 0 THEN
+IF VAL(gs$) >= 0 THEN
 PRINT gs$; SPC(0);
 thecode$ = thecode$ + gs$
 END IF

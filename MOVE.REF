@@ -1,0 +1,252 @@
+@#MOVE
+'                #CLS
+#SHOW ONE.HHS|MOVE
+#PRINT 1
+`X57`Y02`0`F06
+#DECLARE RECORD
+#DECLARE OLDMANX
+#DECLARE OLDMANY
+#DECLARE DIRECTION
+#DECLARE NOCLIP
+#SET NOCLIP = 0;
+#SET OLDMANX = MANX;
+#SET OLDMANY = MANY;
+#PRINT 4
+`b1`Y23`X01`L77`X01
+`1`b0`X01`Y23`FB0`FB1
+`C`%`b1`Y23Final Quest 2 -- By AkoriSoft -- HP (`vHITPOINT`/`vMAXENERGY`) -- Gold: `vGOLD`!
+`1`b0`Y23`X78`FB1`FB0
+                @#REDO
+#SET RECORD = MANY;
+#SET RECORD - 1;
+#SET RECORD * 79;
+#SET RECORD + MANX;
+#PRINT 1
+`X01`Y01`7`b0X:`vMANX` Y:`vMANY` Rec:`vRECORD``F20
+#PRINT 1
+`X47`Y01`7`b0Reference File Example: MOVE.REF
+#PRINT 1
+`X:OLDMANX;`Y:OLDMANY; `b0
+#PRINT 1
+`X:MANX;`Y:MANY;`$`F01`X:MANX;`Y:MANY;
+#SET OLDMANX = MANX;
+#SET OLDMANY = MANY;
+#GETCHAR 1
+        #IF LASTCHAR = 86 THEN
+        #IF NOCLIP = 1 THEN
+                #SET NOCLIP = 0;
+                @GOTO REDO
+                #ENDIF
+        #IF NOCLIP = 0 THEN
+                #SET NOCLIP = 1;
+                @GOT REDO
+                #ENDIF
+        #ENDIF
+        #IF LASTCHAR = 72 THEN
+        #SET MANY - 1;
+#SET DIRECTION = 1;
+@GOTO HARD
+@#RETURNUP
+        #IF MANY = 0 THEN
+                #SET MANY + 1;
+        #ENDIF
+        #IF MANX = 57 THEN
+                #IF MANY = 2 THEN
+                #SET MANY + 1;
+                #ENDIF
+        #ENDIF
+        #ENDIF
+        #IF LASTCHAR = 80 THEN
+        #SET MANY + 1;
+#SET DIRECTION = 2;
+@GOTO HARD
+@#RETURNDOWN
+        #IF MANY = 23 THEN
+                #SET MANY - 1;
+        #ENDIF
+        #IF MANX = 57 THEN
+                #IF MANY = 2 THEN
+                #SET MANY - 1;
+                #ENDIF
+        #ENDIF
+        #ENDIF
+        #IF LASTCHAR = 75 THEN
+        #SET MANX - 1;
+#SET DIRECTION = 3;
+@GOTO HARD
+@#RETURNLEFT
+        #IF MANX = 0 THEN
+                #SET MANX + 1;
+        #ENDIF
+        #IF MANX = 57 THEN
+                #IF MANY = 2 THEN
+                #SET MANX + 1;
+                #ENDIF
+        #ENDIF
+        #ENDIF
+        #IF LASTCHAR = 77 THEN
+        #SET MANX + 1;
+#SET DIRECTION = 4;
+@GOTO HARD
+@#RETURNRIGHT
+
+        #IF MANX = 80 THEN
+                #SET MANX - 1;
+        #ENDIF
+        #IF MANX = 57 THEN
+                #IF MANY = 2 THEN
+                #SET MANX - 1;
+                #ENDIF
+        #ENDIF
+        #ENDIF
+        #IF LASTCHAR = 27 THEN
+        @GOTO DONES
+        #ENDIF
+
+                @GOTO REDO
+                @#DONES
+
+@END
+
+
+@#HARD
+#IF NOCLIP = 1 THEN
+@GOTO GETOUT
+#ENDIF
+#IF MANX = 59 THEN
+     #IF MANY = 9 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 11 THEN
+     #IF MANY = 11 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 12 THEN
+     #IF MANY = 11 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 13 THEN
+     #IF MANY = 11 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 61 THEN
+     #IF MANY = 11 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 11 THEN
+     #IF MANY = 13 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 12 THEN
+     #IF MANY = 13 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 13 THEN
+     #IF MANY = 13 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 15 THEN
+     #IF MANY = 13 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 60 THEN
+     #IF MANY = 13 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 10 THEN
+     #IF MANY = 15 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 12 THEN
+     #IF MANY = 15 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 14 THEN
+     #IF MANY = 15 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 61 THEN
+     #IF MANY = 15 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 63 THEN
+     #IF MANY = 15 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 11 THEN
+     #IF MANY = 17 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 13 THEN
+     #IF MANY = 17 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 16 THEN
+     #IF MANY = 17 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 59 THEN
+     #IF MANY = 17 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 62 THEN
+     #IF MANY = 17 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+#IF MANX = 17 THEN
+     #IF MANY = 19 THEN
+             @GOTO ITISHARD
+     #ENDIF
+#ENDIF
+@GOTO GETOUT
+@#ITISHARD
+#IF DIRECTION = 1 THEN
+        #SET MANY + 1;
+        #ENDIF
+#IF DIRECTION = 2 THEN
+        #SET MANY - 1;
+        #ENDIF
+#IF DIRECTION = 3 THEN
+        #SET MANX + 1;
+        #ENDIF
+#IF DIRECTION = 4 THEN
+        #SET MANX - 1;
+        #ENDIF
+@#GETOUT
+#IF DIRECTION = 1 THEN
+        @GOTO RETURNUP
+        #ENDIF
+
+#IF DIRECTION = 2 THEN
+        @GOTO RETURNDOWN
+        #ENDIF
+
+#IF DIRECTION = 3 THEN
+        @GOTO RETURNLEFT
+        #ENDIF
+
+#IF DIRECTION = 4 THEN
+        @GOTO RETURNRIGHT
+        #ENDIF
+
+@END

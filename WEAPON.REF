@@ -1,52 +1,192 @@
 @#ARMOR
 #CLS
-#PRINT 6
+#PRINT 13
 `%Welcome to Riply's `!A`#r`!m`#o`!u`#r`% Shop!!
 `%I sell the best armor... `$GUARANTEED!!!
+
+`2We have:
+
+`%A Heavy Coat for `$$100`%.
+`%Chain Mail for `$$500`%.
+`%Death Armour for `$$1000`%.
 
 `2You have `$$`g`2.
 
 `4Your Choice:
 
+#CHOICE 3
+Buy New Armour
+Sell Old Armour
+Leave
+#IFCHOICE 3
+@GOTO GETOUT1
+@DONE
+#IFCHOICE 2
+@GOTO SELLOLD
+@DONE
+#IFCHOICE 1
+@GOTO BUYNEW
+@DONE
+@DONECHOICE
+@GOTO ARMOUR
+@#GETOUT1
+@END
+
+@#SELLOLD
+#IF ARMOURPOWER = 0 THEN
+#CLS
+        #PRINT 3
+`2You have no armour to sell!!
+
+`0<`2Continue`0>
+#WAIT 1
+@GOTO ARMOUR
+#ENDIF
+
+#DECLARE OLDARMVALUE
+#DECLARE VARIABLE
+#SET OLDARMVALUE = ARMOURVALUE;
+#SET OLDARMVALUE / 10;
+#FIX OLDARMVALUE
+#SET VARIABLE = ARMOURVALUE;
+#SET VARIABLE - OLDARMVALUE;
+#DELETE OLDARMVALUE
+#CLS
+#PRINT 3
+
+`2Ok...  I would have to say your armour's value is now `$$`vVARIABLE``2.
+`2You still want to sell it?
+#CHOICE 2
+Yes
+No
+#IFCHOICE 2
+@DONE
+#IFCHOICE 1
+#PRINT 2
+
+
+#SET GOLD + VARIABLE;
+#DELETE ARMOURNAME
+#SET ARMOURVALUE = 0;
+#SET ARMOURPOWER = 0;
+#PRINT 3
+`!Ok!!! `2Done.  You have now sold your armour.
+
+`0<`2Continue`0>
+#WAIT 1
+@DONE
+@DONECHOICE
+@GOTO ARMOUR
+@END
+
+
+@#BUYNEW
+#IF ARMOURPOWER <> 0 THEN
+#CLS
+        #PRINT 3
+`2You already have an armour!!!  You must sell it first!!!
+
+`0<`2Continue`0>
+#WAIT 1
+@GOTO ARMOUR
+#ENDIF
+
+#CLS
+#PRINT 8
+`2Hello!  I have three different types of armours that you might be interested
+`2in!!
+
+`2I have a `%Heavy Coat`2 for `$$100`2.
+`2I have some `%Chain Mail`2 for `$$500`2.
+`2I have some `%Death Armour`2 for `$$1000`2.
+
+`2Your Choice:
 #CHOICE 4
 Buy Heavy Coat
 Buy Chain Mail
 Buy Death Armour
 Get outa here...
-#IF 1
-#CLS
-#PRINT 3
-`#A heavy coat for 100 Gold... Here.. try it...
-
-`#Press a key
-#WAIT
-#GOLD- 100
-#ARMOR 2
+#IFCHOICE 4
 @DONE
-#IF 2
+#IFCHOICE 3
 #CLS
-#PRINT 3
-`#A Chainmail for 500 Gold... Here.. try it...
+        #IF GOLD < 1000 THEN
+#PRINT 4
+`2So you want to try out some of our expensive `%Death Armour`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
 
-`#Press a key
-#WAIT
-#GOLD- 500
-#ARMOR 3
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 1000 THEN
+#SET GOLD - 1000;
+#SET ARMOURNAME =2 Death Armour;
+#SET ARMOURVALUE = 1000;
+#SET ARMOURPOWER = 150;
+#PRINT 3
+`2The main helps you into your new armour.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
 @DONE
-#IF 3
+#IFCHOICE 2
 #CLS
-#PRINT 3
-`#Death Armour for 1000 Gold... Here.. try it...
+        #IF GOLD < 500 THEN
+#PRINT 4
+`2So you want to try out some of our expensive `%Chain Mail`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
 
-`#Press a key
-#WAIT
-#GOLD- 1000
-#ARMOR 4
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 500 THEN
+#SET GOLD - 500;
+#SET ARMOURNAME =2 Chain Mail;
+#SET ARMOURVALUE = 500;
+#SET ARMOURPOWER = 100;
+#PRINT 3
+`2The main helps you into your new armour.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
 @DONE
-#IF 4
+#IFCHOICE 1
+#CLS
+        #IF GOLD < 100 THEN
+#PRINT 4
+`2So you want to try out one of our expensive `%Heavy Coat's`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
+
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 100 THEN
+#SET GOLD - 100;
+#SET ARMOURNAME =2 Heavy Coat;
+#SET ARMOURVALUE = 100;
+#SET ARMOURPOWER = 50;
+#PRINT 3
+`2The main helps you into your new armour.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
 @DONE
 @DONECHOICE
+@GOTO ARMOUR
 @END
+
 
 
 @#WEAPON
@@ -62,42 +202,175 @@ Get outa here...
 `2You have `$`g`2 gold...
 
 `4Your Choice:
-#CHOICE 4
-Buy chaingun
-Buy RPG
-Buy shotgun
-Get outa here...
-#IF 1
-#CLS
-#PRINT 3
-`#A chaingun for 5000 Gold... Here.. try it...
-
-`#Press a key
-#WAIT
-#GOLD- 5000
-#WEAPON 3
+#CHOICE 3
+Buy New Weapon
+Sell Old Weapon
+Leave
+#IFCHOICE 3
+@GOTO GETOUT2
 @DONE
-#IF 2
-#CLS
-#PRINT 3
-`#An RPG for 20000 Gold... Here.. try it...
-
-`#Press a key
-#WAIT
-#GOLD- 20000
-#WEAPON 4
+#IFCHOICE 2
+@GOTO SELLOLD1
 @DONE
-#IF 3
-#CLS
-#PRINT 3
-`#A shotgun for 1000 Gold... Here.. try it...
-
-`#Press a key
-#WAIT
-#GOLD- 1000
-#WEAPON 2
-@DONE
-#IF 4
+#IFCHOICE 1
+@GOTO BUYNEW1
 @DONE
 @DONECHOICE
+@GOTO ARMOUR
+@#GETOUT2
+@END
+
+@#SELLOLD1
+#IF WEAPONPOWER = 0 THEN
+#CLS
+        #PRINT 3
+`2You have no weapon to sell!!
+
+`0<`2Continue`0>
+#WAIT 1
+@GOTO WEAPON
+#ENDIF
+
+#DECLARE OLDARMVALUE
+#DECLARE VARIABLE
+#SET OLDARMVALUE = WEAPONVALUE;
+#SET OLDARMVALUE / 10;
+#FIX OLDARMVALUE
+#SET VARIABLE = WEAPONVALUE;
+#SET VARIABLE - OLDARMVALUE;
+#DELETE OLDARMVALUE
+#CLS
+#PRINT 3
+
+`2Ok...  I would have to say your weapon's value is now `$$`vVARIABLE``2.
+`2You still want to sell it?
+#CHOICE 2
+Yes
+No
+#IFCHOICE 2
+#DELETE VARIABLE
+@DONE
+#IFCHOICE 1
+#PRINT 2
+
+
+#SET GOLD + VARIABLE;
+#DELETE WEAPONNAME
+#SET WEAPONVALUE = 0;
+#SET WEAPONPOWER = 0;
+#PRINT 3
+`!Ok!!! `2Done.  You have now sold your weapon.
+
+`0<`2Continue`0>
+#WAIT 1
+@DONE
+@DONECHOICE
+@GOTO WEAPON
+@END
+
+
+@#BUYNEW1
+#IF WEAPONPOWER <> 0 THEN
+#CLS
+        #PRINT 3
+`2You already have a weapon!!!  You must sell it first!!!
+
+`0<`2Continue`0>
+#WAIT 1
+@GOTO WEAPON
+#ENDIF
+
+#CLS
+#PRINT 8
+`2Hello!  I have three different types of weapons that you might be interested
+`2in!!
+
+`2I have a `%Shotgun`2 for `$$1000`2.
+`2I have some `%Chain Gun`2 for `$$5000`2.
+`2I have some `%RPG`2 for `$$10000`2.
+
+`2Your Choice:
+#CHOICE 4
+Buy Shotgun
+Buy Chain Gun
+Buy RPG
+Get outa here...
+#IFCHOICE 4
+@DONE
+#IFCHOICE 3
+#CLS
+        #IF GOLD < 10000 THEN
+#PRINT 4
+`2So you want to try out one of our expensive `%RPG's`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
+
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 10000 THEN
+#SET GOLD - 10000;
+#SET WEAPONNAME =2 RPG;
+#SET WEAPONVALUE = 10000;
+#SET WEAPONPOWER = 500;
+#PRINT 3
+`2The main helps you strap your new weapon to your back.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+@DONE
+#IFCHOICE 2
+#CLS
+        #IF GOLD < 5000 THEN
+#PRINT 4
+`2So you want to try out one of our expensive `%Chain Gun's`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
+
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 5000 THEN
+#SET GOLD - 5000;
+#SET WEAPONNAME =2 Chain Gun;
+#SET WEAPONVALUE = 5000;
+#SET WEAPONPOWER = 250;
+#PRINT 3
+`2The main helps you strap your new weapon to your back.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+@DONE
+#IFCHOICE 1
+#CLS
+        #IF GOLD < 1000 THEN
+#PRINT 4
+`2So you want to try out one of our expensive `%Shotgun's`2`F2C do you?
+`2Well`F2C you're going to have to have the cash!!
+
+`2Sorry`F2C but you don't.  Come back later.  `0<`2Continue`0>
+#WAIT 1
+#ENDIF
+
+
+        #IF GOLD >= 1000 THEN
+#SET GOLD - 1000;
+#SET WEAPONNAME =2 Shotgun;
+#SET WEAPONVALUE = 1000;
+#SET WEAPONPOWER = 100;
+#PRINT 3
+`2The main helps you strap your new weapon to your back.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+@DONE
+@DONECHOICE
+@GOTO WEAPON
 @END

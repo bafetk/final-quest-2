@@ -1,3 +1,33 @@
+Version Changes (04/01/01) 094 Rev B
+
+Hey!! I put all the Save Game and Load Game routines in a function in
+the second module so that they wouldn't clutter up the main module. I also
+renamed all the FQMAPS.DAT etc to MAPS.DAT etc like in QFP.  I updated
+LEVEL.EXE for this as well.  I went through and tried to organize the
+code.  I don't know... I don't think I'll ever be able to completely
+organize it. :-).. Anyway.......
+
+Version Changes (03/25/01) 094 Rev B
+
+Ok, I haven't been updating in a while, but here goes.  I revamped the
+Monster Routines, so they are more sound.  Also, I completely changed the
+weapon and armour routines.  You can now have as many armours and weapons
+as you like.  I am planning to fix the #MONSTER routine now.. so... bye!
+
+Version Changes (03/07/01) Rev 094
+
+Well.  I did something that I never thought possible in a million and
+one years.  I broke the FQ2.BAS Module up to FQ2MOD1.BAS and FQ2MOD2.BAS,
+soon to be renamed FQ2.BAS AND FQ2MOD2.BAS.  I can't believe it.  I can
+once again compile the program using the original QB45 compiler.  I no
+longer have to use the program that I made to do it.  It is SO COOL!  Any
+way,  this allows for unlimited expansion, as long as I limit my additions
+to the main module.  I guess this is a good thing... So for that reason, I
+upped the version.  It is now Rev 094.  We are coming closer and closer
+to completion, but on the other hand, I have been programming this thing
+for like 4 years so I don't think it will ever end.  But that is ok
+because it gives me something to do.
+
 Version Changes (03/03/01) 093 Rev E
 
 Ok, heres the deal..  I changed some mega things...  First, I completely
@@ -31,7 +61,7 @@ bye!!!
 Version Changes (02/25/01) 093 Rev C
 
 I tried to get the code to be more organized.  Also, I added the FIX,
-DECLARE, and GETCHAR functions.
+DECLARE, and GETCHAR reference functions.
 
 Version Changes (02/19/01) 093 Rev B
 
@@ -60,7 +90,7 @@ Version Changes (12/10/98) 090 Rev D
 Version Changes (11/26/98) 090 Rev B
 Version Changes (10/16/98) 090 Rev B
 
-Version Changes (08/06/98) 090 Rev A/B
+Version Changes (08/06/98) 090 Rev A/B     /* it is 1.0B in the BAS */
 
 Initial.  I am writing this on 2/17/01, but I just had to write something
 here..  This was the very first time that I thought of Final Quest 2. I

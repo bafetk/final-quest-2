@@ -1,9 +1,9 @@
 AkoriSoft
 Akori Software
 Final Quest 2
-V0.93
-V0.93
-Rev A
+V0.94
+V0.94
+Rev B
 NO
 3
 250
@@ -13,26 +13,8 @@ NO
 11
 10
 10
-1
-1
 721
 82
-Stick
-Shotgun
-Chaingun
-RPG
-Vest
-Heavy Coat
-Chain Mail
-Death Armour
-1
-100
-300
-500
-1
-100
-300
-500
 ROOM
 0
 GOLD1
@@ -51,3 +33,9 @@ MANX
 10
 MANY
 10
+PASSWORD
+0
+OLDMAN
+0
+WEAPONNAME
+Stick

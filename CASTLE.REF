@@ -1,0 +1,16 @@
+@#CASTLE
+#IF PASSWORD = 0 THEN
+#SET PASSWORD = 1;
+#CLS
+#PRINT 5
+`%A guard says...
+`!GUESS WHAT!!!!  `2This castle has never been discovered, until now!!!
+
+`2You are the lucky guy who gets to make it his home!
+`0<`2Continue`0>
+#SLEEP 2
+#WAIT
+#ENDIF
+#GOTO 726
+#NEWPOS 41 21
+@END

@@ -1,6 +1,9 @@
 Here is a list of functions, examples, and instructions to get
 you started with REF programming.
 
+Update (03/23/01):  This file is slightly outdated, but most of the
+way functions are shown in here should work the way that they are shown.
+
 All commands MUST be capitalized in the REF file. Use a text editor.
 
 Contents:
@@ -19,8 +22,8 @@ Section 2
         4. #CLS
         5. #PRINT
         6. #GOLD+,-
-        7. #WEAPON,+,-
-        8. #ARMOR,+,-
+        7. Weapon Routines
+        8. Armour Routines
         9. #CHOICE
        10. #WRITE
        11. #RETURN
@@ -44,7 +47,7 @@ Section 2
        29. #INPUT
        30. #FIX
        31. #GETCHAR
-               
+       32. #DELETE
 
     B. @#INTRO, @#INVSCR, @#HELP, @#MAP
 
@@ -173,42 +176,36 @@ enough gold.  If the user doesn't, then it will simply print to the screen
 "Not enough gold, press a key..."
 
 
-7. #WEAPON, #WEAPON+, #WEAPON-
+7. Weapon Routines  //REPLACING #WEAPON,+,-//
 
-Syntax:
+Use the #SET command to set the WEAPONNAME, WEAPONVALUE, and WEAPONPOWER
+statements.  The WEAPONNAME statement is what is displayed when a ref
+file invokes the `I function.  WEAPONVALUE does not need to be used, but
+you can use it if you want to keep tabs on how much your weapon costs.
+WEAPONPOWER is what the MonsterFunction Function in FQ2 uses to determine
+your weapons usefullness in battle.
 
-#WEAPON #
+NOTE:  When using WEAPONNAME, use  #SET ### =2 ###;
 
-    Use this to change a users weapon from 1-4, one being the weakest, 4
-being the strongest.
-
-#WEAPON+ #
-
-    Use this to add # to the weapon for instance, weapon 1 + 3 = weapon 4
-
-#WEAPON- #
-
-    Use this to subtract # from the weapon for instance,
-    weapon 3 - 1 = weapon 2
+where ### is a variable or string.
+use =2 so that the weapon is in the CASE that your have it in the ref
+file.
 
 
-8. #ARMOR, #ARMOR+, #ARMOR-
+7. Armour Routines  //REPLACING #ARMOUR,+,-//
 
-Syntax:
+Use the #SET command to set the ARMOURNAME, ARMOURVALUE, and ARMOURPOWER
+statements.  The ARMOURNAME statement is what is displayed when a ref
+file invokes the `Z function.  ARMOURVALUE does not need to be used, but
+you can use it if you want to keep tabs on how much your armour costs.
+ARMOURPOWER is what the MonsterFunction Function in FQ2 uses to determine
+your armours usefullness in battle.
 
-#ARMOR #
+NOTE:  When using ARMOURNAME, use  #SET ### =2 ###;
 
-    Use this to change a users armor from 1-4, one being the weakest, 4
-being the strongest.
-
-#ARMOR+ #
-
-    Use this to add the armor number, for instance armor 3 + 1 = armor 4
-
-#ARMOR- #
-
-    Use this to subtract the armor number, for instance armor 3 - 1 = armor 2
-
+where ### is a variable or string.
+use =2 so that the armour is in the CASE that your have it in the ref
+file.
 
 
 9. #CHOICE
@@ -356,7 +353,7 @@ Syntax:
 
 Syntax:
 
-#SET ## +,-,=,+1,-1,=1 ##;
+#SET ## +,-,=,+1,-1,=1,=2,+2 ##;
 
     Use to set a variable in the game.  For instance...
 
@@ -368,6 +365,8 @@ Syntax:
 =1 = Set variable on left to VARIABLE on right
 -1 = Subtract from variable on left the value of the variable on right
 +1 = Add to variable on left the value of the variable on right
+=2 = Set Variable on left to string on right
++2 = Concanterate Variable string with string on right.
 
 17.  #IF
 
@@ -577,6 +576,17 @@ his decision, and a 0 is for a cursor not to be blinking.  The character
 returned by the user is returned as the variable LASTCHAR.
 
 
+32. #DELETE
+
+Syntax:
+
+#DELETE ####
+
+where #### is some setting.
+
+Use this to delete a setting that you created with DECLARE, or set with
+SET.
+
 
 ------------------------------------------------------------------------------
 B. @#INTRO, @#INVSCR, @#HELP, @#MAP
@@ -724,7 +734,7 @@ A = Show's Attack...
 D = Show's Defense...
 I = Show's Weapon Name
 Z = Show's Armor Name
-
+? = Show's game Version and Revision
 
 The "`v" function...
 

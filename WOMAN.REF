@@ -10,9 +10,9 @@
 #CHOICE 2
 Say yes`F2C that would be nice...
 Leave this putrit house...
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
 #CLS
 #PRINT 3
 `2You think to yourself`F2C `$Mabye this isn't such a good idea... It looks
@@ -21,7 +21,7 @@ Leave this putrit house...
 #CHOICE 2
 Drink it anyway...
 Don't Drink it`F2C Leave.. fast...
-#IF 1
+#IFCHOICE 1
 #PRINT 1
 `Y08`!Here goes...
 #WAIT
@@ -35,7 +35,7 @@ Don't Drink it`F2C Leave.. fast...
 #MAXENERGY
 #WAIT
 @DONE
-#IF 2
+#IFCHOICE 2
 #PRINT 1
 `Y08`2The woman says`F2C `@"Ok`F2C that's fine..." `2Press a key...
 #WAIT

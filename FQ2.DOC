@@ -1,5 +1,5 @@
                                 Final Quest 2
-                                   V0.93
+                                   V0.94
 
                           Created by Akori Software
 
@@ -25,7 +25,7 @@ working on.  I started my quest and only seven days later, on 6-28-98, I
 came out with Final Quest Version 1.0.  The only problem with that world
 was that you could not go explore any other screens in any way.  I created
 six different versions, all with the disappointment of not being able to let
-people go onto other screens.  This is why I created final quest 2.  The
+people go onto other screens.  This is why I created Final Quest 2.  The
 whole purpose is to let people explore the world that I, or you, had created
 for them.
 
@@ -55,61 +55,40 @@ VAR.EXE -- Uses EDIT.COM to edit VARIABLE.DAT
 REFEDIT.EXE -- Uses EDIT.COM to edit FQREFS.DAT
 LEVEL.EXE -- Uses FQ2LEVEL Engine to edit FQMAPS.DAT
 
-The below information is unrealiable...
-
+Update (03/23/01):  I have redone the below, so it is accurate.
 
 VARIABLE.DAT
 
-AkoriSoft        ;Name of Company, to appear on INFO bar...
-Akori Software   ;Name of Company, to appear on Main Menu screen and help menu.
-Final Quest 2    ;Name of Game
-V0.9             ;Version of Game without revision letter
-V0.9H            ;Version of Game with revision letter
-Rev H            ;Game Revision
-250              ;Starting hitpoints
-0                ;Starting score
-11               ;Starting x
-18               ;Starting y
-10               ;Starting strength
-10               ;Starting defense
-1                ;Starting weapon 1-4
-1                ;Starting armour 1-4
-721              ;Starting screen 1-1920
-82               ;Starting Map screen 1-1920
-Stick            ;Weapon 1
-Shotgun          ;Weapon 2
-Chaingun         ;Weapon 3
-RPG              ;Weapon 4
-Vest             ;Armour 1
-Heavy Coat       ;Armour 2
-Chain Mail       ;Armour 3
-Death Armour     ;Armour 4
-1                ;Strength of Weapon 1
-100              ;Strength of Weapon 2
-300              ;Strength of Weapon 3
-500              ;Strength of Weapon 4
-1                ;Strength of Armour 1
-100              ;Strength of Armour 1
-300              ;Strength of Armour 1
-500              ;Strength of Armour 1
-HEART           ;Variable.. Can have as many for game as you want...
-1               ;Variable Data...  Can be Number or Word.
+AkoriSoft               ;Short name of Developing Company.
+Akori Software          ;Name of Developing Company.
+Final Quest 2           ;Name of Game
+V0.94                   ;Version Display #1
+V0.94                   ;Version Display #2
+Rev A                   ;Game Revisions
+NO                      ;Start as Superhuman... I'm not sure, don't ask. :-)
+3                       ;Divide all Damage to a superhuman by #
+250                     ;Starting Hitpoint
+250                     ;Starting Max Hitpoints
+50                      ;Starting Gold
+33                      ;Starting X
+11                      ;Starting Y
+10                      ;Starting Strength
+10                      ;Starting Defense
+721                     ;Starting Screen
+82                      ;Where little face blinks on MAP SCREEN. (m)
+HEART                   ;Variable.. Can have as many for game as you want...
+1                       ;Variable Data...  Can be Number or Word.
 
 
-The below information is unrealiable...
+Update (03/23/01):  I have redone the below, so it is accurate.
 
 NOSCR.DAT
 
-YES             ;Monsters?, YES/NO
-91              ;Screen where no monsters attack player
-92              ;Screen where no monsters attack player
-93              ;Screen where no monsters attack player
-12              ;Screen where no monsters attack player
-16              ;Screen where no monsters attack player
-23              ;Screen where no monsters attack player
-32              ;Screen where no monsters attack player
-------  THE LINE BELOW STAYS!!!! IMPORTANT!!!  ------
-1921            ;End Screens.. This LINE MUST STAY!
+NO                              ;Monsters at begin of game?, YES/NO
+725;721;722;723                 ;Screens where no monsters attack.
+724;82;86;163                   ;Screens where no monsters attack.
+242                             ;Screens where no monsters attack.
+// END VALUES //                ;KEEP HERE!!!!
 10              ;Number of Monsters...
 3               ;Determines how many calculations like the ones below are
 30              ;Chance of seeing a monster
@@ -167,7 +146,8 @@ VII. Trouble-shooting
 on all systems.  If it goes to slow, then maybe you should try upgrading your 
 system!  Try running readme.exe for suggestions...
 
+UPDATE:   Got rid of README.EXE
+
 VIII. Credits
 
 Akori Software....................All the gaming engine, and gameplay so far..
-

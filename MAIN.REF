@@ -4,6 +4,7 @@
                 #WRITE
                         `C`%You pick some more wildberries...
                 #SET BERRY + 5;
+        #ENDIF
                 #ENDIF
         #IF BERRY = 25 THEN
                 #WRITE
@@ -25,9 +26,9 @@
 #CHOICE 2
 Yes...
 No...
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
         #SET ACCOUNT = 1;
         #RETURN
 @DONE
@@ -41,7 +42,7 @@ Deposit...
 Withdraw...
 Close Account...
 Get out of here...
-#IF 1
+#IFCHOICE 1
         #CLS
         #PRINT 5
 `2Your account has `$$`vBANK``2.
@@ -53,6 +54,8 @@ Get out of here...
  15
  1
  6
+#FIX LASTRESPONSE
+
         #IF LASTRESPONSE <= 0 THEN
         #RETURN
         #ENDIF
@@ -68,7 +71,7 @@ Get out of here...
                 #ENDIF
         #RETURN
 @DONE
-#IF 2
+#IFCHOICE 2
         #CLS
 #PRINT 5
 `2Your account has `$$`vBANK``2.
@@ -95,21 +98,21 @@ Get out of here...
                 #ENDIF
         #RETURN
 @DONE
-#IF 4
+#IFCHOICE 4
 @DONE
-#IF 3
+#IFCHOICE 3
 #CLS
 #PRINT 1
 `2Are you sure you want to close your account??
 #CHOICE 2
 Yes..
 No..
-#IF 1
+#IFCHOICE 1
 #SET GOLD +1 BANK;
 #SET BANK = 0;
 #SET ACCOUNT = 0;
 @DONE
-#IF 2
+#IFCHOICE 2
 #RETURN
 @DONE
 @DONECHOICE
@@ -126,9 +129,9 @@ No..
 #CHOICE 2
 Depart to Hill Valley...
 Leave the Office...
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
 #CLS
 #PRINT 2
 `2It will cost `$$20`2 to goto Hill Valley.
@@ -136,7 +139,7 @@ Leave the Office...
 #CHOICE 2
 Pay..
 Don't Pay..
-#IF 1
+#IFCHOICE 1
 #GOLD- 20
 #GOTO 163
 #NEWPOS 47 11
@@ -144,7 +147,7 @@ Don't Pay..
 #DONE
 #ENDIF
 @DONE
-#IF 2
+#IFCHOICE 2
 #RETURN
 @DONE
 @DONECHOICE
@@ -160,9 +163,9 @@ Don't Pay..
 #CHOICE 2
 Depart to Stone Valley...
 Leave the Office...
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
 #CLS
 #PRINT 2
 `2It will cost `$$30`2 to goto Stone Valley.
@@ -170,7 +173,7 @@ Leave the Office...
 #CHOICE 2
 Pay..
 Don't Pay..
-#IF 1
+#IFCHOICE 1
 #GOLD- 30
 #GOTO 82
 #MAPSCREEN 82
@@ -178,7 +181,7 @@ Don't Pay..
 #DONE
 #ENDIF
 @DONE
-#IF 2
+#IFCHOICE 2
 #RETURN
 @DONE
 @DONECHOICE
@@ -199,9 +202,9 @@ Don't Pay..
 #CHOICE 2
 Train
 Leave
-#IF 2
+#IFCHOICE 2
 @DONE
-#IF 1
+#IFCHOICE 1
 #MONSTER
 Beat me if you can... Loser!!
 Master Roshi
@@ -233,4 +236,163 @@ Press any key...
 @DONECHOICE
 @END
 
+@#HEALER
+#CLS
+#PRINT 7
+`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0= `0Healer's Hut `0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-`0=`2-
 
+`2You walk into the healers hut and find that the place already quite full.
+`2You take a number, and then a seat.  Finally, you hear your number called.
+
+`2The nurse says, "`%How may we help you?`2"
+
+#CHOICE 3
+Ask for a complete heal...
+Ask for some damage`F2C but not all`F2C to be healed...
+Leave the hut...
+#IFCHOICE 3
+@DONE
+#IFCHOICE 2
+#CLS
+#DECLARE HEAL
+#SET HEAL =1 MAXENERGY;
+#SET HEAL -1 HITPOINT;
+
+#DECLARE NEWGOLD
+#SET NEWGOLD =1 GOLD;
+#SET NEWGOLD / 2;
+
+#IF NEWGOLD >2 HEAL THEN
+#SET NEWGOLD =1 HEAL;
+#ENDIF
+
+#PRINT 4
+`2You have `%`vHITPOINT` `2hitpoint(s).  It costs `$$2`2 For every hitpoint
+`2we heal.  With your current funds, we could heal up to `%`vNEWGOLD` `2hitpoints.
+
+`2Please input the amount of hitpoints to heal. Enter `0(`$1`0) `2for all possible.:
+#INPUT
+10
+1
+5
+
+#FIX LASTRESPONSE
+
+#IF HITPOINT =1 MAXENERGY THEN
+#CLS
+#PRINT 3
+`2I'm sorry, but you do not need to be healed! Maybe another time...
+
+`0<`2Continue`0>
+#WAIT
+#RETURN
+#ENDIF
+
+
+#IF LASTRESPONSE >2 NEWGOLD THEN
+#CLS
+#PRINT 3
+`2I'm sorry, but you do not have the funds.  Maybe another time...
+
+`0<`2Continue`0>
+#WAIT
+#RETURN
+#ENDIF
+
+#IF LASTRESPONSE = 0 THEN
+#RETURN
+#ENDIF
+
+#IF LASTRESPONSE < 0 THEN
+#RETURN
+#ENDIF
+
+#IF LASTRESPONSE = 1 THEN
+#SET HITPOINT +1 NEWGOLD;
+#SET NEWGOLD * 2;
+#SET GOLD -1 NEWGOLD;
+#PRINT 4
+
+
+`!All Done!!! `2You are now healed.
+`0<`2Continue`0>
+#WAIT
+@GOTO DONE
+#ENDIF
+
+
+#IF LASTRESPONSE <1 NEWGOLD THEN
+#SET HITPOINT +1 LASTRESPONSE;
+#SET LASTRESPONSE * 2;
+#SET GOLD -1 LASTRESPONSE;
+#PRINT 4
+
+
+`!All Done!!! `2You are now healed.
+`0<`2Continue`0>
+#WAIT
+#ENDIF
+
+@#DONE
+        #ENDIF
+@DONE
+#IFCHOICE 1
+#CLS
+#DECLARE HEALER
+#SET HEALER = MAXENERGY;
+#SET HEALER - HITPOINT;
+#SET HEALER * 2;
+#Print 6
+`2It costs `$2$`2 for every hitpoint healed.
+
+`2You have `%`vHITPOINT` `2hitpoints.
+`2It will cost you `$`vHEALER`$ `2to be completely healed.
+
+`2Continue?
+#CHOICE 2
+Yes..
+No..
+#IFCHOICE 2
+#RETURN
+#IFCHOICE 1
+#IF HITPOINT =1 MAXENERGY THEN
+#PRINT 5
+
+
+
+`2You don't need to be healed!!!  You are perfectly ok!!!
+`0<`2Continue`0>
+#WAIT
+@DONE
+#ENDIF
+
+
+
+        #IF GOLD >1 HEALER THEN
+        #SET GOLD -1 HEALER;
+        #MAXENERGY
+#PRINT 5
+
+
+
+`!All done!!! `2You are now completely healed.
+`0<`2Continue`0>
+#WAIT
+@DONE
+        #ENDIF
+
+#IF GOLD <2 HEALER THEN
+#PRINT 6
+
+
+
+`4Your don't exactly have enough money for this...
+`2You think to yourself, "Maybe later..."
+`0<`2Continue`0>
+#WAIT
+#ENDIF
+
+#RETURN
+@DONE
+@DONECHOICE
+@END
