@@ -1,3 +1,4 @@
+DECLARE FUNCTION inputer$ (screener)
 DECLARE FUNCTION exist! (file$)
 DECLARE FUNCTION VOB$ (dtlf$)
 DECLARE SUB setsettings ()
@@ -7,9 +8,9 @@ DECLARE SUB printer (da, towrite$, doingit)
 DECLARE SUB writer (towrite$)
 DIM map(1920)
 DIM map2(1920)
-DIM opt(2000)
-DIM SHARED settings$(5000)
-COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp
+DIM opt(200)
+DIM SHARED settings$(500), reffile(1920)
+COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp, refpos, fileopened
 COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, EXPER, k, x, y, monsters$
 RANDOMIZE TIMER
 cl$ = COMMAND$
@@ -23,7 +24,7 @@ helpmecode = 1
 superhuman$ = "NO"
 monsters$ = "NO"
 doposx = 1
-
+refpos = 1
 
 IF exist("NOSCR.DAT") = 0 THEN GOTO noscrdat
 IF exist("VARIABLE.DAT") = 0 THEN GOTO novardat
@@ -32,7 +33,7 @@ OPEN "VARIABLE.DAT" FOR INPUT AS #60
 INPUT #60, COMP1$
 INPUT #60, COMP2$
 INPUT #60, gamename$
-
+ 
 IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP2$ = "Akori Software"
 IF UCASE$(gamename$) = "FINAL QUEST" THEN COMP2$ = "Akori Software"
 IF UCASE$(gamename$) = "FINAL QUEST 2" THEN COMP1$ = "AkoriSoft"
@@ -139,6 +140,31 @@ END IF
 PRINT "Found."
 IF cc = 2 THEN SLEEP 1
 
+PRINT "Building Reference Table..."; SPC(0);
+cursery = CSRLIN
+curserx = POS(0)
+OPEN "FQREFS.DAT" FOR INPUT AS #1
+totalfile = 1
+DO
+IF EOF(1) THEN GOTO finishtable
+LINE INPUT #1, juc$
+        IF LTRIM$(LEFT$(juc$, 5)) = "@#SCR" THEN
+                screen1 = VAL(LTRIM$(RTRIM$(RIGHT$(juc$, LEN(juc$) - 5))))
+                reffile(screen1) = totalfile
+                LOCATE cursery, curserx: PRINT screen1; SPC(0);
+        END IF
+
+totalfile = totalfile + LEN(juc$) + 2
+LOOP
+finishtable:
+CLOSE #1
+
+LOCATE cursery, curserx
+PRINT "Done."
+
+
+IF cc = 2 THEN SLEEP 1
+
 
 PRINT "Looking for saved games..."; SPC(0);
 
@@ -197,10 +223,14 @@ IF cc = 2 THEN dd = 4
 COLOR 7, 0
 CLS
 CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 findit1:
-IF EOF(36) THEN GOTO NOINTRO
-LINE INPUT #36, data$
+data$ = inputer(0)
+IF data$ = "--EOF--" THEN GOTO NOINTRO
+
+'IF EOF(36) THEN GOTO NOINTRO
+'LINE INPUT #36, data$
 IF LEFT$(data$, 7) = "@#INTRO" THEN
 k = 1
 GOTO invscr3
@@ -208,16 +238,19 @@ END IF
 GOTO findit1
 invscr3:
 
-INPUT #36, data$
+'INPUT #36, data$
+data$ = inputer(0)
 color11 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 color12 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
-INPUT #36, data$
+'INPUT #36, data$
+data$ = inputer(0)
 color21 = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 color22 = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 
 
 FOR isdf = 1 TO 6
-INPUT #36, data$
+'INPUT #36, data$
+data$ = inputer(0)
 opy = VAL(LEFT$(data$, INSTR(data$, ";") - 1))
 opx = VAL(RIGHT$(data$, LEN(data$) - INSTR(data$, ";")))
 opname$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";")), LEN(data$) - INSTR(INSTR(data$, ";") + 1, data$, ";"))
@@ -256,7 +289,9 @@ NEXT
 
 
 invscr1:
-LINE INPUT #36, iner$
+'LINE INPUT #36, iner$
+iner$ = inputer(0)
+
 IF iner$ = "@END" THEN GOTO waiter4
 printer 0, iner$, k
 k = k + 1
@@ -310,6 +345,8 @@ IF o = 3 GOTO yesload
 IF o = 4 GOTO help
 IF o = 5 THEN
 towait1 = FIX(TIMER)
+COLOR 7, 0
+CLS
 GOTO loadmap
 END IF
 IF o = 6 GOTO no1
@@ -318,17 +355,21 @@ help:
 COLOR 7, 0
 CLS
 CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 findit13:
-IF EOF(36) THEN GOTO NOHELP
-LINE INPUT #36, data$
+'IF EOF(36) THEN GOTO NOHELP
+data$ = inputer(0)
+IF data$ = "--EOF--" THEN GOTO NOHELP
+'LINE INPUT #36, data$
 IF LEFT$(data$, 6) = "@#HELP" THEN
 k = 1
 GOTO invscr4
 END IF
 GOTO findit13
 invscr4:
-LINE INPUT #36, iner1$
+'LINE INPUT #36, iner1$
+iner1$ = inputer$(0)
 IF iner1$ = "@END" THEN GOTO waiter6
 IF iner1$ = "@NEXT" THEN GOTO nexter52
 printer 0, iner1$, k
@@ -850,14 +891,16 @@ doneloading:
 
 begin:
 CLOSE #36, #53
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 DO
-IF EOF(36) THEN EXIT DO
+'IF EOF(36) THEN EXIT DO
 gotothenext:
-INPUT #36, iner$
+'INPUT #36, iner$
+iner$ = inputer$(0): IF iner$ = "--EOF--" THEN EXIT DO
 IF alwaysdo = 5 AND iner$ = "@END" THEN GOTO dones3
 IF iner$ = "@#ALWAYSDO" THEN
-IF alwaysdo = 0 THEN INPUT #36, iner$
+IF alwaysdo = 0 THEN iner$ = inputer$(0)    'INPUT #36, iner$
 IF iner$ = "@END" THEN GOTO dones3
 alwaysdo = 5
 GOTO togo2
@@ -865,7 +908,7 @@ END IF
 LOOP
 dones3:
 alwaysdo = 0
-CLOSE #36
+'CLOSE #36
 
 
 
@@ -875,18 +918,20 @@ CLOSE #36
 IF ghs = 5 THEN
 ghs = 0
 CLOSE #36, #53
-OPEN "FQREFS.DAT" FOR INPUT AS #36
-rp$ = STR$(rp)
-DO
-IF EOF(36) THEN EXIT DO
-INPUT #36, aggggf$
-IF aggggf$ = "@#SCR" + rp$ THEN
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+'refpos = 1
+'rp$ = STR$(rp)
+'DO
+'IF EOF(36) THEN EXIT DO
+'INPUT #36, aggggf$
+'IF aggggf$ = "@#SCR" + rp$ THEN
+thescreen$ = inputer$(rp): IF thescreen$ = "--EOF--" THEN GOTO bg1
 what = 5
 waypoint = 0
 GOTO doiter
-END IF
-LOOP
-CLOSE #36
+'END IF
+'LOOP
+'CLOSE #36
 END IF
 bg1:
 
@@ -1616,18 +1661,21 @@ NEXT xcc
 LOCATE 1, 1
 
 CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 
 gs:
-IF EOF(36) THEN GOTO NOMAPERROR
-INPUT #36, da$
+'IF EOF(36) THEN GOTO nomaperror
+da$ = inputer$(0): IF da$ = "--EOF--" THEN GOTO nomaperror
+'INPUT #36, da$
 IF da$ = "@#MAP" THEN GOTO mapsx
 GOTO gs:
 
 mapsx:
 k = 1
 invscr63:
-LINE INPUT #36, iner$
+'LINE INPUT #36, iner$
+iner$ = inputer$(0)
 IF LTRIM$(RTRIM$(iner$)) = "@END" THEN GOTO waiter62
 printer 0, iner$, k
 k = k + 1
@@ -1701,11 +1749,13 @@ IF y = 22 AND direction$ = "D" THEN
 thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
 END IF
 
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 rp$ = STR$(rp)
 DO
-IF EOF(36) THEN EXIT DO
-INPUT #36, aggggf$
+aggggf$ = inputer$(rp): IF aggggf$ = "--EOF--" THEN EXIT DO
+'IF EOF(36) THEN EXIT DO
+'INPUT #36, aggggf$
 IF aggggf$ = "@#SCR" + rp$ THEN
         IF direction$ = "L" THEN
         way = 1: what = 1
@@ -1770,17 +1820,20 @@ inventory:
 COLOR 7, 0
 CLS
 CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 findit:
-IF EOF(36) THEN GOTO SUCKIT
-LINE INPUT #36, data$
+'IF EOF(36) THEN GOTO SUCKIT
+data$ = inputer$(0): IF data$ = "--EOF--" THEN GOTO suckit
+'LINE INPUT #36, data$
 IF LEFT$(data$, 8) = "@#INVSCR" THEN
 k = 1
 GOTO invscr
 END IF
 GOTO findit
 invscr:
-LINE INPUT #36, iner$
+iner$ = inputer$(0)
+'LINE INPUT #36, iner$
 IF iner$ = "@END" THEN GOTO waiter
 printer 1, iner$, k
 k = k + 1
@@ -1864,12 +1917,12 @@ IF kk = 4 THEN GOTO l56b  'down1
 GOTO begin
 Quit:
 GOTO load
-SUCKIT:
+suckit:
 PRINT
 PRINT "The following error was detected... Cannot find @#INVSCR in REF file."
 PRINT
 GOTO ender5
-NOMAPERROR:
+nomaperror:
 PRINT
 PRINT "The following error was detected... Cannot find @#MAP in REF file."
 PRINT
@@ -1921,25 +1974,32 @@ END IF
 
 doiter:
 DO
-INPUT #36, adsg$
+'INPUT #36, adsg$
+adsg$ = inputer$(0)
+
+IF adsg$ = "--EOF--" THEN GOTO leaver
 adsg$ = LTRIM$(adsg$)
 IF adsg$ = "@DO" THEN GOTO dothe
 IF LEFT$(adsg$, 3) = "@IF" THEN
 iner$ = adsg$
 GOTO ifer
 END IF
+
 IF LEFT$(adsg$, 4) = "@IPS" THEN GOTO ifposition
 IF adsg$ = "@END" THEN GOTO leaver
 
 IF runref$ <> "YES" THEN
-IF EOF(36) THEN GOTO leaver
+'IF EOF(36) THEN GOTO leaver
+IF adsg$ = "--EOF--" THEN GOTO leaver
 END IF
 IF runref$ = "YES" THEN
-IF EOF(53) THEN GOTO ins
+IF adsg$ = "--EOF--" THEN GOTO ins
+'IF EOF(53) THEN GOTO ins
 END IF
 LOOP
 dothe:
-INPUT #36, iner$
+'INPUT #36, iner$
+iner$ = inputer$(0)
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
 IF iner$ = "@END" THEN GOTO donewith
@@ -1962,7 +2022,7 @@ GOTO doiter
 
 itisonit:
 DO
-IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ <> "YES" THEN iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 
@@ -2010,7 +2070,7 @@ rp = VAL(LTRIM$(RIGHT$(iner$, LEN(iner$) - 5)))
 reloadscreen = 2
 END IF
 
-IF LEFT$(iner$, 7) = "#NEWPOS" THEN
+IF RIGHT$(LEFT$(iner$, 7), 6) = "NEWPOS" THEN
 dfdf$ = LTRIM$(RIGHT$(iner$, LEN(iner$) - 7))
 IF waypoint = 1 THEN x = x + 1
 IF waypoint = 2 THEN x = x - 1
@@ -2022,6 +2082,8 @@ PRINT " "; SPC(0);
 
 x = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
 y = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
+
+IF LEFT$(iner$, 1) = "!" THEN
 record = (y - 1) * 79 + x
 
 color$ = SPACE$(1)
@@ -2031,12 +2093,13 @@ COLOR 14, color1: LOCATE y, x: PRINT CHR$(1); SPC(0);
 
 direction$ = ""
 waypoint = 0
+END IF
 
 END IF
 
 
 IF iner$ = "#MOVEOBJ" THEN
-IF runref$ <> "YES" THEN INPUT #36, kind$
+IF runref$ <> "YES" THEN kind$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, kind$
 ret = 0
 ghs = 5
@@ -2045,7 +2108,7 @@ returnhere:
         DO
         LOOP WHILE TIMER < ts + VAL(kind$)
 
-IF runref$ <> "YES" THEN INPUT #36, dfdf$
+IF runref$ <> "YES" THEN dfdf$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
@@ -2073,7 +2136,7 @@ LOCATE cury, curx
 PRINT " "
 doer = 0
 
-IF runref$ <> "YES" THEN INPUT #36, dfdf$
+IF runref$ <> "YES" THEN dfdf$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 
@@ -2094,12 +2157,14 @@ END IF
 
 IF iner$ = "#ANIMATE" THEN
 IF RUNRUF$ = "YES" THEN GOTO donet
-INPUT #36, ani$
+ani$ = inputer$(0)
+'INPUT #36, ani$
 ret1 = 0
 IF ani$ = "1" THEN ret1 = 3
 todo:
 cb = 0
-INPUT #36, newthing$
+newthing$ = inputer$(0)
+'INPUT #36, newthing$
 IF newthing$ = "#DONEANIMATE" THEN GOTO doneanimate
 iner$ = newthing$
 iner$ = UCASE$(iner$)
@@ -2120,7 +2185,7 @@ IF LEFT$(iner$, 7) = "#CHOICE" THEN
 LOCATE , , 0
 howmany = VAL(RIGHT$(iner$, LEN(iner$) - 7))
 FOR hg = 1 TO howmany
-IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ <> "YES" THEN data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 opt$(hg) = data$
 NEXT hg
@@ -2201,18 +2266,19 @@ toGET$ = "#IF" + op4$
 
 gg:
 IF runref$ <> "YES" THEN
-IF EOF(36) THEN GOTO nothing
+'IF EOF(36) THEN GOTO nothing
+IF data$ = "--EOF--" THEN GOTO nothing
 END IF
 IF runref$ = "YES" THEN
 IF EOF(53) THEN GOTO nothing
 END IF
-IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ <> "YES" THEN data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 IF data$ = toGET$ THEN GOTO dofunc
 GOTO gg
 dofunc:
 in:
-IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ <> "YES" THEN iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 
@@ -2221,7 +2287,7 @@ IF iner$ = "@DONE" THEN GOTO donefunc
 doits = 5
 GOTO togo2
 donefunc:
-IF runref$ <> "YES" THEN INPUT #36, data$
+IF runref$ <> "YES" THEN data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 data$ = UCASE$(data$)
 IF data$ = "@DONECHOICE" THEN GOTO nothing
@@ -2247,10 +2313,13 @@ IF LEFT$(togoto$, 2) <> "@#" THEN togoto$ = "@#" + togoto$
 
 IF runref$ <> "YES" THEN
 CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+refpos = 1
 gos:
-IF EOF(36) THEN GOTO getout6
-INPUT #36, dat$
+'IF EOF(36) THEN GOTO getout6
+dat$ = inputer$(0)
+IF dat$ = "--EOF--" THEN GOTO getout6
+'INPUT #36, dat$
 IF dat$ = togoto$ THEN GOTO itisonit
 GOTO gos
 END IF
@@ -2372,7 +2441,7 @@ END IF
 IF LEFT$(iner$, 6) = "#PRINT" THEN
 
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) = "P" THEN
-IF runref$ <> "YES" THEN LINE INPUT #36, toprint$
+IF runref$ <> "YES" THEN toprint$ = inputer$(0)
 IF runref$ = "YES" THEN LINE INPUT #53, toprint$
 printer 1, toprint$, doposy
 GOTO g55
@@ -2380,9 +2449,10 @@ END IF
 
 howmany = VAL(RIGHT$(iner$, LEN(iner$) - 6))
 FOR doingit = 1 TO howmany
-IF runref$ <> "YES" THEN LINE INPUT #36, toprint$
+IF runref$ <> "YES" THEN toprint$ = inputer$(0)
 IF runref$ = "YES" THEN LINE INPUT #53, toprint$
-printer 2, toprint$, doposy
+IF doingit <> howmany THEN printer 1, toprint$, doposy
+IF doingit = howmany THEN printer 2, toprint$, doposy
 doposy = doposy + 1
 NEXT
 g55:
@@ -2398,11 +2468,11 @@ IF runref$ = "YES" THEN INPUT #53, b$
 IF runref$ = "YES" THEN INPUT #53, togetscore
 IF runref$ = "YES" THEN INPUT #53, expertoget
 
-IF runref$ <> "YES" THEN INPUT #36, tosay$
-IF runref$ <> "YES" THEN INPUT #36, m$
-IF runref$ <> "YES" THEN INPUT #36, b$
-IF runref$ <> "YES" THEN INPUT #36, togetscore
-IF runref$ <> "YES" THEN INPUT #36, expertoget
+IF runref$ <> "YES" THEN tosay$ = inputer$(0)
+IF runref$ <> "YES" THEN m$ = inputer$(0)
+IF runref$ <> "YES" THEN b$ = inputer$(0)
+IF runref$ <> "YES" THEN togetscore = VAL(inputer$(0))
+IF runref$ <> "YES" THEN expertoget = VAL(inputer$(0))
 
 IF i = 1 THEN weapon = weapon1power
 IF i = 2 THEN weapon = weapon2power
@@ -2461,11 +2531,11 @@ END IF
 
 
 IF iner$ = "#INPUT" THEN
-IF runref$ <> "YES" THEN INPUT #36, random1$
+IF runref$ <> "YES" THEN random1$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, random1$
-IF runref$ <> "YES" THEN INPUT #36, x$
+IF runref$ <> "YES" THEN x$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, x$
-IF runref$ <> "YES" THEN INPUT #36, y$
+IF runref$ <> "YES" THEN y$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, y$
 thex = VAL(x$)
 they = VAL(y$)
@@ -2512,18 +2582,19 @@ IF rag = 1 THEN GOTO ifit1
 
 idg:
 IF runref$ <> "YES" THEN
-IF EOF(36) THEN GOTO donerandom
+'IF EOF(36) THEN GOTO donerandom
+IF junk$ = "--EOF--" THEN GOTO donerandom
 END IF
 IF runref$ = "YES" THEN
 IF EOF(53) THEN GOTO donerandom
 END IF
-IF runref$ <> "YES" THEN INPUT #36, junk$
+IF runref$ <> "YES" THEN junk$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, junk$
 IF UCASE$(junk$) = "#ENDRANDOM" THEN GOTO donerandom
 GOTO idg
 
 ifit1:
-IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ <> "YES" THEN iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
@@ -2758,7 +2829,7 @@ junk$ = settings$(nus): nus = nus + 1
 GOTO EOF1:
 
 runit:
-IF runref$ <> "YES" THEN INPUT #36, iner$
+IF runref$ <> "YES" THEN iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 IF iner$ = "#ENDIF" THEN GOTO donenext1
@@ -2773,7 +2844,7 @@ GOTO togo2
 
 donenext:
 gog:
-IF runref$ <> "YES" THEN INPUT #36, junk$
+IF runref$ <> "YES" THEN junk$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, junk$
 IF junk$ = "#ENDIF" THEN GOTO donenext1
 IF junk$ = "#ENDIF1" THEN
@@ -2827,11 +2898,11 @@ hmr = VAL(RIGHT$(iner$, LEN(iner$) - 12))
 RANDOMIZE TIMER
 rand1 = INT(RND * hmr)
 FOR i12 = 1 TO rand1
-IF runref$ <> "YES" THEN INPUT #36, D5342$
+IF runref$ <> "YES" THEN D5342$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, D5342$
 
 NEXT i12
-IF runref$ <> "YES" THEN INPUT #36, towrite$
+IF runref$ <> "YES" THEN towrite$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
@@ -2840,7 +2911,7 @@ END IF
 
 
 IF LEFT$(iner$, 6) = "#WRITE" THEN
-IF runref$ <> "YES" THEN INPUT #36, towrite$
+IF runref$ <> "YES" THEN towrite$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
@@ -3014,21 +3085,27 @@ GOTO getre2
 
 getout:
 IF runref$ = "YES" THEN GOTO returnref
-CLOSE #36
-OPEN "FQREFS.DAT" FOR INPUT AS #36
-rp$ = STR$(rp)
-scr$ = "@#SCR" + rp$
-DO
-IF EOF(36) THEN EXIT DO
-INPUT #36, agggg$
-IF agggg$ = scr$ THEN EXIT DO
-LOOP
+agggg$ = inputer$(rp)
+
+'CLOSE #36
+'OPEN "FQREFS.DAT" FOR INPUT AS #36
+'refpos = 1
+'rp$ = STR$(rp)
+'scr$ = "@#SCR" + rp$
+'DO
+'IF EOF(36) THEN EXIT DO
+'agggg$ = inputer$(0): IF agggg$ = "--EOF--" THEN EXIT DO
+'IF agggg$ = scr$ THEN EXIT DO
+'LOOP
+
 GOTO doiter
 nottt:
 COLOR 7, 0
+CLEAR
 END
 
 SUB cole (pressed, toprint$, cole1$)
+
 
 IF pressed = 1 THEN
 gg = gdi
@@ -3379,6 +3456,37 @@ END IF
 getouts:
 END FUNCTION
 
+FUNCTION inputer$ (screener)
+IF fileopened = 0 THEN OPEN "fqrefs.dat" FOR BINARY AS #13
+fileopened = 1
+jk = 0
+data$ = ""
+IF screener <> 0 THEN refpos = reffile(screener)
+IF refpos = 0 THEN GOTO nothing323
+DO
+IF refpos + jk > LOF(13) THEN GOTO nothing323
+ag$ = SPACE$(80)
+GET #13, refpos + jk, ag$
+IF INSTR(ag$, CHR$(13)) THEN
+        ag1$ = LEFT$(ag$, INSTR(ag$, CHR$(13)) - 1)
+        data$ = data$ + ag1$
+        jk = jk + (INSTR(ag$, CHR$(13)) - 1)
+        GOTO nothing32
+        END IF
+
+jk = jk + 80
+data$ = data$ + ag$
+LOOP
+GOTO nothing32
+nothing323:
+data$ = "--EOF--"
+refpos = 1: jk = -2
+nothing32:
+'CLOSE #13
+refpos = refpos + jk + 2
+inputer$ = LTRIM$(RTRIM$(data$))
+END FUNCTION
+
 SUB printer (da, toprint$, doposy)
 bg = 0
 screenmode = 0
@@ -3448,6 +3556,7 @@ cone3:
 NEXT gdi
 IF da = 1 THEN PRINT
 IF da = 3 THEN PRINT
+'PRINT
 END SUB
 
 SUB setsettings

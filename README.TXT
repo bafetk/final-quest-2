@@ -1,3 +1,11 @@
+Version Changes (02/19/01) 093 Rev B
+
+I changed the input routine for the primary Reference file.  It increases
+speed a little, but not as much as I expected.  I am still reluctant to
+use an array for different parts of the reference file, but it might come
+to that.  The input routine, or inputer$ function, uses binary to do an
+"Input" style routine.
+
 Version Changes (02/17/01) 093 Rev A
 
 Not much externally, but a bunch of internal routines were revamped to
