@@ -1,3 +1,5 @@
 *.BAS encoding=cp1252
 *.DOC encoding=cp1252
 *.TXT encoding=cp1252
+*.REF encoding=cp1252
+
