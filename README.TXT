@@ -1,3 +1,33 @@
+Version Changes (03/03/01) 093 Rev E
+
+Ok, heres the deal..  I changed some mega things...  First, I completely
+implemented mouse support into The leveler. Its now like 3.31 or something
+now.  In Fq2, I changed it so when you use the print command and you do not
+specify a background color, it automaticly prints it onto the background
+color that is on the screen.  Also, if monsters are off, I added an array
+called ReferenceArray$() that stores every command for a specific screen
+and instead of FQ2 searching the Ref file every time you move the guy
+around the screen, it searches the array.  This COMPLETELY makes it so
+FQ2 doesn't have to search the hard drive while playing.  This is of
+course only if you have monsters off. ANYWAY...  I guess I'll have to
+keep programming.... I also added an array to make storing Saved names
+easier. It is Realsavename$().  All five saved names are stored in it.
+Also, when you save over a previous game, you can now just hit enter and
+it will save it with the original name of that game.
+
+Version Changes (02/28/01) 093 Rev D
+
+HEY!!!  I completely cut 1/3 of the size of the map file by combining
+the Frontground, background, and HARD status into ONE BYTE!! This is
+possible because the backgrounds can be only 0-7, the forgrounds 0-15,
+and the hard 0 or 1.  I also COMPLETELY changed the Install Program that
+I used originally for Final Quest 2 and 1.  You can use reference files
+to create a custom setup and you can ENCRYPT it so noone can know what
+is in it but you.  It has mouse routines as well.  Man I'm ON A ROLL!!!
+Uh, yea, I forgot that now that I have a new MAP system, I have to
+COMPLETELY revamp the LEVEL.EXE file.  That's going to suck.. Anyway,
+bye!!!
+
 Version Changes (02/25/01) 093 Rev C
 
 I tried to get the code to be more organized.  Also, I added the FIX,

@@ -3,16 +3,18 @@ DECLARE FUNCTION inputer$ (screener)
 DECLARE FUNCTION exist! (file$)
 DECLARE FUNCTION VOB$ (dtlf$)
 DECLARE SUB setsettings ()
-DECLARE SUB cole (pressed, toprint$, cole1$)
+DECLARE SUB cole (pressed, toprint$, cole1$, fground, bground)
 DECLARE SUB endscreen ()
-DECLARE SUB printer (da, towrite$, doingit)
+DECLARE SUB printer (da, towrite$, jack)
 DECLARE SUB writer (towrite$)
+DIM ReferenceArray$(750)
+DIM realsavename$(300)
 DIM map(1920)
 DIM map2(1920)
 DIM opt(200)
 DIM SHARED settings$(500), reffile(1920)
 COMMON SHARED save1name$, save2name$, save3name$, save4name$, save5name$, doposx, doposy, gamename$, revision$, version1$, version2$, COMP1$, COMP2$, h, s, w, defs, i, z, gdi, cgd, bg, rp, refpos, fileopened, thescreen1
-COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, exper, k, x, y, monsters$, hitmax
+COMMON SHARED armour1name$, armour2name$, armour3name$, armour4name$, weapon1name$, weapon2name$, weapon3name$, weapon4name$, exper, k, x, y, monsters$, hitmax, Ber, jdcolor
 RANDOMIZE TIMER
 cl$ = COMMAND$
 IF UCASE$(cl$) = "-DEBUGMODE" THEN cc = 2
@@ -120,7 +122,7 @@ IF type$ = "1" THEN map(number) = 1
 IF type$ = "2" THEN map(number) = 2
 IF type$ = "3" THEN map(number) = 3
 map2(number) = im
-im = im + 5219
+im = im + 3481
 GOTO csg
 
 nx:
@@ -186,24 +188,26 @@ END IF
 NEXT xv
 
 
-save1name$ = "Empty"
-save2name$ = "Empty"
-save3name$ = "Empty"
-save4name$ = "Empty"
-save5name$ = "Empty"
+'save1name$ = "Empty"
+'save2name$ = "Empty"
+'save3name$ = "Empty"
+'save4name$ = "Empty"
+'save5name$ = "Empty"
 
 
 FOR bx = 1 TO 5
+realsavename$(bx) = "Empty"
 IF file$(bx) = "1" THEN
 bx$ = LTRIM$(RTRIM$(STR$(bx - 1)))
 OPEN "FQSAVE" + bx$ + ".DAT" FOR BINARY AS #2
 savename$ = SPACE$(15)
 GET #2, 1, savename$
-IF bx = 1 THEN save1name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-IF bx = 2 THEN save2name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-IF bx = 3 THEN save3name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-IF bx = 4 THEN save4name$ = LTRIM$(RTRIM$(crypt$(savename$)))
-IF bx = 5 THEN save5name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+realsavename$(bx) = LTRIM$(RTRIM$(crypt$(savename$)))
+'IF bx = 1 THEN save1name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+'IF bx = 2 THEN save2name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+'IF bx = 3 THEN save3name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+'IF bx = 4 THEN save4name$ = LTRIM$(RTRIM$(crypt$(savename$)))
+'IF bx = 5 THEN save5name$ = LTRIM$(RTRIM$(crypt$(savename$)))
 CLOSE #2
 END IF
 NEXT bx
@@ -318,6 +322,7 @@ IF cc = 2 THEN LOCATE 25, 1
 IF cc = 2 THEN COLOR 7, 0
 IF cc = 2 THEN PRINT "S - Set game settings"; SPC(0);
 
+
 DO
 check$ = INKEY$
 LOOP WHILE check$ = ""
@@ -406,19 +411,26 @@ COLOR 4, 0
 LOCATE 17, 30: PRINT "Enter a Choice."
 savegame1:
 COLOR 15, 0
-LOCATE 11, 30: PRINT save1name$ + "..."
-LOCATE 12, 30: PRINT save2name$ + "..."
-LOCATE 13, 30: PRINT save3name$ + "..."
-LOCATE 14, 30: PRINT save4name$ + "..."
-LOCATE 15, 30: PRINT save5name$ + "..."
 
+FOR gsx = 11 TO 15
+LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+'LOCATE 12, 30: PRINT savename$ + "..."
+'LOCATE 13, 30: PRINT savename$ + "..."
+'LOCATE 14, 30: PRINT savename$ + "..."
+'LOCATE 15, 30: PRINT savename$ + "..."
+NEXT gsx
 
 COLOR 12, 0
-LOCATE 11, 30: IF ooo = 1 THEN PRINT save1name$ + "..."
-LOCATE 12, 30: IF ooo = 2 THEN PRINT save2name$ + "..."
-LOCATE 13, 30: IF ooo = 3 THEN PRINT save3name$ + "..."
-LOCATE 14, 30: IF ooo = 4 THEN PRINT save4name$ + "..."
-LOCATE 15, 30: IF ooo = 5 THEN PRINT save5name$ + "..."
+
+LOCATE ooo + 10, 30: PRINT realsavename$(ooo) + "..."
+
+'FOR gsx = 11 TO 15
+'LOCATE gsx, 30: IF ooo = (gsx - 10) THEN PRINT realsavename$(ooo) + "..."
+'LOCATE 12, 30: IF ooo = 2 THEN PRINT save2name$ + "..."
+'LOCATE 13, 30: IF ooo = 3 THEN PRINT save3name$ + "..."
+'LOCATE 14, 30: IF ooo = 4 THEN PRINT save4name$ + "..."
+'LOCATE 15, 30: IF ooo = 5 THEN PRINT save5name$ + "..."
+'NEXT gsx
 
 
 DO
@@ -461,6 +473,7 @@ GOTO savegame1
 END SELECT
 saveover1:
 IF file$(ooo) <> "1" THEN GOTO saveover1notexist
+saveover = 1
 GOTO saveover1go
 saveover1notexist:
 saveover1go:
@@ -471,20 +484,35 @@ COLOR 4, 0
 LOCATE 17, 30: PRINT "Enter a Choice."
 COLOR 15, 0
 
-LOCATE 11, 30: IF ooo <> 1 THEN PRINT save1name$ + "..."
-LOCATE 12, 30: IF ooo <> 2 THEN PRINT save2name$ + "..."
-LOCATE 13, 30: IF ooo <> 3 THEN PRINT save3name$ + "..."
-LOCATE 14, 30: IF ooo <> 4 THEN PRINT save4name$ + "..."
-LOCATE 15, 30: IF ooo <> 5 THEN PRINT save5name$ + "..."
+FOR gsx = 11 TO 15
+IF ooo <> gsx - 10 THEN
+        LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+        END IF
+NEXT gsx
+
+
+'LOCATE 11, 30: IF ooo <> 1 THEN PRINT save1name$ + "..."
+'LOCATE 12, 30: IF ooo <> 2 THEN PRINT save2name$ + "..."
+'LOCATE 13, 30: IF ooo <> 3 THEN PRINT save3name$ + "..."
+'LOCATE 14, 30: IF ooo <> 4 THEN PRINT save4name$ + "..."
+'LOCATE 15, 30: IF ooo <> 5 THEN PRINT save5name$ + "..."
 
 LOCATE ooo + 10, 30
 
+
 savename$ = ""
+IF saveover = 1 THEN
+        saveover = 0
+        savename$ = realsavename$(ooo)
+        END IF
+
+COLOR 15, 0: LOCATE ooo + 10, 30: PRINT savename$; SPC(0);
+
 wordenter:
 
 DO
 COLOR 15, 0
-LOCATE , , 1, 6, 7
+LOCATE , , 1, 6, 7           ': PRINT savename$; SPC(0);
 id$ = INKEY$
 LOOP WHILE id$ = ""
 
@@ -499,7 +527,6 @@ savename$ = LEFT$(savename$, asdf - 1)
 GOTO wordenter
 END IF
 
-
 IF id$ = CHR$(13) THEN GOTO pressenter
 
 IF LEN(savename$) >= 15 THEN GOTO wordenter
@@ -512,16 +539,22 @@ GOTO wordenter
 pressenter:
 IF savename$ = "" THEN savename$ = "NoName"
 IF savename$ = "Empty" THEN savename$ = "NoName"
-IF ooo = 1 THEN save1name$ = savename$
-IF ooo = 2 THEN save2name$ = savename$
-IF ooo = 3 THEN save3name$ = savename$
-IF ooo = 4 THEN save4name$ = savename$
-IF ooo = 5 THEN save5name$ = savename$
-IF ooo = 1 THEN SHELL "IF EXIST FQSAVE0.DAT DEL FQSAVE0.DAT"
-IF ooo = 2 THEN SHELL "IF EXIST FQSAVE1.DAT DEL FQSAVE1.DAT"
-IF ooo = 3 THEN SHELL "IF EXIST FQSAVE2.DAT DEL FQSAVE2.DAT"
-IF ooo = 4 THEN SHELL "IF EXIST FQSAVE3.DAT DEL FQSAVE3.DAT"
-IF ooo = 5 THEN SHELL "IF EXIST FQSAVE4.DAT DEL FQSAVE4.DAT"
+realsavename$(ooo) = savename$
+
+
+'IF ooo = 1 THEN save1name$ = savename$
+'IF ooo = 2 THEN save2name$ = savename$
+'IF ooo = 3 THEN save3name$ = savename$
+'IF ooo = 4 THEN save4name$ = savename$
+'IF ooo = 5 THEN save5name$ = savename$
+SHELL "IF EXIST FQSAVE" + LTRIM$(STR$(ooo)) + ".DAT DEL FQSAVE" + LTRIM$(STR$(ooo)) + ".DAT"
+
+'IF ooo = 1 THEN SHELL "IF EXIST FQSAVE0.DAT DEL FQSAVE0.DAT"
+'IF ooo = 2 THEN SHELL "IF EXIST FQSAVE1.DAT DEL FQSAVE1.DAT"
+'IF ooo = 3 THEN SHELL "IF EXIST FQSAVE2.DAT DEL FQSAVE2.DAT"
+'IF ooo = 4 THEN SHELL "IF EXIST FQSAVE3.DAT DEL FQSAVE3.DAT"
+'IF ooo = 5 THEN SHELL "IF EXIST FQSAVE4.DAT DEL FQSAVE4.DAT"
+
 ooo$ = LTRIM$(RTRIM$(STR$(ooo - 1)))
 OPEN "FQSAVE" + ooo$ + ".DAT" FOR BINARY AS #2
 IF monsters$ = "YES" THEN monsters5$ = "1"
@@ -617,19 +650,21 @@ COLOR 4, 0
 LOCATE 17, 30: PRINT "Enter a Choice."
 loadgame1:
 COLOR 15, 0
-LOCATE 11, 30: PRINT save1name$ + "..."
-LOCATE 12, 30: PRINT save2name$ + "..."
-LOCATE 13, 30: PRINT save3name$ + "..."
-LOCATE 14, 30: PRINT save4name$ + "..."
-LOCATE 15, 30: PRINT save5name$ + "..."
 
+FOR gsx = 11 TO 15
+LOCATE gsx, 30: PRINT realsavename$(gsx - 10) + "..."
+NEXT gsx
 
 COLOR 12, 0
-LOCATE 11, 30: IF op = 1 THEN PRINT save1name$ + "..."
-LOCATE 12, 30: IF op = 2 THEN PRINT save2name$ + "..."
-LOCATE 13, 30: IF op = 3 THEN PRINT save3name$ + "..."
-LOCATE 14, 30: IF op = 4 THEN PRINT save4name$ + "..."
-LOCATE 15, 30: IF op = 5 THEN PRINT save5name$ + "..."
+
+LOCATE op + 10, 30: PRINT realsavename$(op) + "..."
+
+'COLOR 12, 0
+'LOCATE 11, 30: IF op = 1 THEN PRINT save1name$ + "..."
+'LOCATE 12, 30: IF op = 2 THEN PRINT save2name$ + "..."
+'LOCATE 13, 30: IF op = 3 THEN PRINT save3name$ + "..."
+'LOCATE 14, 30: IF op = 4 THEN PRINT save4name$ + "..."
+'LOCATE 15, 30: IF op = 5 THEN PRINT save5name$ + "..."
 
 
 DO
@@ -814,6 +849,21 @@ begingame = 1
 GOTO getready
 begingame:
 loadmap:
+
+fa$ = inputer$(rp)
+        xcc = 1
+        DO
+        ReferenceArray$(xcc) = inputer$(0)
+        IF ReferenceArray$(xcc) = "--EOF--" THEN
+                COLOR 7, 0: CLS
+                PRINT "Error:  @END Missing in Reffile for SCR " + LTRIM$(STR$(rp))
+                END
+                END IF
+        IF LTRIM$(RTRIM$(UCASE$(ReferenceArray$(xcc)))) = "@END" THEN EXIT DO
+        xcc = xcc + 1
+        LOOP
+ReferenceArray$(xcc + 1) = "--EOF--"
+
 begingame = 0
 printline$ = "YES"
 gbbn = 0
@@ -835,18 +885,31 @@ IF dd = 0 THEN
 yes:
 LOCATE 1, 1
         bk = dd + 5
-        kb = dd + 5219
-FOR l = bk TO kb STEP 3
-a$ = SPACE$(3)
+        kb = dd + 3481
+FOR l = bk TO kb STEP 2
+a$ = SPACE$(2)
 GET #1, l, a$
 IF POS(0) = 80 THEN
 LOCATE CSRLIN + 1, 1
 END IF
 d$ = LEFT$(a$, 1)
 d = ASC(d$)
-bg = FIX(d / 16)
-fg = d - (bg * 16)
+
+'MARK1
+fg = FIX(d / 16)
+bg = d - (fg * 16)
+IF bg > 7 THEN bg = bg - 8
 COLOR fg, bg
+
+'648 on scr 82
+'PRINT ((l - dd) - 5) / 2 + 1: END
+'IF ((l - dd) - 5) / 2 + 1 = 648 THEN
+'        PRINT fg; bg; SPC(0);
+'        i$ = INPUT$(1)
+'        END IF
+
+'bg = FIX(d / 16)
+'fg = d - (bg * 16)
 IF fg = 0 AND bg = 0 THEN COLOR 15
 
 IF RIGHT$(a$, 1) = CHR$(32) THEN
@@ -946,6 +1009,8 @@ IF cc = 2 THEN LOCATE 1, 1
 IF cc = 2 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
 IF cc = 2 THEN LOCATE 1, 75
 IF cc = 2 THEN PRINT "S=SET"
+IF cc = 2 THEN LOCATE 2, 70
+IF cc = 2 THEN PRINT "V=View Ref"
 IF dd1 = 1 THEN LOCATE 1, 1
 IF dd1 = 1 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
 color$ = SPACE$(1)
@@ -954,13 +1019,22 @@ color$ = SPACE$(1)
 
 dd = map2(rp)
 dk = dd + 5
-mk = record * 3 - 3
+mk = record * 2 - 2
 m = mk + dk
+
+
+
 
 GET #1, m, color$
 d$ = LEFT$(color$, 1)
 dg = ASC(d$)
-color1 = FIX(dg / 16)
+
+fg = FIX(dg / 16)
+bg = dg - (fg * 16)
+IF bg > 7 THEN bg = bg - 8
+
+color1 = bg
+'color1 = FIX(dg / 16)
 
 nomap1:
 COLOR 14, color1
@@ -968,6 +1042,7 @@ LOCATE y, x
 PRINT CHR$(1)
 
 'don't do these screens with monsters
+IF monsters$ = "NO" THEN GOTO doer1
 OPEN "NOSCR.DAT" FOR INPUT AS #62
 INPUT #62, firstanswer$
 IF monsters$ = "YES" THEN GOTO ghb
@@ -1059,8 +1134,8 @@ printer 0, tosay$, 24
 
 COLOR 14, 0
 
-G = INT(RND * 2) + 1
-IF G = 1 THEN GOTO m1hitf
+g = INT(RND * 2) + 1
+IF g = 1 THEN GOTO m1hitf
 
 m1fight:
 COLOR 14, 1
@@ -1356,10 +1431,9 @@ ydf = INT(RND * 25) + 1
 xdf = 79
 
 FOR ixv = 1 TO 79
-        idler = 0
+        xf = TIMER + .1
         DO
-        idler = idler + 1
-        LOOP WHILE idler <= 15000
+        LOOP WHILE TIMER <= xf
         IF INKEY$ <> "" THEN GOTO NOT2
                 b$ = LEFT$(a$, ixv)
                 LOCATE ydf, xdf
@@ -1368,10 +1442,9 @@ FOR ixv = 1 TO 79
 NEXT ixv
         vdf = LEN(a$) - 1
 FOR ixv = 1 TO LEN(a$)
-                idler = 0
-                DO
-                idler = idler + 1
-                LOOP WHILE idler <= 15000
+        xf = TIMER + .1
+        DO
+        LOOP WHILE TIMER <= xf
                 IF INKEY$ <> "" THEN GOTO NOT2
         b$ = RIGHT$(a$, vdf)
         vdf = vdf - 1
@@ -1754,13 +1827,13 @@ thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
 END IF
 
 'OPEN "FQREFS.DAT" FOR INPUT AS #36
-refpos = 1
-rp$ = STR$(rp)
-DO
-aggggf$ = inputer$(rp): IF aggggf$ = "--EOF--" THEN EXIT DO
-'IF EOF(36) THEN EXIT DO
-'INPUT #36, aggggf$
-IF aggggf$ = "@#SCR" + rp$ THEN
+'refpos = 1
+'rp$ = STR$(rp)
+'DO
+'aggggf$ = inputer$(rp): IF aggggf$ = "--EOF--" THEN EXIT DO
+''IF EOF(36) THEN EXIT DO
+''INPUT #36, aggggf$
+'IF aggggf$ = "@#SCR" + rp$ THEN
         IF direction$ = "L" THEN
         way = 1: what = 1
         END IF
@@ -1774,8 +1847,8 @@ IF aggggf$ = "@#SCR" + rp$ THEN
         way = 4: what = 4
         END IF
 GOTO dofunction
-END IF
-LOOP
+'END IF
+'LOOP
 CLOSE #36
 GOTO hard
 
@@ -1795,13 +1868,20 @@ IF direction$ = "R" THEN record = record + 1
 IF direction$ = "U" THEN record = record - 79
 IF direction$ = "D" THEN record = record + 79
 
-bk$ = SPACE$(3): lk = dd + 5:
-dfdf = record * 3 - 3: m = lk + dfdf
+bk$ = SPACE$(2): lk = dd + 5:
+dfdf = record * 2 - 2: m = lk + dfdf
 GET #1, m, bk$
-kb$ = RIGHT$(bk$, 2): bk1$ = LEFT$(kb$, 1)
+bk1$ = LEFT$(bk$, 1)
+d = ASC(bk1$)
 
+fg = FIX(d / 16)
+bg = d - (fg * 16)
+IF bg > 7 THEN
+        hard = 1
+        END IF
 
-IF bk1$ = CHR$(1) THEN
+IF hard = 1 THEN
+        hard = 0
         IF direction$ = "L" THEN record = record + 1
         IF direction$ = "R" THEN record = record - 1
         IF direction$ = "U" THEN record = record + 79
@@ -1809,7 +1889,8 @@ IF bk1$ = CHR$(1) THEN
        GOTO doer1
 END IF
 
-IF bk1$ = CHR$(0) THEN
+IF hard = 0 THEN
+        hard = 0
         IF direction$ = "L" THEN record = record + 1
         IF direction$ = "R" THEN record = record - 1
         IF direction$ = "U" THEN record = record + 79
@@ -1817,6 +1898,7 @@ IF bk1$ = CHR$(0) THEN
         GOTO l56
 END IF
 
+hard = 0
 GOTO begin
 
 
@@ -1883,7 +1965,7 @@ IF doer = 5 THEN
 dkdk = cury - 1
 record1 = dkdk * 79 + curx
 lk = dd + 5
-dfdf = record1 * 3 - 3
+dfdf = record1 * 2 - 2
 m = lk + dfdf
 GOTO getstuff
 END IF
@@ -1892,19 +1974,22 @@ END IF
 
 
 lk = dd + 5
-dfdf = record * 3 - 3
+dfdf = record * 2 - 2
 m = lk + dfdf
 
 
 getstuff:
 LOCATE y, x
-a$ = SPACE$(3)
+a$ = SPACE$(2)
 GET #1, m, a$
 d$ = LEFT$(a$, 1)
 dhg = ASC(d$)
-bg1 = FIX(dhg / 16)
-fg1 = dhg - (bg1 * 16)
+
+fg1 = FIX(dhg / 16)
+bg1 = dhg - (fg1 * 16)
+IF bg1 > 7 THEN bg1 = bg1 - 8
 COLOR fg1, bg1
+
 IF doer = 5 THEN GOTO gotcolor
 e$ = RIGHT$(a$, 1)
 IF e$ = CHR$(0) THEN
@@ -1964,22 +2049,23 @@ GOTO ender5
 leaver1:
 dofunction:
 IF way = 1 THEN
-x = x - 1: waypoint = 1
+x = x - 1: waypoint = 1: looker = 1
 END IF
 IF way = 2 THEN
-x = x + 1: waypoint = 2
+x = x + 1: waypoint = 2: looker = 1
 END IF
 IF way = 3 THEN
-y = y - 1: waypoint = 3
+y = y - 1: waypoint = 3: looker = 1
 END IF
 IF way = 4 THEN
-y = y + 1: waypoint = 4
+y = y + 1: waypoint = 4: looker = 1
 END IF
 
 doiter:
 DO
 'INPUT #36, adsg$
-adsg$ = inputer$(0)
+adsg$ = ReferenceArray$(looker): looker = looker + 1
+'adsg1$ = inputer$(0)
 adsg$ = UCASE$(adsg$)
 
 IF adsg$ = "--EOF--" THEN GOTO leaver
@@ -2004,7 +2090,8 @@ END IF
 LOOP
 dothe:
 'INPUT #36, iner$
-iner$ = inputer$(0)
+iner$ = ReferenceArray$(looker): looker = looker + 1
+'iner$ = inputer$(0)
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
 IF iner$ = "@END" THEN GOTO donewith
@@ -2027,7 +2114,7 @@ GOTO doiter
 
 itisonit:
 DO
-IF runref$ <> "YES" THEN iner$ = inputer$(0)
+IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 
@@ -2047,7 +2134,8 @@ IF LEFT$(iner$, 5) = "#WAIT" THEN
 if$ = LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 5)))
 IF if$ = "1" THEN LOCATE , , 1
 IF if$ = "0" THEN LOCATE , , 0
-i$ = INPUT$(1)
+WHILE a$ <> "": a$ = INKEY$: WEND
+Is$ = INPUT$(1)
 END IF
 
 IF LEFT$(iner$, 6) = "#SLEEP" THEN
@@ -2092,8 +2180,11 @@ IF LEFT$(iner$, 1) = "!" THEN
 record = (y - 1) * 79 + x
 
 color$ = SPACE$(1)
-dd = map2(rp): dk = dd + 5: mk = record * 3 - 3: m = mk + dk
-GET #1, m, color$: d$ = LEFT$(color$, 1): dg = ASC(d$): color1 = FIX(dg / 16)
+dd = map2(rp): dk = dd + 5: mk = record * 2 - 2: m = mk + dk
+GET #1, m, color$: d$ = LEFT$(color$, 1): dg = ASC(d$):
+fg = FIX(dg / 16): bg = dg - (fg * 16): IF bg > 7 THEN bg = bg - 8
+color1 = bg
+
 COLOR 14, color1: LOCATE y, x: PRINT CHR$(1); SPC(0);
 
 direction$ = ""
@@ -2104,7 +2195,7 @@ END IF
 
 
 IF iner$ = "#MOVEOBJ" THEN
-IF runref$ <> "YES" THEN kind$ = inputer$(0)
+IF runref$ <> "YES" THEN kind$ = ReferenceArray$(looker): looker = looker + 1'kind$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, kind$
 ret = 0
 ghs = 5
@@ -2113,7 +2204,7 @@ returnhere:
         DO
         LOOP WHILE TIMER < ts + VAL(kind$)
 
-IF runref$ <> "YES" THEN dfdf$ = inputer$(0)
+IF runref$ <> "YES" THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1'dfdf$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
@@ -2141,7 +2232,7 @@ LOCATE cury, curx
 PRINT " "
 doer = 0
 
-IF runref$ <> "YES" THEN dfdf$ = inputer$(0)
+IF runref$ <> "YES" THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1'dfdf$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 
@@ -2162,13 +2253,14 @@ END IF
 
 IF iner$ = "#ANIMATE" THEN
 IF RUNRUF$ = "YES" THEN GOTO donet
-ani$ = inputer$(0)
+ani$ = ReferenceArray$(looker): looker = looker + 1'ani$ = inputer$(0)
 'INPUT #36, ani$
 ret1 = 0
 IF ani$ = "1" THEN ret1 = 3
 todo:
 cb = 0
-newthing$ = inputer$(0)
+'newthing$ = inputer$(0)
+newthing$ = ReferenceArray$(looker): looker = looker + 1
 'INPUT #36, newthing$
 IF newthing$ = "#DONEANIMATE" THEN GOTO doneanimate
 iner$ = newthing$
@@ -2190,7 +2282,7 @@ IF LEFT$(iner$, 7) = "#CHOICE" THEN
 LOCATE , , 0
 howmany = VAL(RIGHT$(iner$, LEN(iner$) - 7))
 FOR hg = 1 TO howmany
-IF runref$ <> "YES" THEN data$ = inputer$(0)
+IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 opt$(hg) = data$
 NEXT hg
@@ -2202,6 +2294,7 @@ beg6:
 LOCATE cury, 1
 LOCATE , 1
 COLOR 15, 0
+jdcolor = 1
 FOR hg = 1 TO (op4 - 1)
 data$ = opt$(hg)
 
@@ -2218,6 +2311,7 @@ COLOR 15, 1
 
 printer 3, option$, cury + hg - 1
 doposx1 = doposx
+
 COLOR 15, 0
 
 sssg = 1
@@ -2230,6 +2324,8 @@ fds = fds + 1
 printer 1, junk$, cury + hg - sssg
 GOTO curg
 curg1:
+
+jdcolor = 0
 
 DO
 LOCATE cury + (op4 - 1), doposx1, 1, 6, 7
@@ -2270,7 +2366,7 @@ gg:
 IF runref$ <> "YES" AND data$ = "--EOF--" THEN GOTO nothing
 IF runref$ = "YES" AND EOF(53) THEN GOTO nothing
 
-IF runref$ <> "YES" THEN data$ = inputer$(0)
+IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 
 IF LEFT$(data$, 7) = "#CHOICE" THEN
@@ -2278,12 +2374,12 @@ numofchoices = VAL(RIGHT$(data$, LEN(data$) - 7))
 gv = 0
 DO
         IF gv = numofchoices THEN EXIT DO
-        IF runref$ <> "YES" THEN iner2$ = inputer$(0)
+        IF runref$ <> "YES" THEN iner2$ = ReferenceArray$(looker): looker = looker + 1'iner2$ = inputer$(0)
         IF runref$ = "YES" THEN INPUT #53, iner2$
         IF LEFT$(iner2$, 9) = "#IFCHOICE" THEN gv = gv + 1
 LOOP
 DO
-        IF runref$ <> "YES" THEN iner2$ = inputer$(0)
+        IF runref$ <> "YES" THEN iner2$ = ReferenceArray$(looker): looker = looker + 1'iner2$ = inputer$(0)
         IF runref$ = "YES" THEN INPUT #53, iner2$
         IF LEFT$(iner2$, 5) = "@DONE" THEN EXIT DO
 LOOP
@@ -2294,7 +2390,7 @@ IF data$ = toGET$ THEN GOTO dofunc
 GOTO gg
 dofunc:
 in:
-IF runref$ <> "YES" THEN iner$ = inputer$(0)
+IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 
@@ -2304,7 +2400,7 @@ IF iner$ = "@DONE" THEN GOTO donefunc
 doits = 5
 GOTO togo2
 donefunc:
-IF runref$ <> "YES" THEN data$ = inputer$(0)
+IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, data$
 data$ = UCASE$(data$)
 IF data$ = "@DONECHOICE" THEN GOTO nothing
@@ -2330,14 +2426,26 @@ IF LEFT$(togoto$, 2) <> "@#" THEN togoto$ = "@#" + togoto$
 
 IF runref$ <> "YES" THEN
 CLOSE #36
-'OPEN "FQREFS.DAT" FOR INPUT AS #36
 refpos = 1
 gos:
-'IF EOF(36) THEN GOTO getout6
 dat$ = inputer$(0)
 IF dat$ = "--EOF--" THEN GOTO getout6
-'INPUT #36, dat$
-IF dat$ = togoto$ THEN GOTO itisonit
+IF dat$ = togoto$ THEN
+        xcc = 1
+        DO
+        ReferenceArray$(xcc) = inputer$(0)
+        IF ReferenceArray$(xcc) = "--EOF--" THEN
+                COLOR 7, 0: CLS
+                PRINT "Error:  @END Missing in Reffile for SCR " + LTRIM$(STR$(rp))
+                END
+                END IF
+        IF LTRIM$(RTRIM$(UCASE$(ReferenceArray$(xcc)))) = "@END" THEN EXIT DO
+        xcc = xcc + 1
+        LOOP
+ReferenceArray$(xcc + 1) = "--EOF--"
+        GOTO itisonit
+        END IF
+
 GOTO gos
 END IF
 
@@ -2449,8 +2557,7 @@ showit1:
 IF EOF(252) THEN GOTO done2
 INPUT #252, toprint$
 IF toprint$ = "@END" THEN GOTO done2
-printer 1, toprint$, doposy
-doposy = doposy + 1
+printer 1, toprint$, 1000
 GOTO showit1
 done2:
 CLOSE #252
@@ -2461,7 +2568,7 @@ END IF
 IF LEFT$(iner$, 6) = "#PRINT" THEN
 
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) = "P" THEN
-IF runref$ <> "YES" THEN toprint$ = inputer$(0)
+IF runref$ <> "YES" THEN toprint$ = ReferenceArray$(looker): looker = looker + 1'toprint$ = inputer$(0)
 IF runref$ = "YES" THEN LINE INPUT #53, toprint$
 printer 1, toprint$, doposy
 GOTO g55
@@ -2469,7 +2576,7 @@ END IF
 
 howmany = VAL(RIGHT$(iner$, LEN(iner$) - 6))
 FOR doingit = 1 TO howmany
-IF runref$ <> "YES" THEN toprint$ = inputer$(0)
+IF runref$ <> "YES" THEN toprint$ = ReferenceArray$(looker): looker = looker + 1'toprint$ = inputer$(0)
 IF runref$ = "YES" THEN LINE INPUT #53, toprint$
 IF doingit <> howmany THEN printer 1, toprint$, doposy
 IF doingit = howmany THEN printer 2, toprint$, doposy
@@ -2488,11 +2595,11 @@ IF runref$ = "YES" THEN INPUT #53, b$
 IF runref$ = "YES" THEN INPUT #53, togetscore
 IF runref$ = "YES" THEN INPUT #53, expertoget
 
-IF runref$ <> "YES" THEN tosay$ = inputer$(0)
-IF runref$ <> "YES" THEN m$ = inputer$(0)
-IF runref$ <> "YES" THEN b$ = inputer$(0)
-IF runref$ <> "YES" THEN togetscore = VAL(inputer$(0))
-IF runref$ <> "YES" THEN expertoget = VAL(inputer$(0))
+IF runref$ <> "YES" THEN tosay$ = ReferenceArray$(looker): looker = looker + 1'tosay$ = inputer$(0)
+IF runref$ <> "YES" THEN m$ = ReferenceArray$(looker): looker = looker + 1'm$ = inputer$(0)
+IF runref$ <> "YES" THEN b$ = ReferenceArray$(looker): looker = looker + 1'b$ = inputer$(0)
+IF runref$ <> "YES" THEN togetscore = VAL(ReferenceArray$(looker)): looker = looker + 1'(inputer$(0))
+IF runref$ <> "YES" THEN expertoget = VAL(ReferenceArray$(looker)): looker = looker + 1'(inputer$(0))
 
 IF i = 1 THEN weapon = weapon1power
 IF i = 2 THEN weapon = weapon2power
@@ -2551,11 +2658,11 @@ END IF
 
 
 IF iner$ = "#INPUT" THEN
-IF runref$ <> "YES" THEN random1$ = inputer$(0)
+IF runref$ <> "YES" THEN random1$ = ReferenceArray$(looker): looker = looker + 1'random1$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, random1$
-IF runref$ <> "YES" THEN x$ = inputer$(0)
+IF runref$ <> "YES" THEN x$ = ReferenceArray$(looker): looker = looker + 1'x$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, x$
-IF runref$ <> "YES" THEN y$ = inputer$(0)
+IF runref$ <> "YES" THEN y$ = ReferenceArray$(looker): looker = looker + 1'y$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, y$
 thex = VAL(x$)
 they = VAL(y$)
@@ -2602,19 +2709,18 @@ IF rag = 1 THEN GOTO ifit1
 
 idg:
 IF runref$ <> "YES" THEN
-'IF EOF(36) THEN GOTO donerandom
 IF junk$ = "--EOF--" THEN GOTO donerandom
 END IF
 IF runref$ = "YES" THEN
 IF EOF(53) THEN GOTO donerandom
 END IF
-IF runref$ <> "YES" THEN junk$ = inputer$(0)
+IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, junk$
 IF UCASE$(junk$) = "#ENDRANDOM" THEN GOTO donerandom
 GOTO idg
 
 ifit1:
-IF runref$ <> "YES" THEN iner$ = inputer$(0)
+IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
@@ -2671,7 +2777,19 @@ IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 9))) = "0" THEN LOCATE , , 0
 
 DO: getchar$ = INKEY$: LOOP WHILE getchar$ = ""
 
-FOR chars = 1 TO 32
+'FOR chars = 1 TO 32
+'IF getchar$ = CHR$(chars) THEN
+'        getchar$ = LTRIM$(STR$(chars))
+'        EXIT FOR
+'        END IF
+'IF getchar$ = CHR$(0) + CHR$(chars) THEN
+'        getchar$ = LTRIM$(STR$(chars))
+'        PRINT chars; getchar$: i$ = INPUT$(1)
+'        EXIT FOR
+'        END IF
+'NEXT chars
+
+FOR chars = 1 TO 255
 IF getchar$ = CHR$(chars) THEN
         getchar$ = LTRIM$(STR$(chars))
         EXIT FOR
@@ -2682,17 +2800,21 @@ IF getchar$ = CHR$(0) + CHR$(chars) THEN
         END IF
 NEXT chars
 
-FOR chars = 127 TO 255
-IF getchar$ = CHR$(chars) THEN
-        getchar$ = LTRIM$(STR$(chars))
-        EXIT FOR
-        END IF
-IF getchar$ = CHR$(0) + CHR$(chars) THEN
-        getchar$ = LTRIM$(STR$(chars))
-        EXIT FOR
-        END IF
-NEXT chars
 
+
+'
+'FOR chars = 127 TO 255
+'IF getchar$ = CHR$(chars) THEN
+'        getchar$ = LTRIM$(STR$(chars))
+'        EXIT FOR
+'        END IF
+'IF getchar$ = CHR$(0) + CHR$(chars) THEN
+'        getchar$ = LTRIM$(STR$(chars))
+'        EXIT FOR
+'        END IF
+'NEXT chars
+
+'LOCATE 1, 1: PRINT getchar$; SPC(0);
 
 toset$ = "LASTCHAR"
 tosetto$ = getchar$
@@ -2966,7 +3088,7 @@ junk$ = settings$(nus): nus = nus + 1
 GOTO EOF1:
 
 runit:
-IF runref$ <> "YES" THEN iner$ = inputer$(0)
+IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 IF iner$ = "#ENDIF" THEN GOTO donenext1
@@ -2981,7 +3103,7 @@ GOTO togo2
 
 donenext:
 gog:
-IF runref$ <> "YES" THEN junk$ = inputer$(0)
+IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, junk$
 IF junk$ = "#ENDIF" THEN GOTO donenext1
 IF junk$ = "#ENDIF1" THEN
@@ -3035,11 +3157,11 @@ hmr = VAL(RIGHT$(iner$, LEN(iner$) - 12))
 RANDOMIZE TIMER
 rand1 = INT(RND * hmr)
 FOR i12 = 1 TO rand1
-IF runref$ <> "YES" THEN D5342$ = inputer$(0)
+IF runref$ <> "YES" THEN D5342$ = ReferenceArray$(looker): looker = looker + 1'D5342$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, D5342$
 
 NEXT i12
-IF runref$ <> "YES" THEN towrite$ = inputer$(0)
+IF runref$ <> "YES" THEN towrite$ = ReferenceArray$(looker): looker = looker + 1'towrite$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
@@ -3048,7 +3170,7 @@ END IF
 
 
 IF LEFT$(iner$, 6) = "#WRITE" THEN
-IF runref$ <> "YES" THEN towrite$ = inputer$(0)
+IF runref$ <> "YES" THEN towrite$ = ReferenceArray$(looker): looker = looker + 1'towrite$ = inputer$(0)
 IF runref$ = "YES" THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
@@ -3243,7 +3365,7 @@ COLOR 7, 0
 CLEAR
 END
 
-SUB cole (pressed, toprint$, cole1$)
+SUB cole (pressed, toprint$, cole1$, fground, bground)
 
 
 IF pressed = 1 THEN
@@ -3368,10 +3490,12 @@ h$ = ""
 
 
 IF gh2$ = "F" THEN gh = gh + 2
+IF gh2$ = "Y" THEN gh = gh + 2
+IF gh2$ = "X" THEN gh = gh + 2
 IF gh2$ = "H" THEN h$ = LTRIM$(STR$(h))
 
 IF gh2$ = "E" THEN h$ = LTRIM$(STR$(exper))
-IF gh2$ = "G" THEN h$ = LTRIM$(STR$(G))
+IF gh2$ = "G" THEN h$ = LTRIM$(STR$(g))
 IF gh2$ = "A" THEN h$ = LTRIM$(STR$(w))
 IF gh2$ = "D" THEN h$ = LTRIM$(STR$(defs))
 IF gh2$ = "I" THEN
@@ -3387,13 +3511,33 @@ IF z = 3 THEN h$ = armour3name$
 IF z = 4 THEN h$ = armour4name$
 END IF
 IF gh2$ = "V" THEN
+crapdata$ = ""
 hh:
 gh1$ = LEFT$(toprint$, gh)
-gh2$ = RIGHT$(gh1$, 1)
-IF gh2$ = "`" THEN GOTO ghhh
+ghb$ = RIGHT$(gh1$, 1)
+IF ghb$ = "`" THEN
+        GOTO ghhh
+        END IF
+crapdata$ = crapdata$ + ghb$
 gh = gh + 1
 GOTO hh
 ghhh:
+crapdata$ = RIGHT$(crapdata$, LEN(crapdata$) - 1)
+nus = 1
+DO
+vs$ = settings$(nus): nus = nus + 1
+vsdata$ = settings$(nus): nus = nus + 1
+IF vs$ = "--END--" THEN
+        h$ = ""
+        EXIT DO
+        END IF
+
+IF UCASE$(vs$) = UCASE$(crapdata$) THEN
+        h$ = LTRIM$(vsdata$)
+        EXIT DO
+        END IF
+LOOP
+
 END IF
 IF gh2$ = "B" THEN gh = gh + 1
 
@@ -3440,6 +3584,7 @@ last = VAL(e$)
 g1 = first * 16
 b1 = g1 + last
 h$ = CHR$(b1)
+COLOR fground, bground
 PRINT h$; SPC(0);
 doposx = doposx + 1
 END IF
@@ -3450,6 +3595,7 @@ gg = gg + 1
 d1$ = LEFT$(toprint$, gg)
 c1$ = RIGHT$(d1$, 1)
 bg = VAL(c1$)
+Ber = 1
 END IF
 
 
@@ -3468,17 +3614,17 @@ PRINT h$; SPC(0);
 END IF
 
 IF cole1$ = "G" THEN
-G$ = STR$(s)
-G$ = LTRIM$(RTRIM$(G$))
-PRINT G$; SPC(0);
- doposx = doposx + LEN(G$)
+g$ = STR$(s)
+g$ = LTRIM$(RTRIM$(g$))
+PRINT g$; SPC(0);
+ doposx = doposx + LEN(g$)
 END IF
 
 IF cole1$ = "E" THEN
-G$ = STR$(exper)
-G$ = LTRIM$(RTRIM$(G$))
-PRINT G$; SPC(0);
-doposx = doposx + LEN(G$)
+g$ = STR$(exper)
+g$ = LTRIM$(RTRIM$(g$))
+PRINT g$; SPC(0);
+doposx = doposx + LEN(g$)
 END IF
 
 IF cole1$ = "A" THEN
@@ -3496,23 +3642,23 @@ PRINT h$; SPC(0);
 END IF
 
 IF cole1$ = "I" THEN
-IF i = 1 THEN G$ = weapon1name$
-IF i = 2 THEN G$ = weapon2name$
-IF i = 3 THEN G$ = weapon3name$
-IF i = 4 THEN G$ = weapon4name$
-G$ = LTRIM$(RTRIM$(G$))
-PRINT G$; SPC(0);
-doposx = doposx + LEN(G$)
+IF i = 1 THEN g$ = weapon1name$
+IF i = 2 THEN g$ = weapon2name$
+IF i = 3 THEN g$ = weapon3name$
+IF i = 4 THEN g$ = weapon4name$
+g$ = LTRIM$(RTRIM$(g$))
+PRINT g$; SPC(0);
+doposx = doposx + LEN(g$)
 END IF
 
 IF cole1$ = "Z" THEN
-IF z = 1 THEN G$ = armour1name$
-IF z = 2 THEN G$ = armour2name$
-IF z = 3 THEN G$ = armour3name$
-IF z = 4 THEN G$ = armour4name$
-G$ = LTRIM$(RTRIM$(G$))
-PRINT G$; SPC(0);
-doposx = doposx + LEN(G$)
+IF z = 1 THEN g$ = armour1name$
+IF z = 2 THEN g$ = armour2name$
+IF z = 3 THEN g$ = armour3name$
+IF z = 4 THEN g$ = armour4name$
+g$ = LTRIM$(RTRIM$(g$))
+PRINT g$; SPC(0);
+doposx = doposx + LEN(g$)
 END IF
 
 IF cole1$ = "V" THEN
@@ -3652,7 +3798,8 @@ refpos = refpos + jk + 2
 inputer$ = LTRIM$(RTRIM$(data$))
 END FUNCTION
 
-SUB printer (da, toprint$, doposy)
+SUB printer (da, toprint$, jack)
+IF jack <> 1000 THEN doposy = jack
 bg = 0
 screenmode = 0
 collor = 15
@@ -3702,7 +3849,14 @@ END IF
 
 COLOR collor, bg
 
-cole 1, toprint$, cole2$
+bg1 = bg
+
+IF Ber = 0 AND jdcolor <> 1 THEN
+        xx = SCREEN(doposy, doposx, 1)
+        bg1 = FIX(xx / 16)
+        END IF
+
+cole 1, toprint$, cole2$, collor, bg1
 GOTO cone3
 END IF
 
@@ -3713,6 +3867,10 @@ doposx = 1
 END IF
 
 LOCATE doposy, doposx
+IF Ber = 0 AND jdcolor <> 1 THEN
+        xx = SCREEN(doposy, doposx, 1)
+        bg = FIX(xx / 16)
+        END IF
 COLOR collor, bg
 PRINT letter$; SPC(0);
 IF letter$ = CHR$(10) THEN GOTO cone3
@@ -3722,6 +3880,7 @@ NEXT gdi
 IF da = 1 THEN PRINT
 IF da = 3 THEN PRINT
 'PRINT
+Ber = 0
 END SUB
 
 SUB setsettings
@@ -3922,7 +4081,9 @@ collor = bb
 END IF
 
 
-cole 0, towrite$, cole4$
+fground = collor
+bground = bg
+cole 0, towrite$, cole4$, fground, bground
 GOTO cone2
 END IF
 
