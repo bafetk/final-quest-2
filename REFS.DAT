@@ -35,26 +35,63 @@
 @#STATUSLINE
 `b1`Y23`X01`L77`X01`1`b0`X01`Y23`FB0`FB1`C`%`b1`Y23Final Quest 2 -- By AkoriSoft -- HP (`vHITPOINT`/`vMAXENERGY`) -- Gold: `vGOLD`!`1`b0`Y23`X78`FB1`FB0
 @#MAP
+#PRINT 4
 `X30`Y03`%`b1Welcome to `$F`4inal `$Q`4uest `$2`%.
 `X28`Y05`%`b1A `b7 `b1 represents a large town,
 `X28`Y06`%`b1a `7`b2`FFE`b1`% represents a small town,
 `X28`Y07`%`b1and a `b2 `b1 represents land.
 @END
 @#INVSCR
+#DECLARE CURSER
+#SET CURSER = 17;
+#PRINT 4
 `%`b0`%`b0`K`Y02`X01`Y03`X01`X07`%`b0ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y04`X01  `%`b1    `%`b0³`X13Inventory`X27³`%`b1    `Y05`X01`X07`%`b0ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y06`X01`Y07`X01`X14`%`b1ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y08`X01`X14³                    `%`b0`Y09`X14
 `Y08`X35`%`b1                                 ³`Y09`X01`X14³                                                     ³`Y10`X01`X14³                                                     ³`Y11`X01`X14³                                                     ³`%`b0`Y12`X14
 `%`b1`Y12`X01`X14³                                                     ³`Y13`X01`X14³                                                     ³`Y14`X01`X14³                                                     ³`Y15`X01`X14³                            `%`b0`Y16`X14
-`Y15`X43`%`b1                         ³`Y16`X01`X14³                                                     ³`Y17`X01`X14³                                                     ³`Y18`X01`X14³                                                     ³`Y19`X01`X14`%`b0`Y20`X14
-`Y19`X14`%`b1ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y20`X01`Y21`X01`X54`%`b0ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿`Y22`X01`X50`%`b1    `%`b0³   Press a Key..   ³`%`b1    `Y23`X01`X54`%`b0ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y01`X01
+`Y15`X43`%`b1                         ³`Y16`X01`X14³                                                     ³
+        #IF ACCOUNT = 1 THEN
+        #PRINT 1
+`Y:CURSER;`b1`%`X01`X14³                                                     ³
+        #SET CURSER + 1;
+        #ENDIF
+        #IF BERRY > 0 THEN
+        #PRINT 1
+`Y:CURSER;`b1`%`X01`X14³                                                     ³
+        #SET CURSER + 1;
+        #ENDIF
+#PRINT 1
+`Y:CURSER;`X14`%`b1ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+#SET CURSER + 2;
+#PRINT 1
+`Y:CURSER;`X01`X54`%`b0ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+#SET CURSER + 1;
+#PRINT 1
+`Y:CURSER;`X01`X50`%`b1    `%`b0³   Press a Key..   ³`%`b1    `Y23
+#SET CURSER + 1;
+#PRINT 1
+`Y:CURSER;`X01`X54`%`b0ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ`Y01`X01
+#SET CURSER = 9;
+#PRINT 3
 `Y09`X17`%Experience: `%`e`X58
 `X17`%Hitpoints: `@`h`X58
 `X17`%Gold: `$$`g`X58
-`X17`%Gold in Bank: `$$`vBANK``x58
-`X17`%Strength: `!`a`X58
+#SET CURSER + 3;
+        #IF ACCOUNT = 1 THEN
+#PRINT 1
+`X17`Y:CURSER;`%Gold in Bank: `$$`vBANK``x58
+        #SET CURSER + 1;
+        #ENDIF
+#PRINT 4
+`X17`Y:CURSER;`%Strength: `!`a`X58
 `X17`%Defense: `!`d`X58
 `X17`%Weapon: `#`i`X58
 `X17`%Armour: `#`z`X58
-`X17`%Wildberries: `4`vBERRY``X58
+#SET CURSER + 4;
+        #IF BERRY > 0 THEN
+#PRINT 1
+`X17`Y:CURSER;`%Wildberries: `4`vBERRY``X58
+        #ENDIF
+#DELETE CURSER
 @END
 @#HELP
 `$`CWelcome to Final Quest 2 V0.94 by Akori Software.
@@ -147,10 +184,20 @@
 @END
 
 @#SCR 82
-
-@IPS 29 17
-!NEWPOS 29 17
-#DONE
+        @IPS 28 17
+                #IF WARPTOPORT = 2 THEN
+                #SET WARPTOPORT = 0;
+                #WRITE
+                        `C`!You have warped to `7Stone Valley`!.
+                #ENDIF
+                #DONE
+        @IPS 29 17
+                #GOTO 486
+                #NEWPOS 4 13
+                #MAPSCREEN 486
+                #DECLARE WARPTOPORT
+                #SET WARPTOPORT = 1;
+                #DONE
         @IPS 47 22
                 #NEWPOS 79 22
                 #WRITE
@@ -172,11 +219,11 @@
                 #DONE
 
         @IPS 32 7
-                #WRITE
-                        `C`2The Sign Reads:  Village of Stone Valley...
-                #DONE
-'        #RUNREF MOVE|MOVE.REF
+'                #WRITE
+'                        `C`2The Sign Reads:  Village of Stone Valley...
 '                #DONE
+        #RUNREF MOVE|MOVE.REF
+                #DONE
          @IPS 65 17
                 #RUNREF TRAVELSTONE|MAIN.REF
                 #DONE
@@ -535,7 +582,7 @@
                 #DONE
         @IPS 55 9
                 #GOTO 881
-                #NEWPOS 55 9
+                #NEWPOS 53 15
                 #DONE
 @END
 @#SCR 802
@@ -596,8 +643,188 @@
                 #DONE
 @END
 @#SCR 881
-        @IPS 55 11
+        @IPS 53 16
                 #GOTO 801
                 #NEWPOS 55 11
+                #DONE
+@END
+@#SCR 486
+        @IPS 4 13
+                #IF WARPTOPORT = 1 THEN
+                #SET WARPTOPORT = 0;
+                #WRITE
+                        `C`!You have warped to `7Port City`!.
+                #ENDIF
+                #DONE
+        @IPS 3 13
+                #DECLARE WARPTOPORT
+                #SET WARPTOPORT = 2;
+                #MAPSCREEN 82
+                #NEWPOS 28 17
+                #GOTO 82
+                #DONE
+        @IPS 15 11
+                #RUNREF PORTBANK|PORTCITY.REF
+                #DONE
+        @IPS 3 9
+                #RUNREF GUARDS|PORTCITY.REF
+                #DONE
+        @IPS 17 5
+                #GOTO 1041
+                #NEWPOS 39 17
+                #DONE
+        @IPS 33 11
+                #GOTO 1042
+                #NEWPOS 41 18
+                #DONE
+        @IPS 38 15
+                #GOTO 1043
+                #NEWPOS 41 18
+                #DONE
+        @IPS 49 8
+                #RUNREF BOATHOUSE|PORTCITY.REF
+                #DONE
+        @IPS 67 14
+                #RUNREF BOAT|PORTCITY.REF
+                #DONE
+@END
+@#SCR 1041
+        @IPS 39 18
+                #GOTO 486
+                #NEWPOS 17 6
+                #DONE
+        @IPS 38 11
+        @IPS 39 11
+        @IPS 40 11
+        @IPS 41 11
+        @IPS 37 12
+        @IPS 38 12
+        @IPS 39 12
+        @IPS 40 12
+        @IPS 41 12
+        @IPS 42 12
+        @IPS 37 13
+        @IPS 38 13
+        @IPS 39 13
+        @IPS 40 13
+        @IPS 41 13
+        @IPS 42 13
+        @IPS 38 14
+        @IPS 39 14
+        @IPS 40 14
+        @IPS 41 14
+                #WRITE
+                        `C`%A ball room floor!
+        #DONE
+        @IPS 30 13
+        @IPS 31 13
+        @IPS 32 13
+        @IPS 33 13
+        @IPS 34 12
+        @IPS 32 11
+        @IPS 33 11
+        @IPS 30 11
+                #WRITE
+                        `C`%You take a chair!
+        #DONE
+        @IPS 22 13
+        @IPS 26 13
+                #WRITE
+                        `C`%A nightstand.
+        #DONE
+        @IPS 23 17
+        @IPS 24 17
+        @IPS 25 17
+                #WRITE
+                        `C`%What a wonderful view out this window!
+        #DONE
+        @IPS 23 13
+        @IPS 24 13
+        @IPS 25 13
+        @IPS 23 14
+        @IPS 24 14
+        @IPS 25 14
+                #WRITE
+                        `C`%What a huge bed!
+        #DONE
+        @IPS 53 11
+                #WRITE
+                        `C`%A sink.
+        #DONE
+        @IPS 54 11
+                #WRITE
+                        `C`%A stove.
+        #DONE
+        @IPS 51 10
+                #WRITE
+                        `C`0My husband and I are soooo rich!!! oooOOhh!!!
+        #DONE
+        @IPS 31 11
+                #WRITE
+                        `C`0Yep`F2C kid... It's all mine!!
+        #DONE
+@END
+@#SCR 1042
+        @IPS 28 9
+                #WRITE
+                        `C`!You don't need to use this toilet.
+                #DONE
+        @IPS 30 9
+                #WRITE
+                        `C`%"`$That's all I do, is clean Clean CLEAN!  I HATE THIS JOB!`%"
+                #DONE
+        @IPS 32 9
+        @IPS 54 9
+        @IPS 45 17
+                #WRITE
+                        `C`%A sink.
+                #DONE
+        @IPS 51 11
+                #WRITE
+                        `C`%"`$Man, I LOVE living in the city!  Have a drink, kid.`%"
+                #DONE
+        @IPS 52 9
+                #WRITE
+                        `C`%The bartender says`F2C "`$What'll it be?`%"
+                #DONE
+        @IPS 53 11
+                #RUNREF REDDRINK|PORTCITY.REF
+                #DONE
+        @IPS 51 16
+                #WRITE
+                        `C`%"`$He doesn't pay me enough to cook his food.`%"
+                #DONE
+        @IPS 46 17
+                #WRITE
+                        `C`%A stove.
+                #DONE
+        @IPS 43 17
+                #WRITE
+                        `C`%A place to hang coats.
+                #DONE
+        @IPS 29 17
+        @IPS 32 17
+                #WRITE
+                        `C`%A nightstand.
+                #DONE
+        @IPS 30 17
+        @IPS 31 17
+                #WRITE
+                        `C`!A nicely sized bed.
+                #DONE
+        @IPS 29 11
+        @IPS 30 11
+                #WRITE
+                        `C`%A walk in closet!!!!! Alright!
+                #DONE
+        @IPS 41 19
+                #GOTO 486
+                #NEWPOS 33 12
+                #DONE
+@END
+@#SCR 1043
+        @IPS 41 19
+                #GOTO 486
+                #NEWPOS 38 16
                 #DONE
 @END

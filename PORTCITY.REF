@@ -1,0 +1,191 @@
+@#REDDRINK
+#PRINT 3
+`7`b0`k
+`2The bartender asks`F2C "`%What'll it be?`2"
+
+#CHOICE 3
+Ask for the best drink in the house...
+Chat with the bartender...
+Leave...
+#IFCHOICE 3
+@DONE
+#IFCHOICE 2
+#PRINT 3
+`7`b0`k`2The bartender looks at you and says`F2C "`%I've got nothing to say to you.`2"
+
+`0<`2Continue`0>
+#WAIT 1
+#RETURN
+@DONE
+#IFCHOICE 1
+#IF DRINK = 1 THEN
+#PRINT 3
+`7`b0`k`2The bartender looks at you and says`F2C "`%Only one drink today.`2"
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+#IF DRINK = 0 THEN
+#SET DRINK = 1;
+#PRINT 6
+`7`b0`k`2You tell the bartender`F2C "`$Give me the best drink you got!`2"
+
+`2The bartender moves away for a second`F2C but returns with a mistly
+`2glass and proceeds to pour a clear liquid into it.
+
+`0<`2Continue`0>
+#WAIT 1
+#PRINT 4
+`Y06`2You drink out of the glass and get a nice sensation from it.  The drink
+`2is strong, but you can handle it.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+#RETURN
+@DONE
+@DONECHOICE
+@END
+
+@#PORTBANK
+        #IF ACCOUNT = 0 THEN
+                #CLS
+                #PRINT 1
+`2You don't have an account with us yet.  Do you wish to start one?
+#CHOICE 2
+Yes...
+No...
+#IFCHOICE 2
+@DONE
+#IFCHOICE 1
+        #SET ACCOUNT = 1;
+        #RETURN
+@DONE
+#ENDIF
+        #CLS
+        #PRINT 2
+`2Welcome to `%Port City Bank`2. You have `$$`vBANK``2 in your account.
+`2You have `$$`g`2 on hand.
+#CHOICE 4
+Deposit...
+Withdraw...
+Close Account...
+Get out of here...
+#IFCHOICE 1
+        #CLS
+        #PRINT 5
+`2Your account has `$$`vBANK``2.
+`2You have `$$`g`2.
+
+`2How much do you want to deposit?
+`2Press 1 to Deposit all your gold on hand.
+#INPUT
+ 15
+ 1
+ 6
+#FIX LASTRESPONSE
+
+        #IF LASTRESPONSE <= 0 THEN
+        #RETURN
+        #ENDIF
+
+        #IF LASTRESPONSE = 1 THEN
+                #SET BANK +1 GOLD;
+                #SET GOLD = 0;
+                #ENDIF
+
+        #IF GOLD >1 LASTRESPONSE THEN
+                #SET GOLD -1 LASTRESPONSE;
+                #SET BANK +1 LASTRESPONSE;
+                #ENDIF
+        #RETURN
+@DONE
+#IFCHOICE 2
+        #CLS
+#PRINT 5
+`2Your account has `$$`vBANK``2.
+`2You have `$$`g`2.
+
+`2How much do you want to withdraw?
+`2Press 1 to withdraw all money in bank.
+#INPUT
+ 15
+ 1
+ 6
+        #IF LASTRESPONSE <= 0 THEN
+        #RETURN
+        #ENDIF
+
+        #IF LASTRESPONSE = 1 THEN
+                #SET GOLD +1 BANK;
+                #SET BANK = 0;
+                #ENDIF
+
+        #IF LASTRESPONSE <1 BANK THEN
+                #SET GOLD +1 LASTRESPONSE;
+                #SET BANK -1 LASTRESPONSE;
+                #ENDIF
+        #RETURN
+@DONE
+#IFCHOICE 4
+@DONE
+#IFCHOICE 3
+#CLS
+#PRINT 1
+`2Are you sure you want to close your account??
+#CHOICE 2
+Yes..
+No..
+#IFCHOICE 1
+#SET GOLD +1 BANK;
+#SET BANK = 0;
+#SET ACCOUNT = 0;
+@DONE
+#IFCHOICE 2
+#RETURN
+@DONE
+@DONECHOICE
+@END
+
+@#GUARDS
+#IF PORTCITYPASS = 0 THEN
+#PRINT 10
+`7`b0`k
+`2The guards notice your approach.
+`2
+`2A guard says`F2C "`%Hey`F2C let me see your pass!`2"
+`2
+`2Since you do not have a pass`F2C you try to bribe your way in.
+`2Unfortunately`F2C it does not work.  The guard carefully escorts you
+`2away from the gate.
+
+`0<`2Continue`0>  `2(2 second delay)`X11
+#SLEEP 1
+#PRINT 1
+`Y10`X14`21`X11
+#SLEEP 1
+#PRINT 1
+`Y10`X13`b0`L16`X11
+#WAIT 1
+!NEWPOS 2 9
+#ENDIF
+#IF PORTCITYPASS = 1 THEN
+#WRITE
+`C`@The guards eye you as you pass.
+#ENDIF
+@END
+
+@#PINKHOUSE486
+@END
+
+@#REDHOUSE486
+@END
+
+@#CYANHOUSE486
+@END
+
+@#BOATHOUSE
+@END
+
+@#BOAT
+@END

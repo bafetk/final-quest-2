@@ -20,7 +20,7 @@ DIM opt(100)
 DIM SHARED settings$(500), reffile(1920), file$(5)
 COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile(), file$()
 COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, s, w, defs, I, z, gdi
-COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg
+COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg, locatestatement
 
 RANDOMIZE TIMER
 cl$ = COMMAND$
@@ -457,6 +457,14 @@ GOTO getready
 begingame:
 
 loadmap:
+        refreshingmap = 1
+        GOTO getready
+returner25:
+        refreshingmap = 0
+
+
+justloading = 1
+doupdate = 0
 newmap = 1
 begingame = 0
 printline$ = "YES"
@@ -472,8 +480,13 @@ IF rp > 1920 THEN rp = 1920
 dd = map2(rp)
 
 IF dd = 0 THEN
-        dd = 1
-        rp = 1
+        'dd = 1
+        'rp = 1
+        COLOR 7, 0: CLS
+        PRINT "An Error was Detected:"
+        PRINT
+        PRINT "Map Number"; rp; "does not exist."
+        END
         END IF
 
 fa$ = inputer$(rp)
@@ -552,6 +565,11 @@ printer 2, statusline$, 23
 
 doneloading:
 
+IF justloading = 1 THEN
+        justloading = 0
+        GOTO loadmap23
+END IF
+
 begin:
 CLOSE #36, #53
 refpos = 1
@@ -572,6 +590,9 @@ LOOP
 dones3:
 alwaysdo = 0
 
+IF justloading = 1 THEN GOTO dl1
+
+loadmap23:
 
 
 IF ghs = 5 THEN
@@ -608,7 +629,6 @@ IF cc = 2 THEN PRINT "V=View Ref"
 IF dd1 = 1 THEN LOCATE 1, 1
 IF dd1 = 1 THEN PRINT "Y:"; y; "X:"; x; "SCR:"; rp; "Rec:"; record;
 color$ = SPACE$(1)
-
 
 
 color1 = FIX(SCREEN(y, x, 1) / 16)
@@ -970,16 +990,21 @@ da$ = inputer$(0): IF da$ = "--EOF--" THEN GOTO nomaperror
 GOTO gs:
 
 mapsx:
-k = 1
-invscr63:
-        iner$ = inputer$(0)
-                IF LTRIM$(RTRIM$(iner$)) = "@END" THEN GOTO waiter62
-        printer 0, iner$, k
-        k = k + 1
-GOTO invscr63
+        mapscreen$ = "YES"
+        beginninggame = 1
+returnmap:
+
+iner$ = inputer$(0)
+beforecaps$ = iner$
+IF iner$ = "@END" THEN GOTO waiter62
+IF iner$ = "--EOF--" THEN GOTO waiter62
+
+GOTO togo2
 
 
 waiter62:
+beginninggame = 0
+mapscreen$ = "NO"
 LOCATE 1, 1: I$ = INPUT$(1)
 towait1 = FIX(TIMER)
 COLOR 7, 0: CLS
@@ -1164,13 +1189,23 @@ findit:
                         GOTO invscr
                 END IF
 GOTO findit
+
 invscr:
-        iner$ = inputer$(0)
-                IF iner$ = "@END" THEN GOTO waiter
-        printer 1, iner$, k
-        k = k + 1
-GOTO invscr
+        inventoryscreen$ = "YES"
+        beginninggame = 1
+returninventory:
+
+iner$ = inputer$(0)
+beforecaps$ = iner$
+IF iner$ = "@END" THEN GOTO waiter
+IF iner$ = "--EOF--" THEN GOTO waiter
+
+GOTO togo2
+
+
 waiter:
+beginninggame = 0
+inventoryscreen$ = "NO"
 LOCATE , , 0, 6, 7: I$ = INPUT$(1)
 towait1 = FIX(TIMER)
 GOTO loadmap
@@ -1348,13 +1383,15 @@ itisonit:
 IF alwaysdo = 5 THEN GOTO gotothenext
 IF dothe = 5 THEN GOTO dothe
 DO
-IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, iner$
+IF beginninggame = 1 THEN iner$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
                 beforecaps$ = LTRIM$(iner$)
 
 togo2:
 iner$ = UCASE$(iner$)
+
 
 IF iner$ = "#DONE" THEN
 doit3 = 0
@@ -1404,34 +1441,43 @@ IF waypoint = 1 THEN x = x + 1
 IF waypoint = 2 THEN x = x - 1
 IF waypoint = 3 THEN y = y + 1
 IF waypoint = 4 THEN y = y - 1
+
 LOCATE y, x
 COLOR , color1
 PRINT " "; SPC(0);
 
-x = VAL(LEFT$(dfdf$, INSTR(dfdf$, " ")))
-y = VAL(RIGHT$(dfdf$, INSTR(dfdf$, " ") - 1))
+
+x = VAL(LEFT$(dfdf$, INSTR(dfdf$, " "))): dfdf$ = LTRIM$(RIGHT$(dfdf$, LEN(dfdf$) - INSTR(dfdf$, " ")))
+y = VAL(dfdf$)
+
+
 
 IF hh = 0 AND LEFT$(iner$, 1) = "!" THEN
-record = (y - 1) * 79 + x
 
-color$ = SPACE$(1)
-dd = map2(rp): dk = dd + 5: mk = record * 2 - 2: m = mk + dk
-GET #1, m, color$: d$ = LEFT$(color$, 1): dg = ASC(d$):
-fg = FIX(dg / 16): bg = dg - (fg * 16): IF bg > 7 THEN bg = bg - 8
-color1 = bg
+'record = (y - 1) * 79 + x
+'color$ = SPACE$(1)
+'dd = map2(rp): dk = dd + 5: mk = record * 2 - 2: m = mk + dk
+'GET #1, m, color$: d$ = LEFT$(color$, 1): dg = ASC(d$):
+'fg = FIX(dg / 16): bg = dg - (fg * 16): IF bg > 7 THEN bg = bg - 8
+'color1 = bg
 
+color1 = FIX(SCREEN(y, x, 1) / 16)
 COLOR 14, color1: LOCATE y, x: PRINT CHR$(1); SPC(0);
 
 direction$ = ""
 waypoint = 0
 END IF
 
+IF y > 22 THEN y = 22
+IF x > 79 THEN x = 79
+
 END IF
 
 
 IF iner$ = "#MOVEOBJ" THEN
-IF runref$ <> "YES" THEN kind$ = ReferenceArray$(looker): looker = looker + 1'kind$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, kind$
+IF beginninggame = 1 THEN kind$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN kind$ = ReferenceArray$(looker): looker = looker + 1'kind$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, kind$
 ret = 0
 ghs = 5
 returnhere:
@@ -1439,8 +1485,9 @@ returnhere:
         DO
         LOOP WHILE TIMER < ts + VAL(kind$)
 
-IF runref$ <> "YES" THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1'dfdf$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, dfdf$
+IF beginninggame = 1 THEN dfdf$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1 'dfdf$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 
 
@@ -1482,8 +1529,9 @@ LOCATE cury, curx
 PRINT " "
 doer = 0
 
-IF runref$ <> "YES" THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1'dfdf$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, dfdf$
+IF beginninggame = 1 THEN dfdf$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN dfdf$ = ReferenceArray$(looker): looker = looker + 1 'dfdf$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, dfdf$
 dfdf$ = UCASE$(dfdf$)
 
 IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
@@ -1534,8 +1582,9 @@ IF LEFT$(iner$, 7) = "#CHOICE" THEN
 LOCATE , , 0
 howmany = VAL(RIGHT$(iner$, LEN(iner$) - 7))
 FOR hg = 1 TO howmany
-IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, data$
+IF beginninggame = 1 THEN data$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN data$ = ReferenceArray$(looker): looker = looker + 1 'data$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, data$
 opt$(hg) = data$
 NEXT hg
 
@@ -1618,29 +1667,18 @@ gg:
 IF runref$ <> "YES" AND data$ = "--EOF--" THEN GOTO nothing
 IF runref$ = "YES" AND EOF(53) THEN GOTO nothing
 
-IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, data$
+IF beginninggame = 1 THEN data$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN data$ = ReferenceArray$(looker): looker = looker + 1 'data$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, data$
 
 IF LEFT$(data$, 7) = "#CHOICE" THEN
 DO
-        IF runref$ <> "YES" THEN iner2$ = ReferenceArray$(looker): looker = looker + 1'iner2$ = inputer$(0)
-        IF runref$ = "YES" THEN INPUT #53, iner2$
-        IF LEFT$(iner2$, 9) = "@DONECHOICE" THEN EXIT DO
+        IF beginninggame = 1 THEN iner2$ = inputer$(0)
+        IF runref$ <> "YES" AND beginninggame <> 1 THEN iner2$ = ReferenceArray$(looker): looker = looker + 1 'iner2$ = inputer$(0)
+        IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, iner2$
+        IF LEFT$(iner2$, 11) = "@DONECHOICE" THEN EXIT DO
 LOOP
 
-'numofchoices = VAL(RIGHT$(data$, LEN(data$) - 7))
-'gv = 0
-'DO
-'        IF gv = numofchoices THEN EXIT DO
-'        IF runref$ <> "YES" THEN iner2$ = ReferenceArray$(looker): looker = looker + 1'iner2$ = inputer$(0)
-'        IF runref$ = "YES" THEN INPUT #53, iner2$
-'        IF LEFT$(iner2$, 9) = "#IFCHOICE" THEN gv = gv + 1
-'LOOP
-'DO
-'        IF runref$ <> "YES" THEN iner2$ = ReferenceArray$(looker): looker = looker + 1'iner2$ = inputer$(0)
-'        IF runref$ = "YES" THEN INPUT #53, iner2$
-'        IF LEFT$(iner2$, 5) = "@DONE" THEN EXIT DO
-'LOOP
 END IF
 
 IF data$ = toGET$ THEN GOTO dofunc
@@ -1648,8 +1686,9 @@ IF data$ = toGET$ THEN GOTO dofunc
 GOTO gg
 dofunc:
 in:
-IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, iner$
+IF beginninggame = 1 THEN iner$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN iner$ = ReferenceArray$(looker): looker = looker + 1 'iner$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, iner$
 beforecaps$ = iner$
 iner$ = LTRIM$(iner$)
 
@@ -1660,8 +1699,9 @@ doits = 5
 GOTO togo2
 donefunc:
 doits = 0
-IF runref$ <> "YES" THEN data$ = ReferenceArray$(looker): looker = looker + 1'data$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, data$
+IF beginninggame = 1 THEN data$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN data$ = ReferenceArray$(looker): looker = looker + 1 'data$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, data$
 data$ = UCASE$(data$)
 IF data$ = "@DONECHOICE" THEN GOTO nothing
 GOTO donefunc
@@ -1785,19 +1825,24 @@ GOTO junky
 ins:
 IF EOF(53) THEN GOTO endrefit
 INPUT #53, iner$
+
+ins2:
 beforecaps$ = iner$
 iner$ = UCASE$(iner$)
-'PRINT beforecaps$
 
 IF iner$ = "#DONE" THEN GOTO ins
-IF iner$ = "@END" THEN GOTO endrefit
+IF iner$ = "@END" THEN
+        doits = 0
+        doit3 = 0
+        GOTO endrefit
+        END IF
 runref$ = "YES"
 GOTO togo2
 endrefit:
 startplay = 0
 CLOSE #53
 runref$ = "NO"
-IF doit3 = 5 THEN GOTO INR
+IF doit3 = 5 THEN GOTO inr
 GOTO itisonit
 returnit:
 END IF
@@ -1831,6 +1876,23 @@ done2:
 CLOSE #252
 END IF
 
+'IF LEFT$(iner$, 7) = "#LOCATE" THEN
+'locatestatement = 1
+'Alllocatedata$ = RIGHT$(iner$, LEN(iner$) - 8)
+'Xnumber$ = LTRIM$(RTRIM$(LEFT$(Alllocatedata$, INSTR(Alllocatedata$, ","))))
+'Ynumber$ = LTRIM$(RIGHT$(Alllocatedata$, LEN(Alllocatedata$) - INSTR(Alllocatedata$, ",")))
+'IF VAL(Xnumber$) = 0 THEN
+'        Xnumber$ = VOB$(Xnumber$)
+'        IF Xnumber$ = "" THEN Xnumber$ = "1"
+'        END IF
+'IF VAL(Ynumber$) = 0 THEN
+'        Ynumber$ = VOB$(Ynumber$)
+'        IF Ynumber$ = "" THEN Ynumber$ = "1"
+'        END IF
+'doposx = VAL(Xnumber$)
+'doposy = VAL(Ynumber$)
+'END IF
+
 IF LEFT$(iner$, 6) = "#PRINT" THEN
 
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) = "P" THEN
@@ -1853,7 +1915,9 @@ NEXT
 g55:
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) <> "P" THEN reloadscreen = 3
 IF LTRIM$(RTRIM$(RIGHT$(iner$, LEN(iner$) - 6))) <> "P" THEN towait1 = FIX(TIMER)
+
 END IF
+
 
 IF iner$ = "#MONSTER" THEN
 
@@ -1895,6 +1959,7 @@ IF I$ = "WEAPONPOWER" THEN
 I$ = settings$(nus): nus = nus + 1
 LOOP
 END IF
+
 
 IF mond$ = "MAXENERGY" THEN
 DO
@@ -1945,6 +2010,7 @@ monsmn$ = STR$(mn)
 togetscore$ = STR$(togetscore)
 expertoget$ = STR$(expertoget)
 
+
 result = MonsterFunction(monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
 
 END IF
@@ -1982,12 +2048,15 @@ END IF
 
 
 IF iner$ = "#INPUT" THEN
-IF runref$ <> "YES" THEN random1$ = ReferenceArray$(looker): looker = looker + 1'random1$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, random1$
-IF runref$ <> "YES" THEN x$ = ReferenceArray$(looker): looker = looker + 1'x$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, x$
-IF runref$ <> "YES" THEN y$ = ReferenceArray$(looker): looker = looker + 1'y$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, y$
+IF beginninggame = 1 THEN random1$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN random1$ = ReferenceArray$(looker): looker = looker + 1 'random1$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, random1$
+IF beginninggame = 1 THEN x$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN x$ = ReferenceArray$(looker): looker = looker + 1 'x$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, x$
+IF beginninggame = 1 THEN y$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN y$ = ReferenceArray$(looker): looker = looker + 1 'y$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, y$
 thex = VAL(x$)
 they = VAL(y$)
 length = VAL(random1$)
@@ -2039,14 +2108,16 @@ END IF
 IF runref$ = "YES" THEN
 IF EOF(53) THEN GOTO donerandom
 END IF
-IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, junk$
+IF beginninggame = 1 THEN junk$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN junk$ = ReferenceArray$(looker): looker = looker + 1 'junk$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, junk$
 IF UCASE$(junk$) = "#ENDRANDOM" THEN GOTO donerandom
 GOTO idg
 
 ifit1:
-IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, iner$
+IF beginninggame = 1 THEN iner$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN iner$ = ReferenceArray$(looker): looker = looker + 1 'iner$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, iner$
 iner$ = LTRIM$(iner$)
 iner$ = UCASE$(iner$)
 IF iner$ = "#ENDRANDOM" THEN GOTO donerandom
@@ -2362,7 +2433,6 @@ how$ = LTRIM$(RTRIM$(LEFT$(RIGHT$(data$, LEN(data$) - INSTR(data$, " ")), 2)))
 whatequal$ = LEFT$(RIGHT$(data$, LEN(data$) - INSTR(INSTR(data$, " ") + 1, data$, " ")), LEN(data$) - INSTR(INSTR(data$, " ") + 1, data$, " ") - 5)
 
 
-
 GOTO getready
 getre2:
 
@@ -2405,10 +2475,11 @@ IF whatif1$ = "STARTVARIABLE" THEN GOTO eof1
 
 IF whatif$ = whatif1$ THEN
 whatequal1$ = settings$(nus): nus = nus + 1
-INR:
+inr:
 
 oldequal2$ = whatequal1$
 IF whatequal3$ <> "" THEN whatequal1$ = whatequal3$
+
 
 IF whatequal$ = whatequal1$ AND how$ = "=" THEN GOTO runit
 IF whatequal$ <> whatequal1$ AND how$ = "<>" THEN GOTO runit
@@ -2416,6 +2487,7 @@ IF VAL(whatequal$) >= VAL(whatequal1$) AND how$ = "<=" THEN GOTO runit
 IF VAL(whatequal$) <= VAL(whatequal1$) AND how$ = ">=" THEN GOTO runit
 IF VAL(whatequal$) > VAL(whatequal1$) AND how$ = "<" THEN GOTO runit
 IF VAL(whatequal$) < VAL(whatequal1$) AND how$ = ">" THEN GOTO runit
+
 
 whatequal1$ = oldequal2$
 oldequal2$ = ""
@@ -2454,11 +2526,12 @@ IF junk$ = "--END--" THEN END
 GOTO eof1:
 
 runit:
-IF runref$ <> "YES" THEN iner$ = ReferenceArray$(looker): looker = looker + 1'iner$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, iner$
+IF beginninggame = 1 THEN iner$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN iner$ = ReferenceArray$(looker): looker = looker + 1 'iner$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, iner$
 beforecaps$ = LTRIM$(iner$)
-'PRINT beforecaps$: I$ = INPUT$(1)
 iner$ = LTRIM$(iner$)
+IF iner$ = "@END" THEN GOTO ins2
 IF iner$ = "#ENDIF" THEN GOTO donenext1
 IF iner$ = "#ENDIF1" THEN
 doit3 = 0
@@ -2471,16 +2544,18 @@ GOTO togo2
 
 donenext:
 gog:
-IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
-IF runref$ = "YES" THEN
+IF beginninggame = 1 THEN junk$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN junk$ = ReferenceArray$(looker): looker = looker + 1 'junk$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN
         IF EOF(53) THEN GOTO noendif
         END IF
 IF runref$ = "YES" THEN INPUT #53, junk$
 
 IF LEFT$(junk$, 3) = "#IF" AND LEFT$(junk$, 4) <> "#IFC" THEN
         DO
-        IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
-        IF runref$ = "YES" THEN INPUT #53, junk$
+IF beginninggame = 1 THEN junk$ = inputer$(0)
+        IF runref$ <> "YES" AND beginninggame <> 1 THEN junk$ = ReferenceArray$(looker): looker = looker + 1 'junk$ = inputer$(0)
+        IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, junk$
         IF junk$ = "--EOF--" THEN
 noendif:
                 COLOR 7, 0
@@ -2494,8 +2569,10 @@ noendif:
 
 IF LEFT$(junk$, 3) = "@IF" THEN
         DO
-        IF runref$ <> "YES" THEN junk$ = ReferenceArray$(looker): looker = looker + 1'junk$ = inputer$(0)
-        IF runref$ = "YES" THEN INPUT #53, junk$
+IF beginninggame = 1 THEN junk$ = inputer$(0)
+
+        IF runref$ <> "YES" AND beginninggame <> 1 THEN junk$ = ReferenceArray$(looker): looker = looker + 1 'junk$ = inputer$(0)
+        IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, junk$
         IF junk$ = "--EOF--" THEN
                 COLOR 7, 0
                 CLS
@@ -2586,12 +2663,14 @@ hmr = VAL(RIGHT$(iner$, LEN(iner$) - 12))
 RANDOMIZE TIMER
 rand1 = INT(RND * hmr)
 FOR i12 = 1 TO rand1
-IF runref$ <> "YES" THEN D5342$ = ReferenceArray$(looker): looker = looker + 1'D5342$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, D5342$
+IF beginninggame = 1 THEN D5342$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN D5342$ = ReferenceArray$(looker): looker = looker + 1 'D5342$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, D5342$
 
 NEXT i12
-IF runref$ <> "YES" THEN towrite$ = ReferenceArray$(looker): looker = looker + 1'towrite$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, towrite$
+IF beginninggame = 1 THEN towrite$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN towrite$ = ReferenceArray$(looker): looker = looker + 1 'towrite$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
 ggb = 5
@@ -2599,8 +2678,9 @@ END IF
 
 
 IF LEFT$(iner$, 6) = "#WRITE" THEN
-IF runref$ <> "YES" THEN towrite$ = ReferenceArray$(looker): looker = looker + 1'towrite$ = inputer$(0)
-IF runref$ = "YES" THEN INPUT #53, towrite$
+IF beginninggame = 1 THEN towrite$ = inputer$(0)
+IF runref$ <> "YES" AND beginninggame <> 1 THEN towrite$ = ReferenceArray$(looker): looker = looker + 1 'towrite$ = inputer$(0)
+IF runref$ = "YES" AND beginninggame <> 1 THEN INPUT #53, towrite$
 writer towrite$
 towait1 = FIX(TIMER) + 4
 printwrite = 1
@@ -2617,15 +2697,19 @@ IF w < 0 THEN w = 0
 IF defs < 0 THEN defs = 0
 IF h < 0 THEN h = 0
 
-IF beginninggame = 1 THEN GOTO gotothenext1
 IF alwaysdo = 5 THEN GOTO gotothenext
 IF dothe = 5 THEN GOTO dothe
 IF jg = 5 THEN GOTO invscr
 IF doit2 = 5 THEN GOTO ifit1
 IF cb = 56 THEN GOTO todo
 IF doits = 5 THEN GOTO in
+IF doit3 = 5 THEN GOTO runit
 IF runref$ = "YES" THEN GOTO ins
-IF doit3 = 5 THEN GOTO INR
+
+IF mapscreen$ = "YES" THEN GOTO returnmap
+IF inventoryscreen$ = "YES" THEN GOTO returninventory
+IF beginninggame = 1 THEN GOTO gotothenext1
+
 LOOP
 GOTO leaver
 
@@ -2823,6 +2907,7 @@ settings$(nus) = "--END--": nus = nus + 1
 'NEXT igs
 
 
+IF refreshingmap = 1 THEN GOTO returner25
 IF begingame = 1 THEN GOTO begingame
 IF settingsettings = 10 THEN GOTO returner10
 IF settingsettings = 2 THEN GOTO returner2

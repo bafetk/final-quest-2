@@ -1,21 +1,50 @@
 @#CASTLE
 #IF PASSWORD = 0 THEN
-#SET PASSWORD = 1;
 #CLS
-#PRINT 5
-`%A guard says...
-`!GUESS WHAT!!!!  `2This castle has never been discovered, until now!!!
+#PRINT 4
+`2A guard says... "`%The owner of this castle wishes to sell.`2"
 
-`2You are the lucky guy who gets to make it his home!
-`0<`2Continue`0>  `2(2 second delay)`X11
-#SLEEP 1
-#PRINT 1
-`Y05`X14`21`X11
-#SLEEP 1
-#PRINT 1
-`Y05`X13`b0`L16`X11
-#WAIT
+`2Would you like to buy it?
+
+#CHOICE 2
+Maybe.... How much?
+Leave...
+#IFCHOICE 1
+#PRINT 3
+`7`b0`k
+`2The guard continues... "`%The Price is $10`F2C000`2.  Would you like to buy?"
+
+#CHOICE 2
+Yes...
+Nevermind...
+#IFCHOICE 1
+#IF GOLD < 10000 THEN
+#PRINT 3
+`7`b0`k`2I'm sorry`F2C but you do not have the funds for this.  Maybe later.
+
+`0<`2Continue`0>
+#WAIT 1
 #ENDIF
+#IF GOLD > 9999 THEN
+#SET PASSWORD = 1;
+#SET GOLD - 10000;
+#PRINT 4
+`7`b0`k`2You have `%purchased`2 a new castle!  The guards will now let you
+`2pass.
+
+`0<`2Continue`0>
+#WAIT 1
+#ENDIF
+@DONE
+#IFCHOICE 2
+@DONE
+@DONECHOICE
+@DONE
+#IFCHOICE 2
+@DONE
+@DONECHOICE
+#ENDIF
+#IF PASSWORD = 1 THEN
 #IF EXITCASTLE = 41 THEN
         #NEWPOS 41 21
 #ENDIF
@@ -23,4 +52,5 @@
         #NEWPOS 42 21
 #ENDIF
 #GOTO 726
+#ENDIF
 @END

@@ -21,7 +21,7 @@ DIM opt(100)
 DIM SHARED settings$(500), reffile(1920), file$(5)
 COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile(), file$()
 COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, S, w, defs, i, z, gdi
-COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg
+COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg, locatestatement
 
 SUB cole (pressed, toprint$, cole1$, fground, bground)
 
@@ -655,24 +655,24 @@ IF monsb$ <> "" THEN
         monster76 = 1
         END IF
 IF monsmn$ <> "" THEN
-mn = VAL(monsmn$)
-monster76 = 1
+        mn = VAL(monsmn$)
+        monster76 = 1
         END IF
 IF tosay1$ <> "" THEN
-tosay$ = tosay1$
-monster76 = 1
+        tosay$ = tosay1$
+        monster76 = 1
         END IF
 IF m1$ <> "" THEN
-m$ = m1$
-monster76 = 1
+        m$ = m1$
+        monster76 = 1
         END IF
 IF togetscore$ <> "" THEN
-togetscore = VAL(togetscore$)
-monster76 = 1
+        togetscore = VAL(togetscore$)
+        monster76 = 1
         END IF
 IF expertoget$ <> "" THEN
-expertoget = VAL(expertoget$)
-monster76 = 1
+        expertoget = VAL(expertoget$)
+        monster76 = 1
         END IF
 IF monster76 = 1 THEN GOTO monster
 
@@ -856,6 +856,7 @@ PRINT "As you attempt to leave, "; m$; " sees you and attacks!"; SPC(0);
 GOTO m1hitf
 
 attackm1:
+weaponpower = 0
 nus = 1
 DO
 i$ = settings$(nus): nus = nus + 1
@@ -872,6 +873,7 @@ IF i$ = "WEAPONPOWER" THEN
 i$ = settings$(nus): nus = nus + 1
 LOOP
 
+xc = 0
 RANDOMIZE TIMER
 IF weapon = 0 THEN a = INT(RND * 10) + 1
 IF weapon <> 0 AND weaponpower > 36 THEN a = INT(RND * FIX((weaponpower / 6))) + 1
@@ -881,7 +883,22 @@ IF gx = 1 AND weapon <> 0 THEN xc = a + weaponpower
 IF weapon <> 0 AND gx <> 1 THEN xc = weaponpower - a
 IF weapon <> 0 THEN a = xc
 
+jk = INT(RND * 2) + 1
+jks = FIX(w / 10)
+jkd = INT(RND * jks) + 1
+
+IF jk = 1 THEN a = a + w + jkd
+IF jk <> 1 THEN a = a + w - jkd
+
+
 'IF Weapon = 1 THEN a = a + weaponpower
+
+powerhit = 0
+jks = INT(RND * 5) + 1
+IF jks = 5 THEN
+powerhit = 1
+a = a * 2
+END IF
 
 'PRINT weaponpower; weapon, a: END
 
@@ -908,8 +925,16 @@ IF superhuman$ = "YES" THEN
         IF b < 1 THEN PRINT "You hit "; m$; " for"; a * superminus; "points damage.  Press any key..."; SPC(0);
         GOTO consL
 END IF
+IF powerhit = 0 THEN
 IF b > 0 THEN PRINT "You hit "; m$; " for"; a; "points damage."; SPC(0);
 IF b < 1 THEN PRINT "You hit "; m$; " for"; a; "points damage.  Press any key..."; SPC(0);
+END IF
+IF powerhit = 1 THEN
+IF b > 0 THEN PRINT "You POWER HIT "; m$; " for"; a; "points damage."; SPC(0);
+IF b < 1 THEN PRINT "You POWER HIT "; m$; " for"; a; "points damage.  Press any key..."; SPC(0);
+END IF
+
+
 consL:
         COLOR 14, 1
         LOCATE 23, 1: PRINT STRING$(79, " "); SPC(0);
@@ -1099,7 +1124,10 @@ screenmode = 0
 collor = 15
 IF da = 3 THEN bg = 1
 IF doposy > 25 THEN doposy = 1
-doposx = 1
+
+IF locatestatement <> 1 THEN doposx = 1
+IF locatestatement = 1 THEN locatestatement = 0
+
 FOR gdi = 1 TO LEN(toprint$)
 d$ = LEFT$(toprint$, gdi)
 letter$ = RIGHT$(d$, 1)
@@ -1530,7 +1558,7 @@ END IF
 END SUB
 
 FUNCTION VOB$ (dtlf$)
-VOB = ""
+VOB$ = ""
 nus = 1
 eof4:
 IF settings$(nus) = "--END--" THEN GOTO donewithfunc

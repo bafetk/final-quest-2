@@ -48,6 +48,7 @@ Section 2
        30. #FIX
        31. #GETCHAR
        32. #DELETE
+       33. #LOCATE
 
     B. @#INTRO, @#INVSCR, @#HELP, @#MAP
 
@@ -587,6 +588,19 @@ where #### is some setting.
 Use this to delete a setting that you created with DECLARE, or set with
 SET.
 
+
+33. #LOCATE
+
+Syntax:
+
+#LOCATE ##,##
+
+where the first ## is X coordinate, and the second is Y coordinate.
+
+Use this function to chance the position of the cursor on the screen for
+successive #PRINT statements.
+
+UPDATE: WAS REMOVED
 
 ------------------------------------------------------------------------------
 B. @#INTRO, @#INVSCR, @#HELP, @#MAP

@@ -15,6 +15,7 @@ gg$ = " "
 Mouse 0
 Mouse 4
 
+
 C$ = UCASE$(COMMAND$)
 IF C$ = "" THEN filename$ = "maps.dat"
 IF C$ <> "" THEN filename$ = C$

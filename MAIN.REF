@@ -189,8 +189,10 @@ Don't Pay..
 
 @#ROSHI
 #CLS
-#PRINT 9
-`2Welcome to Master Roshi's training center!
+#IF PORTCITYPASS = 0 THEN
+#PRINT 11
+`$A Man Says:
+`2Psst`F2C hey`F2C boy!! If you beat me`F2C I'll give you a pass to `7Port City`2!
 
 `2You have:
 
@@ -199,8 +201,24 @@ Don't Pay..
 `!`a`2 attack points...
 `!`d`2 defense points...
 `2You have a `#`i`2 and a `#`z`2.
+
+#ENDIF
+#IF PORTCITYPASS = 1 THEN
+#PRINT 11
+`$Master Roshi says:
+`2Welcome back!! Ready for a rematch!!!!
+
+`2You have:
+
+`%`e`2 experience points...
+`@`h`2 hitpoints...
+`!`a`2 attack points...
+`!`d`2 defense points...
+`2You have a `#`i`2 and a `#`z`2.
+
+#ENDIF
 #CHOICE 2
-Train
+Challenge Him
 Leave
 #IFCHOICE 2
 @DONE
@@ -208,14 +226,14 @@ Leave
 #MONSTER
 Beat me if you can... Loser!!
 Master Roshi
-MAXENERGY
+350
 1000
 100
-MAXENERGY
-MAXENERGY
+50
+45
 #CLS
 #PRINT 1
-`2Sorry... You loose.. come back next time...
+`2Sorry... You loose.. try again later...
 #IF LASTMONSTER = 1 THEN
 #CLS
 #MAXENERGY
@@ -223,8 +241,21 @@ MAXENERGY
 #MAXENERGY
 #SET STRENGTH + 10;
 #SET DEFENSE + 10;
+#IF PORTCITYPASS = 0 THEN
+#PRINT 9
+`$You are a great man.. YOU HAVE BESTED ME!
+
+`2You get `%100 `2more experience points for a total of `%`e`2.
+`2You get `@25 `2more hitpoints for a total of `@`h`2.
+`2You get `!10 `2extra attack points for a total of `!`a`2.
+`2You get `!10 `2extra defense points for a total of `!`d`2.
+
+`2AND, as promised, your `$PASS `2to Port City.  Good Luck! Come back anytime!
+Press any key...
+#ENDIF
+#IF PORTCITYPASS = 1 THEN
 #PRINT 8
-`$You are a great man..
+`$Hey!! You beat me again!
 
 `2You get `%100 `2more experience points for a total of `%`e`2.
 `2You get `@25 `2more hitpoints for a total of `@`h`2.
@@ -232,6 +263,8 @@ MAXENERGY
 `2You get `!10 `2extra defense points for a total of `!`d`2.
 
 Press any key...
+#ENDIF
+#SET PORTCITYPASS = 1;
 #ENDIF
 #WAIT
 @DONE

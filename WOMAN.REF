@@ -22,15 +22,20 @@ Leave this putrit house...
 Drink it anyway...
 Don't Drink it`F2C Leave.. fast...
 #IFCHOICE 1
-#PRINT 1
+#PRINT 2
 `Y08`!Here goes...
+`0<`2more`0>
 #WAIT
 #CLS
-#PRINT 1
+#PRINT 2
 `$You feal a warm feeling...
+`0<`2more`0>
 #WAIT
 #PRINT 1
-`$You GAIN 25 hitpoints...
+`Y02`X01`L06`Y02
+#PRINT 2
+`$You've GAINED 25 hitpoints and feel totally refreshed!!
+`0<`2more`0>
 #SET MAXENERGY + 25;
 #MAXENERGY
 #WAIT

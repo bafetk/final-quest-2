@@ -1,6 +1,6 @@
 @#ARMOR
 #CLS
-#PRINT 13
+#PRINT 14
 `%Welcome to Riply's `!A`#r`!m`#o`!u`#r`% Shop!!
 `%I sell the best armor... `$GUARANTEED!!!
 
@@ -11,6 +11,7 @@
 `%Death Armour for `$$1000`%.
 
 `2You have `$$`g`2.
+`2Your current armour: `$`vARMOURNAME``2
 
 `4Your Choice:
 
@@ -54,7 +55,7 @@ Leave
 #CLS
 #PRINT 3
 
-`2Ok...  I would have to say your armour's value is now `$$`vVARIABLE``2.
+`2Ok...  I would have to say your `3`vARMOURNAME`'s`2 value is now `$$`vVARIABLE``2.
 `2You still want to sell it?
 #CHOICE 2
 Yes
@@ -66,7 +67,7 @@ No
 
 
 #SET GOLD + VARIABLE;
-#DELETE ARMOURNAME
+#SET ARMOURNAME =2 Nothing;
 #SET ARMOURVALUE = 0;
 #SET ARMOURPOWER = 0;
 #PRINT 3
@@ -191,7 +192,7 @@ Get outa here...
 
 @#WEAPON
 #CLS
-#PRINT 10
+#PRINT 11
 `@Welcome to the best `b1`!W`#e`!a`#p`!o`#n`b0 `@store in the entire world!
 `%Why don't you try some of my weapons... I have:
 
@@ -200,6 +201,7 @@ Get outa here...
 `#A shotgun for 1000 Gold
 
 `2You have `$`g`2 gold...
+`2Your current weapon: `$`vWEAPONNAME``2.
 
 `4Your Choice:
 #CHOICE 3
@@ -242,7 +244,7 @@ Leave
 #CLS
 #PRINT 3
 
-`2Ok...  I would have to say your weapon's value is now `$$`vVARIABLE``2.
+`2Ok...  I would have to say your `3`vWEAPONNAME`'s`2 value is now `$$`vVARIABLE``2.
 `2You still want to sell it?
 #CHOICE 2
 Yes
@@ -255,7 +257,7 @@ No
 
 
 #SET GOLD + VARIABLE;
-#DELETE WEAPONNAME
+#SET WEAPONNAME =2 Nothing;
 #SET WEAPONVALUE = 0;
 #SET WEAPONPOWER = 0;
 #PRINT 3

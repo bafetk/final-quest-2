@@ -1,3 +1,11 @@
+Version Changes (07/22/01) 094 Rev D UPDATE 3:
+
+Hey!! Sup, I decided not to change the revision all that often. Instead,
+I will do "Updates".  This is update 3.  I made a small revision.  The
+Inventory Position in the Ref file is now REF programmable.  That's pretty
+much it.  Still working on Port City... All I have done Ref wise is the
+Bank... Later!
+
 Version Changes (07/13/01) 094 Rev D UPDATE 2:
 
 (FQ2094D2.ZIP) Now, time is: 00:11:26 AM
@@ -150,5 +158,17 @@ took the FQ version 1.6 file and just started adding innovations, like the
 different screen loader.  I started with only like 10 to 25 screens
 originally, and now I am at 1920.  It sure has come a long way.  I started
 Final Quest 1 on 6-21-98.
+
+Version Changes (08/06/98) Final Quest V1.7 Revision B
+
+Okay, today is 7/15/01, and I have an update to the above message.  The files
+in FQ17B directory are actually the beginnings of FQ2.. It appears that it
+was originally going to be Final Quest 1.7, but then I decided to change
+it to Final Quest 2, on the same day... well, here are the beginning files.
+Also, in Zip.Zip there is evidence that I knew the name Final Quest as
+early as 2/12/98 and I have a working(sort-of) copy of the game.  It is
+incredibly primative, but hey, it proves that the first time that I thought
+of final quest was on or before 2/12/98.
+
 
 END FILE
