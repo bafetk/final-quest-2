@@ -20,7 +20,7 @@ DIM map2(1920)
 DIM opt(100)
 DIM SHARED settings$(500), reffile(1920), file$(5)
 COMMON SHARED opt(), map2(), realsavename$(), ReferenceArray$(), map(), settings$(), reffile(), file$()
-COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, S, w, defs, I, z, gdi
+COMMON SHARED doposx, doposy, gamename$, Revision$, Version1$, Version2$, COMP1$, COMP2$, h, S, w, defs, i, z, gdi
 COMMON SHARED exper, k, x, y, monsters$, hitmax, Ber, jdcolor, cb562, cgd, bg, rp, refpos, fileopened, thescreen1, theg
 
 SUB cole (pressed, toprint$, cole1$, fground, bground)
@@ -140,6 +140,7 @@ END IF
 
 IF cole1$ = "C" THEN
 FOR gh = 1 TO LEN(toprint$)
+
 gh1$ = LEFT$(toprint$, gh)
 IF gh <> 1 THEN gh2$ = RIGHT$(gh1$, 1)
 IF gh = 1 THEN gh2$ = gh1$
@@ -465,11 +466,11 @@ iner1$ = inputer$(0)
         GOTO invscr4
 waiter6:
         LOCATE 1, 1, 0
-        I$ = INPUT$(1)
+        i$ = INPUT$(1)
         GOTO done65
 nexter52:
         LOCATE 1, 1, 0
-        I$ = INPUT$(1)
+        i$ = INPUT$(1)
 GOTO invscr4
 done65:
 END SUB
@@ -676,47 +677,13 @@ monster76 = 1
 IF monster76 = 1 THEN GOTO monster
 
 
-
 OPEN "NOSCR.DAT" FOR INPUT AS #62
-INPUT #62, firstanswer$
-        IF monsters$ = "YES" THEN GOTO ghb
-        IF LTRIM$(UCASE$(firstanswer$)) = "NO" THEN
-                monsters$ = "NO"
-                CLOSE #62
-                MonsterFunction = 1
-                GOTO Exitmonster
-        END IF
-ghb:
-IF othervalues <> 0 THEN GOTO othervalues
-INPUT #62, newrp$
-IF newrp$ = "// END VALUES //" THEN GOTO mon5
-IF INSTR(newrp$, ";") <> 0 THEN
-othervalues = 1
-othervalues:
-        IF INSTR(newrp$, ";") = 0 THEN
-                othervalues = 0
-                GOTO ghb
-                END IF
-        newrp = VAL(LEFT$(newrp$, INSTR(newrp$, ";") - 1)): newrp$ = RIGHT$(newrp$, LEN(newrp$) - INSTR(newrp$, ";"))
-        'PRINT newrp: I$ = INPUT$(1)
-        GOTO gx2
-        END IF
-newrp = VAL(newrp$)
+        INPUT #62, firstanswer$
+
 
 gx2:
-        IF newrp = rp THEN
-                CLOSE #62
-                MonsterFunction = 1
-                GOTO Exitmonster
-        END IF
-GOTO ghb
 
 mon5:
-IF monsters$ = "NO" THEN
-                CLOSE #62
-                MonsterFunction = 1
-                GOTO Exitmonster
-        END IF
 theg = 50
 INPUT #62, nummonsters
 INPUT #62, numifscores
@@ -891,18 +858,18 @@ GOTO m1hitf
 attackm1:
 nus = 1
 DO
-I$ = settings$(nus): nus = nus + 1
-IF I$ = "--END--" THEN
+i$ = settings$(nus): nus = nus + 1
+IF i$ = "--END--" THEN
         weapon = 0
         EXIT DO
         END IF
-IF I$ = "WEAPONPOWER" THEN
-        I$ = settings$(nus): nus = nus + 1
-        weaponpower = VAL(I$)
+IF i$ = "WEAPONPOWER" THEN
+        i$ = settings$(nus): nus = nus + 1
+        weaponpower = VAL(i$)
         weapon = 1
         EXIT DO
         END IF
-I$ = settings$(nus): nus = nus + 1
+i$ = settings$(nus): nus = nus + 1
 LOOP
 
 RANDOMIZE TIMER
@@ -958,7 +925,7 @@ consL:
         END IF
         IF b < 1 THEN S = S + togetscore
         IF b < 1 THEN exper = exper + expertoget
-        IF b < 1 THEN I$ = INPUT$(1)
+        IF b < 1 THEN i$ = INPUT$(1)
         IF b < 1 THEN
         COLOR 7, 0
         LOCATE 24, 1: PRINT STRING$(80, " "); SPC(0);
@@ -967,7 +934,7 @@ consL:
         expertoget$ = LTRIM$(STR$(expertoget))
         togetscore4$ = "`2You killed `@" + m$ + "`2!  You find `$$" + togetscore3$ + " `2Gold and get `%" + expertoget$ + "`2 Experience.."
         printer 0, togetscore4$, 24
-        I$ = INPUT$(1)
+        i$ = INPUT$(1)
 END IF
 IF b < 1 THEN
         COLOR 7, 0
@@ -1015,18 +982,18 @@ COLOR 14, 0
 
 nus = 1
 DO
-I$ = settings$(nus): nus = nus + 1
-IF I$ = "--END--" THEN
+i$ = settings$(nus): nus = nus + 1
+IF i$ = "--END--" THEN
         armour = 0
         EXIT DO
         END IF
-IF I$ = "ARMOURPOWER" THEN
-        I$ = settings$(nus): nus = nus + 1
-        armourpower = VAL(I$)
+IF i$ = "ARMOURPOWER" THEN
+        i$ = settings$(nus): nus = nus + 1
+        armourpower = VAL(i$)
         armour = 1
         EXIT DO
         END IF
-I$ = settings$(nus): nus = nus + 1
+i$ = settings$(nus): nus = nus + 1
 LOOP
 
 'IF armour = 1 THEN a = INT(RND * FIX(armourpower / 10)) + 1
@@ -1089,7 +1056,7 @@ exper = exper - exper1
 IF exper < 0 THEN exper = 0
 S = 0
 h = 10
-I$ = INPUT$(1)
+i$ = INPUT$(1)
 
         COLOR 7, 0
         LOCATE 25, 1: PRINT STRING$(80, " "); SPC(0);
@@ -1272,10 +1239,10 @@ zz:
 LOCATE 1, 1: COLOR 2, 0
 
 PRINT "Overwrite Existing Saved Game? Y/N"
-        I$ = INPUT$(1)
-        I$ = UCASE$(I$)
-                IF I$ = "Y" THEN pkd = 6
-                IF I$ = "Y" THEN GOTO saveover1
+        i$ = INPUT$(1)
+        i$ = UCASE$(i$)
+                IF i$ = "Y" THEN pkd = 6
+                IF i$ = "Y" THEN GOTO saveover1
 SaveGame$ = "3"
 EXIT FUNCTION
 'GOTO savegame11
@@ -1420,7 +1387,10 @@ LOCATE y, x
 code$ = UCASE$(code$)
 FOR code = 1 TO LEN(code$)
         letternow$ = MID$(code$, code, 1)
-                userinput$ = UCASE$(INPUT$(1))
+                'userinput$ = UCASE$(INPUT$(1))
+                DO
+                userinput$ = UCASE$(INKEY$)
+                LOOP WHILE userinput$ = ""
                         IF userinput$ <> letternow$ THEN
                                 SecretCode$ = userinput$
                                 EXIT FUNCTION
@@ -1525,7 +1495,7 @@ IF bx$ = "STRENGTH" THEN settings$(nus) = STR$(w)
 IF bx$ = "DEFENSE" THEN settings$(nus) = STR$(defs)
 IF bx$ = "HITPOINT" THEN settings$(nus) = STR$(h)
 IF bx$ = "GOLD" THEN settings$(nus) = STR$(S)
-IF bx$ = "WEAPON" THEN settings$(nus) = STR$(I)
+IF bx$ = "WEAPON" THEN settings$(nus) = STR$(i)
 IF bx$ = "ARMOUR" THEN settings$(nus) = STR$(z)
 
 nus = nus + 1

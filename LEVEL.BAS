@@ -88,6 +88,10 @@ IF im >= LOF(98) THEN GOTO nx
         IF type$ = "2" THEN map(number) = 2
         IF type$ = "3" THEN map(number) = 3
         IF type$ = "4" THEN map(number) = 4
+        IF type$ = "5" THEN map(number) = 5
+        IF type$ = "6" THEN map(number) = 6
+        IF type$ = "7" THEN map(number) = 7
+        IF type$ = "8" THEN map(number) = 8
         im = im + 3481
                 LOCATE , 39: PRINT number; SPC(0);
         dicks = dicks + 1
@@ -119,6 +123,18 @@ loader1:
                                 END IF
                                 IF map(xcc) = 4 THEN
                                         COLOR 7, 2: PRINT CHR$(254); SPC(0);
+                                END IF
+                                IF map(xcc) = 5 THEN
+                                        COLOR 4, 2: PRINT "M"; SPC(0);
+                                END IF
+                                IF map(xcc) = 6 THEN
+                                        COLOR 7, 2: PRINT "M"; SPC(0);
+                                END IF
+                                IF map(xcc) = 7 THEN
+                                        COLOR 4, 7: PRINT "M"; SPC(0);
+                                END IF
+                                IF map(xcc) = 8 THEN
+                                        COLOR 7, 4: PRINT "M"; SPC(0);
                                 END IF
                         NEXT xcc
 
@@ -556,13 +572,12 @@ GOTO loader1
 
 typer:
 dd = 1
-rp$ = STR$(rp)
-rp$ = LTRIM$(rp$)
+rp$ = LTRIM$(STR$(rp))
 DO
 lk = dd * 3481 - 3479
 IF lk > LOF(1) THEN
-GOTO loader1
-END IF
+        GOTO loader1
+        END IF
 dg$ = SPACE$(4)
 GET #1, lk, dg$
 dg$ = LTRIM$(dg$)
@@ -577,42 +592,19 @@ lk = lk - 1
 type$ = SPACE$(1)
 GET #1, lk, type$
 
-IF type$ = "1" THEN
-map(rp) = 2
-type$ = "2"
+IF type$ = "8" THEN type$ = "0"
+type$ = LTRIM$(RTRIM$(STR$(VAL(type$) + 1)))
+map(rp) = VAL(type$)
 PUT #1, lk, type$
 GOTO loader1
-END IF
 
-IF type$ = "2" THEN
-map(rp) = 3
-type$ = "3"
-PUT #1, lk, type$
-GOTO loader1
-END IF
-
-IF type$ = "3" THEN
-type$ = "4"
-map(rp) = 4
-PUT #1, lk, type$
-GOTO loader1
-END IF
-
-IF type$ = "4" THEN
-type$ = "1"
-map(rp) = 1
-PUT #1, lk, type$
-GOTO loader1
-END IF
-
-GOTO loader1
 quit5:
 IF filessize <= 1000 THEN KILL filename$
 COLOR 7, 0
 CLS
 COLOR 15, 0
 PRINT
-PRINT "The Leveler 2001, v3.31, (C) Copyright 2001 Akori Software"
+PRINT "The Leveler 2001, v3.32, (C) Copyright 2001 Akori Software"
 PRINT "All rights reserved..."
 PRINT
 CLOSE

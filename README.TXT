@@ -1,3 +1,42 @@
+Version Changes (07/13/01) 094 Rev D UPDATE 2:
+
+(FQ2094D2.ZIP) Now, time is: 00:11:26 AM
+Ok, here it is... I think that I'm done with the map generator. I think that
+it's good enought for what it is supposed to do, and I can always edit the
+maps after it generates them, right?  Anyway... I made a little utility
+called SHOWALL.BAS... anyway... It reads maps.dat and shows like the first
+40 or so maps, in screen 12!  It puts them all together so that you can see
+all of the maps at once.  It's really cool.... You should look at it.
+(reader)... Anyway... Just having a little fun... I don't think that that
+scroller idea that I had is going to work, so I scrapped it.
+
+Version Changes (07/12/01) 094 Rev D UPDATE 1:
+
+Well, I had some more trouble with my computer, but I got it squared away.
+I created a Map Generator a couple days ago and a Globe Generator.. They
+take the long time of making maps away... They still need a little work
+though.
+
+Version Changes (07/05/01) 094 Rev D
+
+Ok, now that I can update more often now, I have started to.  I first did
+something with the monster routine.  I added four new types to the TYPES.
+The purpose was to eliminate the need to go through the NOSCR file in order
+to determine which screens there should be monsters on and which screens
+there should not.  The bottom four types are for no monsters, the upper four
+are for monsters.  I also changed the Leveler for this addition, it is now
+3.32.  In addition to those changes, I also changed the way that the program
+determines which color that is in the space that the user is occupying.
+Instead of having to search the file over and over again, I used a function
+in QB called SCREEN which allows me to determine the background color.  This
+saves time and is more efficient.  I organized the code a little more. I
+didn't turn on my computer at all yesterday, that is very scary.  What am I
+turning into?  Ha :-) I guess I'm just used to not having a computer.  I know
+this is Verbose.  Another revision that I am planning consists of this:
+There will be different monsters for different screens.  I haven't figured
+out how this is going to work yet, but I can't wait to figure it out.  That
+is my next project.
+
 Version Changes (05/19/01) 094 Rev C
 
 (Writing on 7/01/01)
@@ -113,4 +152,3 @@ originally, and now I am at 1920.  It sure has come a long way.  I started
 Final Quest 1 on 6-21-98.
 
 END FILE
-

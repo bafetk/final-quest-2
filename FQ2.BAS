@@ -83,17 +83,16 @@ IF gamename$ = "" THEN gamename$ = "Unknown"
 
 COLOR 7, 0
 IF cc = 2 THEN PRINT "Debug Mode on..."
-IF cc = 2 THEN SLEEP 1
+'IF cc = 2 THEN SLEEP 1
 
 
+                curtime = TIMER
 PRINT "Looking for Level Map File..."; SPC(0);
 IF exist("MAPS.DAT") = 0 THEN
         PRINT "Not Found."
         nolevelmap = 1
 END IF
 IF nolevelmap <> 1 THEN PRINT "Found."
-IF cc = 2 THEN SLEEP 1
-
 
 PRINT "Building Map Dimension, Please wait..."; SPC(0);
 IF nolevelmap <> 1 THEN
@@ -105,10 +104,7 @@ csg:
         GET #98, im, a$
         type$ = LEFT$(a$, 1)
         number = VAL(RIGHT$(a$, 4))
-        IF type$ = "1" THEN map(number) = 1
-        IF type$ = "2" THEN map(number) = 2
-        IF type$ = "3" THEN map(number) = 3
-        IF type$ = "4" THEN map(number) = 4
+        map(number) = VAL(type$)
         map2(number) = im
         im = im + 3481
 GOTO csg
@@ -117,7 +113,7 @@ nx:
         PRINT "Done."
 END IF
 IF nolevelmap = 1 THEN PRINT "Not done."
-IF cc = 2 THEN SLEEP 1
+'IF cc = 2 THEN SLEEP 1
 
 
 
@@ -127,7 +123,7 @@ IF exist("REFS.DAT") = 0 THEN
         norefdat = 1
 END IF
 IF norefdat <> 1 THEN PRINT "Found."
-IF cc = 2 THEN SLEEP 1
+'IF cc = 2 THEN SLEEP 1
 
 
 
@@ -172,7 +168,7 @@ PRINT "Done.    "
 END IF
 IF norefdat = 1 THEN PRINT "Not done.    "
 
-IF cc = 2 THEN SLEEP 1
+'IF cc = 2 THEN SLEEP 1
 
 
 PRINT "Looking for saved games..."; SPC(0);
@@ -181,7 +177,7 @@ PRINT "Looking for saved games..."; SPC(0);
 FOR xv = 1 TO 5
         LOCATE , 27
         PRINT "Saved Game"; xv; SPC(0);
-        IF cc = 2 THEN SLEEP 1
+        'IF cc = 2 THEN SLEEP 1
         xv$ = LTRIM$(RTRIM$(STR$(xv - 1)))
         file$(xv) = "1"
         IF exist("SAVE" + xv$ + ".DAT") = 0 THEN
@@ -211,13 +207,17 @@ IF noscrdat = 1 THEN GOTO errorhandle
 IF nolevelmap = 1 THEN GOTO errorhandle
 IF norefdat = 1 THEN GOTO errorhandle
 
-IF cc = 2 THEN SLEEP 1
+'IF cc = 2 THEN SLEEP 1
 PRINT COMP2$ + " Development " + Version2$ + " " + Revision$ + "..."
 PRINT "Loading main title screen..."
 
 
 IF cc = 2 THEN PRINT
 IF cc = 2 THEN PRINT "Press any key to continue..."
+                IF cc = 2 THEN
+                        LOCATE CSRLIN - 1, 35
+                        PRINT "Startup Appx: "; TIMER - curtime; " second(s)"
+                END IF
 IF cc = 2 THEN I$ = INPUT$(1)
 
 
@@ -531,7 +531,6 @@ redo:
 NEXT L
 towait1 = FIX(TIMER)
 
-
 ghs = 5
 
 dl1:
@@ -544,7 +543,7 @@ IF printline$ = "NO" THEN GOTO doneloading
 'LOCATE 23, 78: PRINT CHR$(177) + CHR$(176); SPC(0);
 'COLOR 15, 1: LOCATE 23, 2
 '        'bottomline$ = gamename$ + " -- By " + COMP1$ + " -- HP (" + LTRIM$(STR$(h)) + "/" + LTRIM$(STR$(hitmax)) + ") -- Gold:" + STR$(s) + "!"
-'    
+'
 'LOCATE , 40 - FIX((LEN(bottomline$)) \ 2)
 'PRINT bottomline$; SPC(0);
 
@@ -612,24 +611,7 @@ color$ = SPACE$(1)
 
 
 
-dd = map2(rp)
-dk = dd + 5
-mk = record * 2 - 2
-m = mk + dk
-
-
-
-
-GET #1, m, color$
-d$ = LEFT$(color$, 1)
-dg = ASC(d$)
-
-fg = FIX(dg / 16)
-bg = dg - (fg * 16)
-IF bg > 7 THEN bg = bg - 8
-
-color1 = bg
-'color1 = FIX(dg / 16)
+color1 = FIX(SCREEN(y, x, 1) / 16)
 
 nomap1:
 COLOR 14, color1
@@ -640,6 +622,7 @@ PRINT CHR$(1)
 '!!!!!!!!!!!!!!MONSTER FUNCTION!!!!!!!!!!!!!!!
 'don't do these screens with monsters
 IF monsters$ = "NO" THEN GOTO doer1
+IF map(rp) < 5 THEN GOTO doer1
 Monster:
 IF doamonster <> 1 THEN GOTO doer1
 doamonster = 0
@@ -650,6 +633,10 @@ m$ = ""
 togetscore$ = ""
 expertoget$ = ""
 result = MonsterFunction(monsb$, monsmn$, tosay$, m$, togetscore$, expertoget$)
+        settingsettings = 10
+        GOTO getready
+returner10:
+        settingsettings = 0
 IF result = 1 THEN GOTO doer1
 IF result = 3 THEN GOTO dl1
 
@@ -808,6 +795,21 @@ CASE "T"
 CASE "I"
 GOTO inventory
 
+CASE "V"
+        IF cc = 2 THEN
+                positioninarray = 1
+nexter:
+                COLOR 7, 0
+                CLS
+                FOR igxs = positioninarray TO positioninarray + 19
+                PRINT LTRIM$(ReferenceArray$(igxs))
+                NEXT igxs
+                PRINT "Q-quits"
+                positioninarray = positioninarray + 20
+                gsi$ = INPUT$(1)
+                IF UCASE$(gsi$) = "Q" THEN GOTO loadmap
+                GOTO nexter
+        END IF
 
 CASE "M"
 GOTO map
@@ -929,8 +931,18 @@ FOR xcc = 1 TO 1920
                 IF map(xcc) = 4 THEN
                         COLOR 7, 2: PRINT CHR$(254); SPC(0);
                 END IF
-
-
+                IF map(xcc) = 5 THEN
+                        COLOR 15, 2: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 6 THEN
+                        COLOR 7, 2: PRINT CHR$(254); SPC(0);
+                END IF
+                IF map(xcc) = 7 THEN
+                        COLOR 15, 7: PRINT " "; SPC(0);
+                END IF
+                IF map(xcc) = 8 THEN
+                        COLOR 15, 1: PRINT " "; SPC(0);
+                END IF
 IF xcc = thescreen THEN
 
 IF POS(0) = 1 THEN
@@ -1024,18 +1036,28 @@ GOTO loadmap
 
 
 hardhs:
-IF x = 1 AND direction$ = "L" THEN
-        ghs = 5: thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
-END IF
-IF x = 79 AND direction$ = "R" THEN
-        ghs = 5: thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x: GOTO loadmap
-END IF
-IF y = 1 AND direction$ = "U" THEN
-        ghs = 5: rp = rp - 80: thescreen = thescreen - 80: y = 22: record = 21 * 79 + x: GOTO loadmap
-END IF
-IF y = 22 AND direction$ = "D" THEN
-        ghs = 5: thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x: GOTO loadmap
-END IF
+        IF x = 1 AND direction$ = "L" THEN
+                ghs = 5: thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x
+                newmaper = 1
+                GOTO cgs
+        END IF
+        IF x = 79 AND direction$ = "R" THEN
+                ghs = 5: thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x
+                newmaper = 1
+                GOTO cgs
+        END IF
+        IF y = 1 AND direction$ = "U" THEN
+                ghs = 5: rp = rp - 80: thescreen = thescreen - 80: y = 22: record = 21 * 79 + x
+                newmaper = 1
+                GOTO cgs
+        END IF
+        IF y = 22 AND direction$ = "D" THEN
+                ghs = 5: thescreen = thescreen + 80: rp = rp + 80: y = 1: record = x
+                newmaper = 1
+                GOTO cgs
+        END IF
+       
+       
         IF direction$ = "L" THEN
         way = 1: what = 1
         END IF
@@ -1058,7 +1080,6 @@ GOTO hard
 
 
 hard:
-dd = map2(rp)
 
 IF hh = 1 THEN GOTO l56
 IF direction$ = "L" THEN record = record - 1
@@ -1066,6 +1087,9 @@ IF direction$ = "R" THEN record = record + 1
 IF direction$ = "U" THEN record = record - 79
 IF direction$ = "D" THEN record = record + 79
 
+cgs:
+IF hh = 1 THEN GOTO loadmap
+dd = map2(rp)
 bk$ = SPACE$(2): lk = dd + 5:
 dfdf = record * 2 - 2: m = lk + dfdf
 GET #1, m, bk$
@@ -1080,6 +1104,29 @@ IF bg > 7 THEN
 
 IF hard = 1 THEN
         hard = 0
+        IF newmaper = 1 THEN
+                newmaper = 0
+        IF direction$ = "L" THEN
+                ghs = 0: thescreen = thescreen + 1: rp = rp + 1: x = 1: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x
+        END IF
+        IF direction$ = "R" THEN
+                ghs = 0: thescreen = thescreen - 1: rp = rp - 1: x = 79: kkkk = y - 1: kkk = kkkk * 79: record = kkk + x
+        END IF
+        IF direction$ = "U" THEN
+                ghs = 0: rp = rp + 80: thescreen = thescreen + 80: y = 1: record = 21 * 79 + x
+        END IF
+        IF direction$ = "D" THEN
+                ghs = 0: thescreen = thescreen - 80: rp = rp - 80: y = 22: record = x
+        END IF
+                LOCATE 23, 3: COLOR 15, 1: PRINT STRING$(75, " "); SPC(0);
+                writer "`CSomething blocks you... choose another way."
+                towait1 = FIX(TIMER) + 4
+'printwrite = 1
+doposx2 = doposx
+ggb = 5
+                GOTO doer1
+        END IF
+       
         IF direction$ = "L" THEN record = record + 1
         IF direction$ = "R" THEN record = record - 1
         IF direction$ = "U" THEN record = record + 79
@@ -1089,6 +1136,11 @@ IF hard = 1 THEN
 END IF
 
 IF hard = 0 THEN
+IF newmaper = 1 THEN
+        newmaper = 0
+        GOTO loadmap
+        END IF
+       
         hard = 0
         IF direction$ = "L" THEN record = record + 1
         IF direction$ = "R" THEN record = record - 1
@@ -1398,9 +1450,9 @@ IF dfdf$ = "#DONEMOVE" THEN GOTO donemove
 'olddfdf$ = dfdf$
 'returnsemicolon:
 'IF INSTR(dfdf$, ";") <> 0 THEN
-' 
+'
 '        semicolon = 1
-' 
+'
 '        END IF
 'IF INSTR(dfdf$, ";") = 0 AND semicolon = 1 THEN
 '        semicolon = 0
@@ -1675,17 +1727,17 @@ END IF
 
 getout6:
 CLOSE #36, #53
-IF waypoint = 1 THEN x = x + 1
-IF waypoint = 2 THEN x = x - 1
-IF waypoint = 3 THEN y = y + 1
-IF waypoint = 4 THEN y = y - 1
+'IF waypoint = 1 THEN x = x + 1
+'IF waypoint = 2 THEN x = x - 1
+'IF waypoint = 3 THEN y = y + 1
+'IF waypoint = 4 THEN y = y - 1
 kkkk = y - 1
 kkk = kkkk * 79
 record = kkk + x
 GOTO getout
 END IF
 
-
+                      
 IF iner$ = "#NOLINE" THEN
 COLOR 7, 0
 IF gbbn = 5 THEN GOTO nothing3
@@ -2772,6 +2824,7 @@ settings$(nus) = "--END--": nus = nus + 1
 
 
 IF begingame = 1 THEN GOTO begingame
+IF settingsettings = 10 THEN GOTO returner10
 IF settingsettings = 2 THEN GOTO returner2
 IF settingsettings = 1 THEN GOTO returner
 IF hyes = 5 THEN GOTO setnow
